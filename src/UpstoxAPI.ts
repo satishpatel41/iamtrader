@@ -61,57 +61,10 @@ function getAcceToken(code:any)
 
 function start() {
     getProfile();
-
-   /*  upstox.getMasterContract({ exchange: "nse_eq",format:"json" })
-    .then(function (response:any) {
-
-        var j = schedule.scheduleJob('* 17 * * 5', function(){
-            log('Weekly data update');
-            loadAllSymbolData(response.data,'1WEEK','1-1-2005');
-            });
-
-        var j = schedule.scheduleJob('0 8 1 * *', function(){
-            log('Montly data update');
-            loadAllSymbolData(response.data,'1MONTH','1-1-2005');
-        });
-        
-        var j = schedule.scheduleJob('0 18 * * *', function(){
-            log('Daily data update');
-            loadAllSymbolData(response.data,'1DAY','1-1-2005');
-        });
-
-        var newDate = new Date();
-        newDate.setDate(newDate.getDate() - 200*24/60);//240  */   
-        
-    //     var j = schedule.scheduleJob('*/60 * * * *', function(){
-    //         log('NSE 60MINUTE data update');
-    //         loadAllSymbolData(response.data,'60MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
-    //     });
-
-    //     var j = schedule.scheduleJob('*/30 * * * *', function(){
-    //         log('NSE 30MINUTE data update');
-    //         loadAllSymbolData(response.data,'30MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
-    //     });
-
-    //     var newDate = new Date();
-    //     newDate.setDate(newDate.getDate() - 180);     
-    //     var j = schedule.scheduleJob('*/10 * * * *', function(){
-    //         log('NSE 10MINUTE data update');
-    //         loadAllSymbolData(response.data,'10MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
-    //     });
-
-    //     fs.writeFile("data/index/nse_eq.txt", JSON.stringify(response), function (err:any) {
-    //     if (err) throw err;
-    //         log('nse_eq File is created successfully.');
-    //     }); 
-    // })
-    // .catch(function (err:any) {
-    //     log( "******** " +  err);
-    //}); 
-        
+       
     var bankNiftyCall:any;
           
-    upstox.getMasterContract({exchange: "nse_fo"})
+    upstox.getMasterContract({exchange: "nse_fo1"})
     .then(function(response:any) {
         //console.log("NSE FO " + JSON.stringify(response));
         
@@ -197,38 +150,13 @@ function start() {
         console.log("nse fo error " + JSON.stringify(err));
     });
 
-    function loadAllSymbolData(response:any,interval='1day',start_date='1-1-2010'){ 
-        // response.map(async (obj) => {
-            
-        for (let obj of response) {  
-            console.log("Load All > "  +obj.symbol +" > "+JSON.stringify(obj));
-
-            upstox.getOHLC({"exchange": obj.exchange,
-                "symbol": obj.symbol,
-                "start_date": start_date,
-                "format" : "json",
-                "interval" : interval
-            })
-            .then(function (response:any) {
-                fs.writeFile("data/stock/"+interval+"/"+obj.symbol+".txt", JSON.stringify(response), function (err:any) {
-                    if (err) throw err;
-                    log(obj.exchange +" >> "+obj.symbol+" >> "+interval + ' File is created successfully.');
-                }); 
-                //addIndicators(response);
-            })
-            .catch(function(error:any){
-                log("error  : : > " +  JSON.stringify(error));
-            });
-        } 
-    }
-
     // Get Master Contract
     upstox.getMasterContract({ exchange: "NSE_INDEX",format:"json"})
     .then(function (response:any) {
         fs.writeFile("data/index/index.txt", JSON.stringify(response), function (err:any) {
             if (err) throw err;
                 log('index File is created successfully.');
-            }); 
+        }); 
     })
     .catch(function (err:any) {
         log(err);
@@ -307,8 +235,7 @@ function getListOfAllSymbol()
     .then(function (response:any) {
         var list = response.data;
         nseSymbolList = list.map(x => x.symbol);
-        //log("nseSymbolList \n\n" + JSON.stringify(nseSymbolList));
-        //return nseSymbolList;
+        getAllData();
      })
      .catch(function (err:any) {
          log( "Error getListOfAllSymbol > " +  err);
@@ -363,10 +290,103 @@ function getProfile()
 
 
 function loadSymbol(symbol,exchange,interval='1day',start_date='1-1-2010'){ 
+    log("loadSymbol > " + symbol + " > "+ interval +" > "+exchange);
     return upstox.getOHLC({"exchange": exchange,
         "symbol": symbol,
         "start_date": start_date,
         "format" : "json",
         "interval" : interval
     })
+}
+
+function getAllData(){
+   
+    upstox.getMasterContract({ exchange: "nse_eq",format:"json" })
+    .then(function (response:any) {
+
+        var weekly = schedule.scheduleJob('* 17 * * 5', function(){
+            log('Weekly data update');
+            loadAllSymbolData(response.data,'1WEEK','1-1-2015');
+            });
+
+        var Montly = schedule.scheduleJob('0 8 1 * *', function(){
+            log('Montly data update');
+            loadAllSymbolData(response.data,'1MONTH','1-1-2015');
+        });
+        
+        var daily = schedule.scheduleJob('0 18 * * *', function(){
+            log('Daily data update');
+            loadAllSymbolData(response.data,'1DAY','1-1-2015');
+        });
+
+        var newDate = new Date();
+        newDate.setDate(newDate.getDate() - 10);//240    
+        
+        var hourly = schedule.scheduleJob('*/60 * * * *', function(){
+            log('NSE 60MINUTE data update');
+            loadAllSymbolData(response.data,'60MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
+        });
+
+        var min_30 = schedule.scheduleJob('*/30 * * * *', function(){
+            log('NSE 30MINUTE data update');
+            loadAllSymbolData(response.data,'30MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
+        });
+
+        var newDate = new Date();
+        newDate.setDate(newDate.getDate() - 2);     
+        var min_10 = schedule.scheduleJob('*/10 * * * *', function(){
+            log('NSE 10MINUTE data update');
+            loadAllSymbolData(response.data,'10MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
+        });
+
+        var newDate = new Date();
+        newDate.setDate(newDate.getDate() - 1);     
+        var min_50 = schedule.scheduleJob('*/5 * * * *', function(){
+            log('NSE 10MINUTE data update');
+            loadAllSymbolData(response.data,'10MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
+        });
+    })
+    .catch(function (err:any) {
+        log( "getAllData ******** " +  err);
+    }); 
+}
+
+
+var allSymbolWithIndicator = [];
+function loadAllSymbolData(response:any,interval='1day',start_date='1-1-2010'){ 
+    allSymbolWithIndicator = [];
+
+    response.map((obj) => {
+        log("\n loadAllSymbolData ********* > " + obj.symbol + " >> "+ interval);
+        upstox.getOHLC({"exchange": obj.exchange,
+            "symbol": obj.symbol,
+            "start_date": start_date,
+            "format" : "json",
+            "interval" : interval
+        })
+        .then(function (response:any) {
+            var stockData =response.data;
+                stockData.map(row => {
+                    row.timestamp = new Date(row.timestamp);
+                    row.rsi = rsi.nextValue(Number(row.close));
+                    row.sma = sma.nextValue(Number(row.close));
+                    row.bb = bb.nextValue(Number(row.close)); 
+                    return row;
+                });
+                stockData.reverse();
+                var obj = {"symbol":obj.symbol,
+                      "close":stockData[0].close,
+                      "volume":stockData[0].volume,
+                      "rsi":stockData[0].rsi,
+                      "timestamp":stockData[0].timestamp,
+                      "sma":stockData[0].sma, 
+                      "bb":stockData[0].bb
+                };    
+                log("loadAllSymbolData  : : > " + obj.symbol + " >> "+ JSON.stringify(obj) + " >> "+ interval);
+                allSymbolWithIndicator.push(obj)
+        })
+        .catch(function(error:any){
+            log("error  : : > " +  JSON.stringify(error));
+        });
+    });
 }

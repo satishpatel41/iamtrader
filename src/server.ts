@@ -81,15 +81,7 @@ app.get('/index', function (req:any, res:any) {
 });
 
 app.get('/scan', function (req:any, res:any) {
-
-    /* document.getElementById("symbolSearch").addEventListener("change", myFunction);
-
-    function myFunction() {
-       alert("hello");
-    }
- */
     var q = url.parse(req.url, true).query;
-   // new Awesomplete($("#symbolSearch"),{ list: nseSymbolList });
     if(q.symbolSearch){        
         nseSymbolList.map(async (row) => {
             var symbolPattern = new RegExp(q.symbolSearch, 'gi');
@@ -104,8 +96,30 @@ app.get('/scan', function (req:any, res:any) {
 
 app.get('/loadSymbol/:symbol/:interval', function (req:any, res:any) { 
     var symbol = req.params.symbol;  
-    var interval = req.params.interval;  
-   
+    var interval = req.params.interval; 
+    initiateIndicator();
+    loadSymbol(symbol,'nse_eq',interval,'9-9-2018').then(function (response:any) {
+        res.setHeader('Content-Type', 'application/json');
+        var stockData =response.data;
+        stockData.map(row => {
+            row.timestamp = new Date(row.timestamp);
+            row.rsi = rsi.nextValue(Number(row.close));
+            row.sma = sma.nextValue(Number(row.close));
+            row.bb = bb.nextValue(Number(row.close)); 
+
+            return row;
+        });
+        stockData.reverse();
+        res.send(JSON.stringify(stockData));
+        res.end();
+    })
+    .catch(function(error:any){
+       log("loadSymbol/:symbol error > " +  JSON.stringify(error));
+    });
+});
+
+function initiateIndicator()
+{
     var inputRSI:Object = {
         values : [],
         period : 14
@@ -123,45 +137,13 @@ app.get('/loadSymbol/:symbol/:interval', function (req:any, res:any) {
         stdDev : 2 
     }
     bb = new technicalindicators.BollingerBands(inputBB);
+}
 
-    loadSymbol(symbol,'nse_eq',interval,'9-9-2018').then(function (response:any) {
-        res.setHeader('Content-Type', 'application/json');
-        var stockData =response.data;
-       stockData.map(row => {
-            row.timestamp = new Date(row.timestamp);
-            row.rsi = rsi.nextValue(Number(row.close));
-            row.sma = sma.nextValue(Number(row.close));
-            row.bb = bb.nextValue(Number(row.close)); 
-
-            return row;
-        });
-        stockData.reverse();
-        res.send(JSON.stringify(stockData));
-        res.end();
-    })
-    .catch(function(error:any){
-       log("loadSymbol/:symbol error > " +  JSON.stringify(error));
-    });
-});
-
-
-app.post('/loadAllSymbolData', function (req:any, res:any) { 
-    nseSymbolList.map(async (obj) => {
-            upstox.getOHLC({"exchange": "nse_eq",
-                "symbol": obj.symbol,
-                "start_date": start_date,
-                "format" : "json",
-                "interval" : interval
-            })
-            .then(function (response:any) {
-               
-                //addIndicators(response);
-            })
-            .catch(function(error:any){
-                log("error  : : > " +  JSON.stringify(error));
-            });
-        } 
-    });
+app.get('/loadAllSymbolData/:interval', function (req:any, res:any) { 
+    var interval = req.params.interval;  
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(allSymbolWithIndicator));
+    res.end();
 });
  
 app.get('/getListOfAllSymbol', function (req:any, res:any) {   
@@ -186,18 +168,11 @@ app.post('/scan', function (req:any, res:any) {
 
 });
 
-
 app.get('/admin', function (req:any, res:any) {
-   
-    // Get the login url for generating code
-   // var loginUrl = getLogin();
-
    var loginUrl = upstox.getLoginUri(redirect_uri);
     log("**************** loginUri ***********\n" + loginUrl);
-
     res.status(200).header('Content-type', 'text/html');
     code = req.params.code;
-      
     res.status(302).setHeader('Location', loginUrl);
     res.end();
 });
