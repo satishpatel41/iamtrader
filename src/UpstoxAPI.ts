@@ -7,7 +7,6 @@
 
  */
 var $ = require("jquery");
-var Awesomplete = require("Awesomplete");
 var Upstox = require("upstox");
 var api = "cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw";
 var upstox = new Upstox(api);
