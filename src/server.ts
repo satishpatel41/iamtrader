@@ -6,8 +6,9 @@ var url = require('url');
 var Upstox = require("upstox");
 var api:string = "cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw";
 var upstox = new Upstox(api);
-var port = 8080;
-var redirect_uri = "http://127.0.0.1:"+port;
+
+const PORT = process.env.PORT || 8080;
+var redirect_uri = "http://127.0.0.1:"+PORT;
 
 var app = express();
 app.use(express.static('public'));
@@ -183,7 +184,7 @@ app.use(function(req:any, res:any, next:any) {
 });
 
 // start the server in the port 3000 !
-app.listen(port, function () {
-    log('App listening on port '+port);
+app.listen(PORT, function () {
+    log('App listening on port '+PORT);
 });
 
