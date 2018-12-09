@@ -43,4 +43,7 @@ gulp.task('clean', function () {
 
 gulp.task('default',gulpSequence('script','html','server'));
 
+
+gulp.task('release',gulpSequence('clean','script','html'));
+
  
