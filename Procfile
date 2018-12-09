@@ -1,1 +1,1 @@
-web: node --debug=8080 dist/app.min.js
+web: node dist/app.min.js

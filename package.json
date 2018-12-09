@@ -1,6 +1,6 @@
 {
   "name": "iamtrader",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "dependencies": {
@@ -38,7 +38,7 @@
   },
   "scripts": {
     "start": "node app",
-    "postinstall": "gulp default"
+    "postinstall": "gulp release"
   },
   "repository": {
     "type": "git",
