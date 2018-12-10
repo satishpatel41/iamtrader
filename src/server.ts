@@ -45,6 +45,9 @@ app.get('/', function (req:any, res:any) {
 
         res.sendFile("index.html", {"root": __dirname});
     }
+    else{
+        res.sendFile("index.html", {"root": __dirname});
+    }
 });
 
 app.get('/welcome', function (req:any, res:any) {

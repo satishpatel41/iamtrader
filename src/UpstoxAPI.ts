@@ -1,11 +1,4 @@
-/* class UpstoxAPI {
-    fullName: string;
-    constructor(public firstName: string, public middleInitial: string, public lastName: string) {
-        this.fullName = firstName + " " + middleInitial + " " + lastName;
-    }
-}
 
- */
 var $ = require("jquery");
 var Upstox = require("upstox");
 var api = "cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw";
@@ -19,20 +12,12 @@ var __dirname = "views"
 var exchanges =  [ 'MCX_FO', 'BSE_EQ', 'NSE_EQ', 'NSE_FO', 'NCD_FO'];
 var login_code = "ce728b73424e719680aa66a51ba4eb469f9875f2";
 var api_secret = "xs5ibb0pk0";
-var port = 8080;
-var redirect_uri = "http://127.0.0.1:"+port;
+
 var client_id="";
     
 var watchList = ['banknifty','hindalco','ICICIBANK','sbin','idea','lt','HAVELLS'];
 
-var loginUrl = upstox.getLoginUri(redirect_uri);
 
-function getLogin()
-{
-    var loginUrl = upstox.getLoginUri(redirect_uri);
-    console.log("**************** loginUri ***********\n" + loginUrl);
-    return loginUrl;
-}
 
 function getAcceToken(code:any)
 {

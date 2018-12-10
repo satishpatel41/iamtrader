@@ -1,0 +1,17 @@
+
+Mon Dec 10 2018 20:18:25 GMT+0200 (South Africa Standard Time) App listening on port 8080
+Mon Dec 10 2018 20:18:25 GMT+0200 (South Africa Standard Time) **************** loginUri ***********
+https://api.upstox.com/index/dialog/authorize?apiKey=cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw&redirect_uri=https://robo-trader.herokuapp.com/&response_type=code
+Mon Dec 10 2018 20:18:25 GMT+0200 (South Africa Standard Time) **************** loginUri ***********
+https://api.upstox.com/index/dialog/authorize?apiKey=cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw&redirect_uri=https://robo-trader.herokuapp.com/&response_type=code
+Mon Dec 10 2018 20:18:25 GMT+0200 (South Africa Standard Time) **************** loginUri ***********
+https://api.upstox.com/index/dialog/authorize?apiKey=cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw&redirect_uri=https://robo-trader.herokuapp.com/&response_type=code
+Mon Dec 10 2018 20:20:35 GMT+0200 (South Africa Standard Time) App listening on port 8080
+Mon Dec 10 2018 20:24:16 GMT+0200 (South Africa Standard Time) App listening on port 8080
+Mon Dec 10 2018 20:26:29 GMT+0200 (South Africa Standard Time) App listening on port 8080
+Mon Dec 10 2018 20:26:29 GMT+0200 (South Africa Standard Time) **************** loginUri ***********
+https://api.upstox.com/index/dialog/authorize?apiKey=cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw&redirect_uri=https://robo-trader.herokuapp.com/&response_type=code
+Mon Dec 10 2018 20:26:29 GMT+0200 (South Africa Standard Time) loadSymbol > sbin > 1day > nse_eq
+Mon Dec 10 2018 20:26:29 GMT+0200 (South Africa Standard Time) loadSymbol/:symbol error > {"message":"Missing required request parameters: [Authorization]"}
+Mon Dec 10 2018 20:26:29 GMT+0200 (South Africa Standard Time) **************** loginUri ***********
+https://api.upstox.com/index/dialog/authorize?apiKey=cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw&redirect_uri=https://robo-trader.herokuapp.com/&response_type=code
