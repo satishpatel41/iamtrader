@@ -57,10 +57,22 @@ $(document).ready( function () {
             success: function(dataSet){
                   var table = new Tabulator("#example-table", {
                     data:dataSet,
+                    data:dataSet,
+                    layout:"fitColumns",      //fit columns to width of table
+                    responsiveLayout:"hide",  //hide columns that dont fit on the table
+                    tooltips:true,            //show tool tips on cells
+                    history:true,             //allow undo and redo actions on the table
+                    pagination:"local",       //paginate the data
+                    paginationSize:20,         //allow 7 rows per page of data
+                    movableColumns:true,      //allow column order to be changed
+                    resizableRows:true,       //allow row order to be changed
+                    initialSort:[             //set the initial sort order of the data
+                      {column:"Date", dir:"asc"},
+                    ], 
                     columns:[
-                        {title:"timestamp", field:"timestamp"},
-                        {title:"close", field:"close"},
-                        {title:"volume", field:"volume"},
+                        {title:"Date", field:"timestamp"},
+                        {title:"Close", field:"close"},
+                        {title:"Volume", field:"volume"},
                         {title:"RSI", field:"rsi"},
                         {title:"SMA", field:"sma"}
                     ]
@@ -74,23 +86,32 @@ $(document).ready( function () {
 </head>
 <body>
 
-<nav class="navbar navbar-inverse navbar-fixed-top">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="#">All Stocks</a>
-    </div>
-    <ul class="nav navbar-nav">
-      <li class="active"><a href="#">Home</a></li>
-      <li><a href="#login">Login</a></li>
-      <li><a href="#signup">SignUp</a></li>
-      <li><a href="#contactus">Contact Us</a></li>
-    </ul>
-  </div>
-</nav>
-  
-<div class="container">
-  <div class="row">
 
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>                        
+              </button>
+            <a class="navbar-brand" href="#">Scanner</a>
+          </div>
+          <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="#">Home</a></li>
+              <li><a href="#login">Login</a></li>
+              <li><a href="#signup">SignUp</a></li>
+              <li><a href="#contactus">Contact Us</a></li>
+            </ul>
+          </div> 
+        </div>
+      </nav>
+        
+      <div class="container">
+        <div class="row"></div>
+        <div class="row"></div>
+        <div class="row"></div>
       <div class="col-sm">
           <select  id="symbolDropdown" type="button" class="btn-group dropup"></select>
         </div>

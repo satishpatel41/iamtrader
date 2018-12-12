@@ -41,13 +41,13 @@ $(document).ready( function () {
                     movableColumns:true,      //allow column order to be changed
                     resizableRows:true,       //allow row order to be changed
                     initialSort:[             //set the initial sort order of the data
-                      {column:"timestamp", dir:"asc"},
+                      {column:"Date", dir:"asc"},
                     ],  
                     columns:[
-                        {title:"timestamp", field:"timestamp"},
-                        {title:"symbol", field:"symbol"},
-                        {title:"close", field:"close"},
-                        {title:"volume", field:"volume"},
+                        {title:"Date", field:"timestamp"},
+                        {title:"Symbol", field:"symbol"},
+                        {title:"Close", field:"close"},
+                        {title:"Volume", field:"volume"},
                         {title:"RSI", field:"rsi"},
                         {title:"SMA", field:"sma"}
                     ]
@@ -64,21 +64,29 @@ $(document).ready( function () {
 <nav class="navbar navbar-inverse navbar-fixed-top">
   <div class="container-fluid">
     <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>                        
+        </button>
       <a class="navbar-brand" href="#">Scanner</a>
     </div>
-    <ul class="nav navbar-nav">
-      <li class="active"><a href="#">Home</a></li>
-      <li><a href="#login">Login</a></li>
-      <li><a href="#signup">SignUp</a></li>
-      <li><a href="#contactus">Contact Us</a></li>
-    </ul>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Home</a></li>
+        <li><a href="#login">Login</a></li>
+        <li><a href="#signup">SignUp</a></li>
+        <li><a href="#contactus">Contact Us</a></li>
+      </ul>
+    </div> 
   </div>
 </nav>
   
 <div class="container">
-  <div class="row">
-
-        <div class="col-sm">
+  <div class="row"></div>
+  <div class="row"></div>
+  
+      <div class="col-sm">
             <select id="intervalDropDown" class="btn-group dropup">
                 <option value="1MINUTE">1MINUTE</option>
                 <option value="5MINUTE">5MINUTE</option>
