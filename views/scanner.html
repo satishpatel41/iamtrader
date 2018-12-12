@@ -8,6 +8,8 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <link href="https://unpkg.com/tabulator-tables@4.1.3/dist/css/tabulator.min.css" rel="stylesheet">
+<link href="https://unpkg.com/tabulator-tables@4.1.3//dist/css/semantic-ui/tabulator_semantic-ui.min.css" rel="stylesheet">
+
 <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.1.3/dist/js/tabulator.min.js"></script>
 
 <script type="text/javascript">
@@ -32,6 +34,8 @@ $(document).ready( function () {
             success: function(dataSet){
                   var table = new Tabulator("#example-table", {
                     data:dataSet,
+                    height:"90%",
+                    width:"96%",
                     layout:"fitColumns",      //fit columns to width of table
                     responsiveLayout:"hide",  //hide columns that dont fit on the table
                     tooltips:true,            //show tool tips on cells
@@ -85,27 +89,27 @@ $(document).ready( function () {
 <div class="container">
   <div class="row"></div>
   <div class="row"></div>
-  
-      <div class="col-sm">
-            <select id="intervalDropDown" class="btn-group dropup">
-                <option value="1MINUTE">1MINUTE</option>
-                <option value="5MINUTE">5MINUTE</option>
-                <option value="10MINUTE">10MINUTE</option>
-                <option value="30MINUTE">30MINUTE</option>
-                <option value="60MINUTE">60MINUTE</option>
-                <option value="1DAY">1DAY</option>
-                <option value="1WEEK">1WEEK</option>
-                <option value="1MONTH">1MONTH</option>
-              </select>
-        </div>
-        <div class="col-sm">
-          
-        </div>
-  </div>
+  <br></br>
   <br></br>
   <div class="row">
-      <div id="example-table"></div>
-  </div>  
+      <div class="col-sm">
+        <label>interval</label>
+        <select id="intervalDropDown" class="btn-group dropup">
+            <option value="5MINUTE">5MINUTE</option>
+            <option value="10MINUTE">10MINUTE</option>
+            <option value="30MINUTE">30MINUTE</option>
+            <option value="60MINUTE">60MINUTE</option>
+            <option value="1DAY">1DAY</option>
+            <option value="1WEEK">1WEEK</option>
+            <option value="1MONTH">1MONTH</option>
+          </select>
+      </div>     
+  </div>
+  <div class="row">
+    <div class="col-sm">
+        <div id="example-table"></div>
+    </div> 
+  </div>    
 </div>
 </body>
 </html>
