@@ -74,7 +74,7 @@ function start() {
         var dataFrame = dataForge.fromJSON(transformedData)
         .where(row => {
      
-            console.log('\n row > ' + JSON.stringify(row));
+           // console.log('\n row > ' + JSON.stringify(row));
             row = JSON.stringify(row);
            // console.log('\n row > ' + JSON.stringify(row));
            // console.log('\n symbol > ' + row.symbol);
@@ -98,37 +98,37 @@ function start() {
             console.log('nse_fo File is created successfully.');
         }); 
        
-        var j = schedule.scheduleJob('0 18 * * *', function(){
-            log('Daily data update');
-            loadAllSymbolData(transformedData,'1DAY','1-1-2005');
-        });
+        // var j = schedule.scheduleJob('0 18 * * *', function(){
+        //     log('Daily data update');
+        //     loadAllSymbolData(transformedData,'1DAY','1-1-2005');
+        // });
 
-        var newDate = new Date();
-        newDate.setDate(newDate.getDate() - 10);//240     
+        // var newDate = new Date();
+        // newDate.setDate(newDate.getDate() - 10);//240     
         
-        var j = schedule.scheduleJob('*/60 * * * *', function(){
-            log('NSE 60MINUTE data update');
-            loadAllSymbolData(transformedData,'60MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
-        });
+        // var j = schedule.scheduleJob('*/60 * * * *', function(){
+        //     log('NSE 60MINUTE data update');
+        //     loadAllSymbolData(transformedData,'60MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
+        // });
 
-        var j = schedule.scheduleJob('*/30 * * * *', function(){
-            log('NSE 30MINUTE data update');
-            loadAllSymbolData(transformedData,'30MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
-        });
+        // var j = schedule.scheduleJob('*/30 * * * *', function(){
+        //     log('NSE 30MINUTE data update');
+        //     loadAllSymbolData(transformedData,'30MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
+        // });
 
-        var newDate = new Date();
-        newDate.setDate(newDate.getDate() - 5);     
-        var j = schedule.scheduleJob('*/10 * * * *', function(){
-            log('NSE 10MINUTE data update');
-            loadAllSymbolData(transformedData,'10MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
-        });
+        // var newDate = new Date();
+        // newDate.setDate(newDate.getDate() - 5);     
+        // var j = schedule.scheduleJob('*/10 * * * *', function(){
+        //     log('NSE 10MINUTE data update');
+        //     loadAllSymbolData(transformedData,'10MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
+        // });
 
-        var newDate = new Date();
-        newDate.setDate(newDate.getDate() - 5);     
-        var j = schedule.scheduleJob('*/5 * * * *', function(){
-            log('NSE 10MINUTE data update');
-            loadAllSymbolData(transformedData,'5MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
-        });
+        // var newDate = new Date();
+        // newDate.setDate(newDate.getDate() - 5);     
+        // var j = schedule.scheduleJob('*/5 * * * *', function(){
+        //     log('NSE 10MINUTE data update');
+        //     loadAllSymbolData(transformedData,'5MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
+        // });
     })
     .catch(function(err:any) {
         console.log("nse fo error " + JSON.stringify(err));
@@ -288,47 +288,50 @@ function getAllData(){
     upstox.getMasterContract({ exchange: "nse_eq",format:"json" })
     .then(function (response:any) {
 
-        var weekly = schedule.scheduleJob('* 17 * * 5', function(){
-            log('Weekly data update');
-            loadAllSymbolData(response.data,'1WEEK','1-1-2015');
-            });
+        // var weekly = schedule.scheduleJob('* 17 * * 5', function(){
+        //     log('Weekly data update');
+        //     loadAllSymbolData(response.data,'1WEEK','1-1-2015');
+        //     });
 
-        var Montly = schedule.scheduleJob('0 8 1 * *', function(){
-            log('Montly data update');
-            loadAllSymbolData(response.data,'1MONTH','1-1-2015');
-        });
+        // var Montly = schedule.scheduleJob('0 8 1 * *', function(){
+        //     log('Montly data update');
+        //     loadAllSymbolData(response.data,'1MONTH','1-1-2015');
+        // });
         
-        var daily = schedule.scheduleJob('0 18 * * *', function(){
-            log('Daily data update');
-            loadAllSymbolData(response.data,'1DAY','1-1-2015');
-        });
+        // var daily = schedule.scheduleJob('0 18 * * *', function(){
+        //     log('Daily data update');
+        //     loadAllSymbolData(response.data,'1DAY','1-1-2015');
+        // });
 
-        var newDate = new Date();
-        newDate.setDate(newDate.getDate() - 10);//240    
+        // var newDate = new Date();
+        // newDate.setDate(newDate.getDate() - 10);//240    
         
-        var hourly = schedule.scheduleJob('*/60 * * * *', function(){
-            log('NSE 60MINUTE data update');
-            loadAllSymbolData(response.data,'60MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
-        });
+        // var hourly = schedule.scheduleJob('*/60 * * * *', function(){
+        //     log('NSE 60MINUTE data update');
+        //     loadAllSymbolData(response.data,'60MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
+        // });
 
-        var min_30 = schedule.scheduleJob('*/30 * * * *', function(){
-            log('NSE 30MINUTE data update');
-            loadAllSymbolData(response.data,'30MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
-        });
+        // var min_30 = schedule.scheduleJob('*/30 * * * *', function(){
+        //     log('NSE 30MINUTE data update');
+        //     loadAllSymbolData(response.data,'30MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
+        // });
 
-        var newDate = new Date();
-        newDate.setDate(newDate.getDate() - 2);     
-        var min_10 = schedule.scheduleJob('*/10 * * * *', function(){
-            log('NSE 10MINUTE data update');
-            loadAllSymbolData(response.data,'10MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
-        });
+        // var newDate = new Date();
+        // newDate.setDate(newDate.getDate() - 2);     
+        // var min_10 = schedule.scheduleJob('*/10 * * * *', function(){
+        //     log('NSE 10MINUTE data update');
+        //     loadAllSymbolData(response.data,'10MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
+        // });
 
-        var newDate = new Date();
-        newDate.setDate(newDate.getDate() - 1);     
-        var min_50 = schedule.scheduleJob('*/5 * * * *', function(){
-            log('NSE 10MINUTE data update');
-            loadAllSymbolData(response.data,'10MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
-        });
+        // var newDate = new Date();
+        // newDate.setDate(newDate.getDate() - 1);     
+        // var min_50 = schedule.scheduleJob('*/5 * * * *', function(){
+        //     log('NSE 10MINUTE data update');
+        //     loadAllSymbolData(response.data,'10MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
+        // });
+
+
+        //loadAllSymbolData(nseSymbolList,'1DAY','10-10-2018');
     })
     .catch(function (err:any) {
         log( "getAllData ******** " +  err);
@@ -336,41 +339,41 @@ function getAllData(){
 }
 
 
-var allSymbolWithIndicator = [];
-function loadAllSymbolData(response:any,interval='1day',start_date='1-1-2010'){ 
-    allSymbolWithIndicator = [];
-
-    response.map((obj) => {
-        log("\n loadAllSymbolData ********* > " + obj.symbol + " >> "+ interval);
-        upstox.getOHLC({"exchange": obj.exchange,
-            "symbol": obj.symbol,
-            "start_date": start_date,
-            "format" : "json",
-            "interval" : interval
-        })
-        .then(function (response:any) {
+//var allSymbolWithIndicator = [];
+async function loadAllSymbolData(response:any,interval='1day',start_date='11-11-2018'){ 
+    var allSymbolWithIndicator = [];
+    var promiseArr = response.map(async symbol => {
+        var data = {};
+        await loadSymbol(symbol,'nse_eq',interval,'9-9-2018').then(function (response:any) {
             var stockData =response.data;
-                stockData.map(row => {
-                    row.timestamp = new Date(row.timestamp);
-                    row.rsi = rsi.nextValue(Number(row.close));
-                    row.sma = sma.nextValue(Number(row.close));
-                    row.bb = bb.nextValue(Number(row.close)); 
-                    return row;
-                });
-                stockData.reverse();
-                var obj = {"symbol":obj.symbol,
-                      "close":stockData[0].close,
-                      "volume":stockData[0].volume,
-                      "rsi":stockData[0].rsi,
-                      "timestamp":stockData[0].timestamp,
-                      "sma":stockData[0].sma, 
-                      "bb":stockData[0].bb
-                };    
-                log("loadAllSymbolData  : : > " + obj.symbol + " >> "+ JSON.stringify(obj) + " >> "+ interval);
-                allSymbolWithIndicator.push(obj)
+            stockData.map(row => {
+                row.timestamp = new Date(row.timestamp);
+                row.rsi = rsi.nextValue(Number(row.close));
+                row.sma = sma.nextValue(Number(row.close));
+                row.bb = bb.nextValue(Number(row.close)); 
+                return row;
+            });
+            stockData.reverse();
+            data = {"symbol":symbol,
+                    "close":stockData[0].close,
+                    "volume":stockData[0].volume,
+                    "rsi":stockData[0].rsi,
+                    "timestamp":stockData[0].timestamp,
+                    "sma":stockData[0].sma, 
+                    "bb":stockData[0].bb
+            }; 
+            //allSymbolWithIndicator.push(data);
         })
         .catch(function(error:any){
-            log("error  : : > " +  JSON.stringify(error));
+            log("loadAllSymbolData error > " +  JSON.stringify(error));
         });
+        return data;
+    });
+
+    return Promise.all(promiseArr).then(function(res) {
+        var arr = [];
+        arr = res;
+        arr = arr.filter(Boolean);
+        return arr;
     });
 }

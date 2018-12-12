@@ -11,6 +11,10 @@ gulp.task("script", function () {
     var tsResult = gulp.src("src/*.ts")
     .pipe(ts({
             noImplicitAny: false,
+            lib: ["es2015","dom"],
+            target: "es5",
+            noImplicitAny:false,
+            sourceMap:false,
             out: "app.min.js"
     }))
     .pipe(uglify())

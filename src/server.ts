@@ -11,7 +11,7 @@ var upstox = new Upstox(api);
 const PORT = process.env.PORT || 8080;
 var redirect_uri = "http://127.0.0.1:"+PORT;
 
-if(process.env.NODE_ENV="production")
+if(process.env.NODE_ENV=="production")
 {
     api = "cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw";
     redirect_uri = "https://robo-trader.herokuapp.com/";
@@ -92,7 +92,7 @@ app.get('/index', function (req:any, res:any) {
 });
 
 app.get('/scan', function (req:any, res:any) {
-    var q = url.parse(req.url, true).query;
+    /* var q = url.parse(req.url, true).query;
     if(q.symbolSearch){        
         nseSymbolList.map(async (row) => {
             var symbolPattern = new RegExp(q.symbolSearch, 'gi');
@@ -102,7 +102,8 @@ app.get('/scan', function (req:any, res:any) {
         console.log("nseSymbolList " + JSON.stringify(nseSymbolList));
     }else{
         res.sendFile("index.html", {"root": __dirname});
-    }   
+    }    */
+    res.sendFile("scanner.html", {"root": __dirname});
 });
 
 app.get('/loadSymbol/:symbol/:interval', function (req:any, res:any) { 
@@ -152,9 +153,17 @@ function initiateIndicator()
 
 app.get('/loadAllSymbolData/:interval', function (req:any, res:any) { 
     var interval = req.params.interval;  
-    res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(allSymbolWithIndicator));
-    res.end();
+
+    nseSymbolList = nseSymbolList.slice(1, 200);
+
+    loadAllSymbolData(nseSymbolList,interval,'10-11-2018').then(function (response:any) {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(response));
+        res.end();
+    })
+    .catch(function(error:any){
+       log("loadAllSymbolData/ error > " +  JSON.stringify(error));
+    });
 });
  
 app.get('/getListOfAllSymbol', function (req:any, res:any) {   

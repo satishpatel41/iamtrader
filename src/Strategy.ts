@@ -294,12 +294,25 @@ function calculateIndicators(row:any)
 function log(message:any){
     today = date.getDate() +"-"+date.getMonth() +"-"+date.getFullYear();
     time = today +":"+date.getHours() +":"+date.getMinutes();
-    fs.appendFile("logs/log-"+today+".txt", "\n"+date +" "+message, function (err:any) {
-    if (err) throw err;
-        //console.log('logs created successfully.');
-    }); 
+    var path = "logs/log-"+today+".txt";
+    try {
+        if (fs.existsSync(path)) {
+            fs.appendFile(path, "\n"+date +" "+message, function (err:any) {
+            if (err) throw err;
+            }); 
+        }else {
+            fs.writeFile(path, "\n"+date +" "+message, function (err:any) {
+                if (err) throw err;
+            }); 
+        }
+    }    
+    catch(err) {
+        console.error(err);
+        fs.writeFile(path, "\n"+date +" "+message, function (err:any) {
+            if (err) throw err;
+        }); 
+    }    
 }
-
 
 function addIndicators(response:any,path:String){ 
   var stockData =response.data;

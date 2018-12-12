@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Scanner</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link href="https://unpkg.com/tabulator-tables@4.1.3/dist/css/tabulator.min.css" rel="stylesheet">
+<script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.1.3/dist/js/tabulator.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready( function () {
+
+        var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
+       
+        var interval = "1day";
+
+        var nseSymbols = [];
+
+        $( "#intervalDropDown" ).change(function() {
+          interval = $("#intervalDropDown").val();
+          loadSymbolData(interval);
+        });
+
+        loadAllSymbolData(interval);
+
+        function loadAllSymbolData(interval){
+          $.get({
+            url: server+'/loadAllSymbolData/'+interval,
+            success: function(dataSet){
+                  var table = new Tabulator("#example-table", {
+                    data:dataSet,
+                    layout:"fitColumns",      //fit columns to width of table
+                    responsiveLayout:"hide",  //hide columns that dont fit on the table
+                    tooltips:true,            //show tool tips on cells
+                    history:true,             //allow undo and redo actions on the table
+                    pagination:"local",       //paginate the data
+                    paginationSize:20,         //allow 7 rows per page of data
+                    movableColumns:true,      //allow column order to be changed
+                    resizableRows:true,       //allow row order to be changed
+                    initialSort:[             //set the initial sort order of the data
+                      {column:"timestamp", dir:"asc"},
+                    ],  
+                    columns:[
+                        {title:"timestamp", field:"timestamp"},
+                        {title:"symbol", field:"symbol"},
+                        {title:"close", field:"close"},
+                        {title:"volume", field:"volume"},
+                        {title:"RSI", field:"rsi"},
+                        {title:"SMA", field:"sma"}
+                    ]
+                });
+            }
+          });  
+          }
+          
+});
+</script>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Scanner</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li class="active"><a href="#">Home</a></li>
+      <li><a href="#login">Login</a></li>
+      <li><a href="#signup">SignUp</a></li>
+      <li><a href="#contactus">Contact Us</a></li>
+    </ul>
+  </div>
+</nav>
+  
+<div class="container">
+  <div class="row">
+
+        <div class="col-sm">
+            <select id="intervalDropDown" class="btn-group dropup">
+                <option value="1MINUTE">1MINUTE</option>
+                <option value="5MINUTE">5MINUTE</option>
+                <option value="10MINUTE">10MINUTE</option>
+                <option value="30MINUTE">30MINUTE</option>
+                <option value="60MINUTE">60MINUTE</option>
+                <option value="1DAY">1DAY</option>
+                <option value="1WEEK">1WEEK</option>
+                <option value="1MONTH">1MONTH</option>
+              </select>
+        </div>
+        <div class="col-sm">
+          
+        </div>
+  </div>
+  <br></br>
+  <div class="row">
+      <div id="example-table"></div>
+  </div>  
+</div>
+</body>
+</html>

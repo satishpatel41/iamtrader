@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Scanner</title>
+<title>Home Page</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -13,7 +13,7 @@
 <script type="text/javascript">
 $(document).ready( function () {
 
-        var server = window.location.port ? window.location.protocol +"//"+window.location.hostname : window.location.protocol +"//"+window.location.hostname+":"+window.location.port;
+        var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
        
         var interval = "1day";
         $( "#intervalDropDown" ).change(function() {
@@ -59,11 +59,7 @@ $(document).ready( function () {
                     data:dataSet,
                     columns:[
                         {title:"timestamp", field:"timestamp"},
-                        {title:"open", field:"open"},
                         {title:"close", field:"close"},
-                        {title:"high", field:"high"},
-                        {title:"cp", field:"cp"},
-                        {title:"low", field:"low"},
                         {title:"volume", field:"volume"},
                         {title:"RSI", field:"rsi"},
                         {title:"SMA", field:"sma"}
@@ -78,10 +74,10 @@ $(document).ready( function () {
 </head>
 <body>
 
-<nav class="navbar navbar-default">
+<nav class="navbar navbar-inverse navbar-fixed-top">
   <div class="container-fluid">
     <div class="navbar-header">
-      <a class="navbar-brand" href="#">Scanner</a>
+      <a class="navbar-brand" href="#">All Stocks</a>
     </div>
     <ul class="nav navbar-nav">
       <li class="active"><a href="#">Home</a></li>
