@@ -56,10 +56,13 @@ $(document).ready( function () {
           $.get({
             url: server+'/loadSymbol/'+symbolName+"/"+interval,
             success: function(dataSet){
+              console.log(dataSet[0].timestamp);
+                dataSet.filter((obj) => obj );
+                $("#date_txt").html(dataSet[0].timestamp);
+
                   var table = new Tabulator("#example-table", {
                     height:"90%",
                     width:"96%",
-                    data:dataSet,
                     data:dataSet,
                     layout:"fitColumns",      //fit columns to width of table
                     responsiveLayout:"hide",  //hide columns that dont fit on the table
@@ -68,12 +71,11 @@ $(document).ready( function () {
                     pagination:"local",       //paginate the data
                     paginationSize:20,         //allow 7 rows per page of data
                     movableColumns:true,      //allow column order to be changed
-                    resizableRows:true,       //allow row order to be changed
                     initialSort:[             //set the initial sort order of the data
                       {column:"Date", dir:"asc"},
                     ], 
                     columns:[
-                        {title:"Date", field:"timestamp"},
+                       // {title:"Date", field:"timestamp"},
                         {title:"Close", field:"close"},
                         {title:"Volume", field:"volume"},
                         {title:"RSI", field:"rsi"},
@@ -114,11 +116,11 @@ $(document).ready( function () {
     <br></br>
     <br></br>
     <div class="row">
-          <div class="col-sm-6">
+          <div class="col-sm-4">
             <label>Symbol</label>
             <select  id="symbolDropdown" type="button" class="btn-group dropup"></select>
           </div>
-          <div class="col-sm-6">
+          <div class="col-sm-4">
             <label>Interval</label>
             <select id="intervalDropDown" class="btn-group dropup">
                 <option value="5MINUTE">5MINUTE</option>
@@ -129,7 +131,12 @@ $(document).ready( function () {
                 <option value="1WEEK">1WEEK</option>
                 <option value="1MONTH">1MONTH</option>
               </select>
-            </div>      
+          </div>
+          
+          <div class="col-sm-4">
+            <label>Update till :</label>
+            <label id="date_txt"></label>
+          </div> 
     </div> 
     <div class="row">
       <div class="col-sm">

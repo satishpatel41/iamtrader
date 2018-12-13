@@ -28,10 +28,49 @@ $(document).ready( function () {
 
         loadAllSymbolData(interval);
 
+        //Custom filter example
+        function customFilter(data){
+         return data.car && data.rating < 3;
+        }
+
+        //Trigger setFilter function with correct parameters
+        function updateFilter(){
+
+          var filter = $("#filter-field").val() == "function" ? customFilter : $("#filter-field").val();
+
+          if($("#filter-field").val() == "function" ){
+            $("#filter-type").prop("disabled", true);
+            $("#filter-value").prop("disabled", true);
+          }else{
+            $("#filter-type").prop("disabled", false);
+            $("#filter-value").prop("disabled", false);
+        }
+
+        table.setFilter(filter, $("#filter-type").val(), $("#filter-value").val());
+        }
+
+        //Update filters on value change
+        $("#filter-field, #filter-type").change(updateFilter);
+        $("#filter-value").keyup(updateFilter);
+
+        //Clear filters on "Clear Filters" button click
+        $("#filter-clear").click(function(){
+          $("#filter-field").val("");
+          $("#filter-type").val("=");
+          $("#filter-value").val("");
+
+          table.clearFilter();
+        });
+
+
         function loadAllSymbolData(interval){
           $.get({
             url: server+'/loadAllSymbolData/'+interval,
             success: function(dataSet){
+                  dataSet.filter((obj) => obj );
+
+                  $("#date_txt").html(dataSet[0].timestamp);
+
                   var table = new Tabulator("#example-table", {
                     data:dataSet,
                     height:"90%",
@@ -43,15 +82,14 @@ $(document).ready( function () {
                     pagination:"local",       //paginate the data
                     paginationSize:20,         //allow 7 rows per page of data
                     movableColumns:true,      //allow column order to be changed
-                    resizableRows:true,       //allow row order to be changed
                     initialSort:[             //set the initial sort order of the data
                       {column:"Date", dir:"asc"},
                     ],  
                     columns:[
-                        {title:"Date", field:"timestamp"},
+                        //{title:"Date", field:"timestamp"},
                         {title:"Symbol", field:"symbol"},
                         {title:"Close", field:"close"},
-                        {title:"Volume", field:"volume"},
+                        //{title:"Volume", field:"volume"},
                         {title:"RSI", field:"rsi"},
                         {title:"SMA", field:"sma"}
                     ]
@@ -92,7 +130,7 @@ $(document).ready( function () {
   <br></br>
   <br></br>
   <div class="row">
-      <div class="col-sm">
+      <div class="col-sm-6">
         <label>interval</label>
         <select id="intervalDropDown" class="btn-group dropup">
             <option value="5MINUTE">5MINUTE</option>
@@ -103,7 +141,15 @@ $(document).ready( function () {
             <option value="1WEEK">1WEEK</option>
             <option value="1MONTH">1MONTH</option>
           </select>
-      </div>     
+      </div> 
+      
+      
+
+      <div class="col-sm-6">
+        <label>Update till :</label>
+        <label id="date_txt"></label>
+      </div> 
+
   </div>
   <div class="row">
     <div class="col-sm">

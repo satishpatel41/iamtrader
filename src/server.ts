@@ -9,7 +9,7 @@ var api:string = "cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw";
 var upstox = new Upstox(api);
 
 const PORT = process.env.PORT || 8080;
-var redirect_uri = "http://127.0.0.1:"+PORT;
+var redirect_uri = "http://localhost:"+PORT;
 
 if(process.env.NODE_ENV=="production")
 {

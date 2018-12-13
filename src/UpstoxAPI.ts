@@ -69,7 +69,7 @@ function start() {
        var transformedData = JSON.parse(JSON.stringify(transformedData));
         
 
-        console.log(' >  ' + transformedData);
+       // console.log(' >  ' + transformedData);
 
         var dataFrame = dataForge.fromJSON(transformedData)
         .where(row => {
@@ -273,8 +273,8 @@ function getProfile()
 }
 
 
-function loadSymbol(symbol,exchange,interval='1day',start_date='1-1-2010'){ 
-    log("loadSymbol > " + symbol + " > "+ interval +" > "+exchange);
+function loadSymbol(symbol,exchange,interval='1day',start_date='1-1-2018'){ 
+    //log("loadSymbol > " + symbol + " > "+ interval +" > "+exchange);
     return upstox.getOHLC({"exchange": exchange,
         "symbol": symbol,
         "start_date": start_date,
