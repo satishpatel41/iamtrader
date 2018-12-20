@@ -1,0 +1,6 @@
+
+Thu Dec 20 2018 19:26:29 GMT+0200 (South Africa Standard Time) App listening on port 8080
+Thu Dec 20 2018 19:26:29 GMT+0200 (South Africa Standard Time) **************** loginUri ***********
+https://api.upstox.com/index/dialog/authorize?apiKey=cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw&redirect_uri=http://localhost:8080&response_type=code
+Thu Dec 20 2018 19:29:20 GMT+0200 (South Africa Standard Time) App listening on port 8080
+Thu Dec 20 2018 19:59:44 GMT+0200 (South Africa Standard Time) App listening on port 8080

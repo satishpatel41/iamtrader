@@ -2,9 +2,7 @@
 var technicalindicators = require('technicalindicators');
 var fs = require('fs');
 
-const dataForge = require('data-forge');
-require('data-forge-plot'); 
-require('data-forge-fs');
+
 
 var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 

@@ -25,6 +25,11 @@ gulp.task("html", function () {
     var tsResult = gulp.src("views/*.html")
     .pipe(gulp.dest('./dist/views/'));
 });
+
+gulp.task("stockData", function () {
+    var tsResult = gulp.src("data/*.csv")
+    .pipe(gulp.dest('./dist/data/'));
+});
  
 gulp.task('server', function () {
     server.run(['dist/app.min.js']);
@@ -40,12 +45,14 @@ gulp.task('server', function () {
 });
 
 gulp.task('clean', function () {
-    return del([
-        'dist'
-    ]);
-  });
+return del([
+    'dist'
+]);
+});
 
-gulp.task('default',gulpSequence('script','html','server'));
+gulp.task('build',gulpSequence('script','html'));
+
+gulp.task('default',gulpSequence('build','server'));
 
 
 gulp.task('release',gulpSequence('clean','script','html'));

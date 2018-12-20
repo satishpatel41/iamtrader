@@ -2,7 +2,10 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var fs = require('fs');
 var url = require('url');
-
+const https = require('https');
+const dataForge = require('data-forge');
+require('data-forge-plot'); 
+require('data-forge-fs');
 
 var Upstox = require("upstox");
 var api:string = "cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw";
@@ -10,6 +13,14 @@ var upstox = new Upstox(api);
 
 const PORT = process.env.PORT || 8080;
 var redirect_uri = "http://localhost:"+PORT;
+
+
+var nifty = "https://www.nseindia.com/content/indices/ind_nifty50list.csv";
+var fno = "https://www.nseindia.com/content/fo/fo_mktlots.csv";
+
+var MongoClient = require('mongodb').MongoClient;
+var mango_url = "mongodb://localhost:27017/";
+
 
 if(process.env.NODE_ENV=="production")
 {
@@ -32,6 +43,50 @@ var months = ['January','February','March','April','May','June','July','August',
 var date = new Date();
 var today = date.getDate() +"-"+date.getMonth() +"-"+date.getFullYear();
 var time = date +":"+date.getHours() +":"+date.getMinutes();
+
+
+
+/* MongoClient.connect(mango_url, function(err, db) {
+    if (err) throw err;
+    var dbo = db.db("mydb");
+    var query = { address: "Park Lane 38" };
+    dbo.collection("customers").find(query).toArray(function(err, result) {
+        if (err) throw err;
+        console.log(result);
+        db.close();
+    });
+}); */
+
+var PouchDB = require('../lib/pouchdb-7.0.0.min.js');
+var db = new PouchDB('UpstoxDb');
+      
+var fnoArr=  dataForge.readFileSync("data/list/fo_mktlots.csv")
+.parseCSV()
+.toArray();
+
+var fnoList = [];
+fnoArr.forEach(function(item) {   
+    if(item.Symbol)
+        fnoList.push(item.Symbol)
+    else
+        fnoList.push(item.SYMBOL)
+});
+  
+var niftyList =  dataForge.readFileSync("data/list/ind_nifty50list.csv")
+.parseCSV()
+.toArray();
+
+niftyList = niftyList.map(x => x.Symbol);
+
+
+db.put({
+    _id: 'niftyList',
+    niftyList: niftyList
+  }).then(function (response) {
+    console.log("Done niftyList");
+  }).catch(function (err) {
+    console.log(err);
+  });
 
 app.get('/', function (req:any, res:any) {
     var q = url.parse(req.url, true).query;
@@ -151,12 +206,20 @@ function initiateIndicator()
     bb = new technicalindicators.BollingerBands(inputBB);
 }
 
-app.get('/loadAllSymbolData/:interval', function (req:any, res:any) { 
+app.get('/loadAllSymbolData/:interval/:exchange', function (req:any, res:any) { 
     var interval = req.params.interval;  
-
-    nseSymbolList = nseSymbolList.slice(1, 200);
-
-    loadAllSymbolData(nseSymbolList,interval,'10-11-2018').then(function (response:any) {
+    var exchange = req.params.exchange;  
+    
+    var list = [];
+    if(exchange == "nifty")
+        list = niftyList;
+    else if(exchange == "fno")
+        list = fnoList;
+    else{
+        nseSymbolList = nseSymbolList.slice(1, 200);
+        list = nseSymbolList;
+    }
+    loadAllSymbolData(list,interval,'10-11-2018').then(function (response:any) {
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(response));
         res.end();

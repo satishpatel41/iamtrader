@@ -18,15 +18,23 @@ $(document).ready( function () {
         var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
        
         var interval = "1day";
+        var exchange = "nifty";
 
         var nseSymbols = [];
 
         $( "#intervalDropDown" ).change(function() {
           interval = $("#intervalDropDown").val();
-          loadAllSymbolData(interval);
+          loadAllSymbolData(interval,exchange);
         });
 
-        loadAllSymbolData(interval);
+         $( "#exchangeDropDown" ).change(function() {
+          exchange = $("#exchangeDropDown").val();
+          loadAllSymbolData(interval,exchange);
+        });
+
+        
+
+        loadAllSymbolData(interval,exchange);
 
         //Custom filter example
         function customFilter(data){
@@ -63,9 +71,9 @@ $(document).ready( function () {
         });
 
 
-        function loadAllSymbolData(interval){
+        function loadAllSymbolData(interval,exchange){
           $.get({
-            url: server+'/loadAllSymbolData/'+interval,
+            url: server+'/loadAllSymbolData/'+interval+'/'+exchange,
             success: function(dataSet){
                   dataSet.filter((obj) => obj );
 
@@ -130,14 +138,24 @@ $(document).ready( function () {
   <br></br>
   <br></br>
   <div class="row">
-      <div class="col-sm-6">
+      <div class="col-sm-4">
+        <label>Exchange</label>
+        <select id="exchangeDropDown" class="btn-group dropup">
+            <option value="nifty" selected="selected">Nifty</option>
+            <option value="fno">FNO Stocks</option>
+            <option value="nse">NSE</option>
+          </select>
+      </div> 
+
+
+      <div class="col-sm-4">
         <label>interval</label>
         <select id="intervalDropDown" class="btn-group dropup">
             <option value="5MINUTE">5MINUTE</option>
             <option value="10MINUTE">10MINUTE</option>
             <option value="30MINUTE">30MINUTE</option>
             <option value="60MINUTE">60MINUTE</option>
-            <option value="1DAY">1DAY</option>
+            <option value="1DAY" selected="selected">1DAY</option>
             <option value="1WEEK">1WEEK</option>
             <option value="1MONTH">1MONTH</option>
           </select>
@@ -145,7 +163,7 @@ $(document).ready( function () {
       
       
 
-      <div class="col-sm-6">
+      <div class="col-sm-4">
         <label>Update till :</label>
         <label id="date_txt"></label>
       </div> 
