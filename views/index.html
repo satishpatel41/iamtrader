@@ -16,6 +16,14 @@ $(document).ready( function () {
 
         var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
        
+        
+        /* if ("serviceWorker" in navigator) {
+          navigator.serviceWorker
+            .register("sw.js")
+            .then(console.log)
+            .catch(console.error);
+        } */
+
         var interval = "1day";
         $( "#intervalDropDown" ).change(function() {
           interval = $("#intervalDropDown").val();
@@ -55,11 +63,14 @@ $(document).ready( function () {
         function loadSymbolData(symbolName,interval){
           $.get({
             url: server+'/loadSymbol/'+symbolName+"/"+interval,
-            success: function(dataSet){
-              console.log(dataSet[0].timestamp);
+            success: function(response){
+                var dataSet = response.filter(function (el) {
+                  return (el != null && el.close != null && el.close != undefined && el.close != "");
+                });
+
+                //console.log(dataSet[0].timestamp);
                 dataSet.filter((obj) => obj );
                 $("#date_txt").html(dataSet[0].timestamp);
-
                   var table = new Tabulator("#example-table", {
                     height:"90%",
                     width:"96%",
@@ -72,14 +83,15 @@ $(document).ready( function () {
                     paginationSize:20,         //allow 7 rows per page of data
                     movableColumns:true,      //allow column order to be changed
                     initialSort:[             //set the initial sort order of the data
-                      {column:"Date", dir:"asc"},
+                      {column:"timestamp", dir:"asc"},
                     ], 
                     columns:[
                        // {title:"Date", field:"timestamp"},
                         {title:"Close", field:"close"},
                         {title:"Volume", field:"volume"},
                         {title:"RSI", field:"rsi"},
-                        {title:"SMA", field:"sma"}
+                        {title:"SMA", field:"sma"},
+                        {title:"Bolinger Band", field:"bb.isCrossed"}
                     ]
                 });
             }

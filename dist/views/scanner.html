@@ -74,11 +74,12 @@ $(document).ready( function () {
         function loadAllSymbolData(interval,exchange){
           $.get({
             url: server+'/loadAllSymbolData/'+interval+'/'+exchange,
-            success: function(dataSet){
-                  dataSet.filter((obj) => obj );
+            success: function(response){
+                  var dataSet = response.filter(function (el) {
+                    return (el != null && el.close != null && el.close != undefined && el.close != "");
+                  });
 
                   $("#date_txt").html(dataSet[0].timestamp);
-
                   var table = new Tabulator("#example-table", {
                     data:dataSet,
                     height:"90%",
@@ -91,15 +92,16 @@ $(document).ready( function () {
                     paginationSize:20,         //allow 7 rows per page of data
                     movableColumns:true,      //allow column order to be changed
                     initialSort:[             //set the initial sort order of the data
-                      {column:"Date", dir:"asc"},
+                      {column:"timestamp", dir:"asc"},
                     ],  
                     columns:[
                         //{title:"Date", field:"timestamp"},
                         {title:"Symbol", field:"symbol"},
                         {title:"Close", field:"close"},
-                        //{title:"Volume", field:"volume"},
+                        {title:"Volume", field:"volume"},
                         {title:"RSI", field:"rsi"},
-                        {title:"SMA", field:"sma"}
+                        {title:"SMA", field:"sma"},
+                        {title:"Bolinger Band", field:"bb.isCrossed"}
                     ]
                 });
             }

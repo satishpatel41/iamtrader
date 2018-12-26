@@ -6,21 +6,14 @@ const https = require('https');
 const dataForge = require('data-forge');
 require('data-forge-plot'); 
 require('data-forge-fs');
-
 var Upstox = require("upstox");
 var api:string = "cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw";
 var upstox = new Upstox(api);
-
 const PORT = process.env.PORT || 8080;
 var redirect_uri = "http://localhost:"+PORT;
-
-
 var nifty = "https://www.nseindia.com/content/indices/ind_nifty50list.csv";
 var fno = "https://www.nseindia.com/content/fo/fo_mktlots.csv";
-
-var MongoClient = require('mongodb').MongoClient;
-var mango_url = "mongodb://localhost:27017/";
-
+var jsdom = require('jsdom').jsdom;
 
 if(process.env.NODE_ENV=="production")
 {
@@ -44,21 +37,6 @@ var date = new Date();
 var today = date.getDate() +"-"+date.getMonth() +"-"+date.getFullYear();
 var time = date +":"+date.getHours() +":"+date.getMinutes();
 
-
-
-/* MongoClient.connect(mango_url, function(err, db) {
-    if (err) throw err;
-    var dbo = db.db("mydb");
-    var query = { address: "Park Lane 38" };
-    dbo.collection("customers").find(query).toArray(function(err, result) {
-        if (err) throw err;
-        console.log(result);
-        db.close();
-    });
-}); */
-
-var PouchDB = require('../lib/pouchdb-7.0.0.min.js');
-var db = new PouchDB('UpstoxDb');
       
 var fnoArr=  dataForge.readFileSync("data/list/fo_mktlots.csv")
 .parseCSV()
@@ -78,15 +56,6 @@ var niftyList =  dataForge.readFileSync("data/list/ind_nifty50list.csv")
 
 niftyList = niftyList.map(x => x.Symbol);
 
-
-db.put({
-    _id: 'niftyList',
-    niftyList: niftyList
-  }).then(function (response) {
-    console.log("Done niftyList");
-  }).catch(function (err) {
-    console.log(err);
-  });
 
 app.get('/', function (req:any, res:any) {
     var q = url.parse(req.url, true).query;
@@ -147,33 +116,39 @@ app.get('/index', function (req:any, res:any) {
 });
 
 app.get('/scan', function (req:any, res:any) {
-    /* var q = url.parse(req.url, true).query;
-    if(q.symbolSearch){        
-        nseSymbolList.map(async (row) => {
-            var symbolPattern = new RegExp(q.symbolSearch, 'gi');
-            var isMatchingSymbol  = String(row).search(symbolPattern);
-            return row;
-        });
-        console.log("nseSymbolList " + JSON.stringify(nseSymbolList));
-    }else{
-        res.sendFile("index.html", {"root": __dirname});
-    }    */
     res.sendFile("scanner.html", {"root": __dirname});
 });
 
 app.get('/loadSymbol/:symbol/:interval', function (req:any, res:any) { 
     var symbol = req.params.symbol;  
     var interval = req.params.interval; 
+    
+    var now = new Date();
+    now.setDate(now.getDate() - 20);
+    var start_date = now.getDate()+"-"+now.getMonth+"-"+now.getFullYear();
+
     initiateIndicator();
-    loadSymbol(symbol,'nse_eq',interval,'9-9-2018').then(function (response:any) {
+
+    loadSymbol(symbol,'nse_eq',interval,start_date).then(function (response:any) {
         res.setHeader('Content-Type', 'application/json');
         var stockData =response.data;
+        
+        var lastObject = {open:'',close:'',low:'',high:'',volume:'',timestamp:'',rsi:'',sma:'',bb:{upper:'',lower:'',isCrossed:'',middel:'',pb:''}};
         stockData.map(row => {
             row.timestamp = new Date(row.timestamp);
             row.rsi = rsi.nextValue(Number(row.close));
             row.sma = sma.nextValue(Number(row.close));
             row.bb = bb.nextValue(Number(row.close)); 
-
+            
+            if(Number(row.close) >= row.bb.upper && Number(lastObject.close) < Number(lastObject.bb.upper))
+            {
+                row.bb.isCrossed = 'Crossed Above';
+            }
+            else if(Number(row.close) <= row.bb.lower && Number(lastObject.close) > Number(lastObject.bb.lower))
+            {
+                row.bb.isCrossed = 'Crossed Below';
+            }
+            lastObject = row;
             return row;
         });
         stockData.reverse();
@@ -216,7 +191,7 @@ app.get('/loadAllSymbolData/:interval/:exchange', function (req:any, res:any) {
     else if(exchange == "fno")
         list = fnoList;
     else{
-        nseSymbolList = nseSymbolList.slice(1, 200);
+        //nseSymbolList = nseSymbolList.slice(1, 200);
         list = nseSymbolList;
     }
     loadAllSymbolData(list,interval,'10-11-2018').then(function (response:any) {

@@ -1,12 +1,7 @@
 
 var technicalindicators = require('technicalindicators');
 var fs = require('fs');
-
-
-
 var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-
-
 var date = new Date();
 var today = date.getDate() +"-"+date.getMonth() +"-"+date.getFullYear();
 var time = date +":"+date.getHours() +":"+date.getMinutes();
@@ -290,6 +285,7 @@ function calculateIndicators(row:any)
 }
 
 function log(message:any){
+    date = new Date();
     today = date.getDate() +"-"+date.getMonth() +"-"+date.getFullYear();
     time = today +":"+date.getHours() +":"+date.getMinutes();
     var path = "logs/log-"+today+".txt";

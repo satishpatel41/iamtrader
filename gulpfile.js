@@ -6,7 +6,6 @@ var rename = require('gulp-rename');
 var del = require('del');
 var gulpSequence = require('gulp-sequence').use(gulp);
 
-
 gulp.task("script", function () {
     var tsResult = gulp.src("src/*.ts")
     .pipe(ts({
@@ -45,16 +44,12 @@ gulp.task('server', function () {
 });
 
 gulp.task('clean', function () {
-return del([
-    'dist'
-]);
+    return del([
+        'dist'
+    ]);
 });
-
 gulp.task('build',gulpSequence('script','html'));
-
-gulp.task('default',gulpSequence('build','server'));
-
-
+gulp.task('default',gulpSequence('build',['server']));
 gulp.task('release',gulpSequence('clean','script','html'));
 
  

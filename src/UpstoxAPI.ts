@@ -2,6 +2,7 @@ var Upstox = require("upstox");
 var api = "cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw";
 var upstox = new Upstox(api);
 var schedule = require('node-schedule');
+var fs = require('fs');
 
 var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
@@ -280,6 +281,19 @@ function loadSymbol(symbol,exchange,interval='1day',start_date='1-1-2018'){
         "format" : "json",
         "interval" : interval
     })
+
+   /*  var p = new Promise(function(resolve, reject){
+        var list = [];
+        var file = 'data/stock/1DAY/'+symbol+'.txt';
+        console.log(file);
+        fs.readFile(file, 'utf8',  function(err, res) {
+            //if (err) throw err;
+            if(err) reject(err);
+            else
+                resolve(JSON.parse(res));
+        });      
+    });    
+    return p; */
 }
 
 function getAllData(){
@@ -341,6 +355,7 @@ function getAllData(){
 //var allSymbolWithIndicator = [];
 async function loadAllSymbolData(response:any,interval='1day',start_date='11-11-2018'){ 
     var allSymbolWithIndicator = [];
+    log( "loadAllSymbolData ******** " +  response);
     var promiseArr = response.map(async symbol => {
         var data = {};
         await loadSymbol(symbol,'nse_eq',interval,'9-9-2018').then(function (response:any) {
@@ -350,21 +365,34 @@ async function loadAllSymbolData(response:any,interval='1day',start_date='11-11-
                 row.rsi = rsi.nextValue(Number(row.close));
                 row.sma = sma.nextValue(Number(row.close));
                 row.bb = bb.nextValue(Number(row.close)); 
+
+                if(Number(row.close) > row.bb.upper)
+                {
+                    row.bb.isCrossed = 'Crossed Above';
+                }
+                else if(Number(row.close) < row.bb.lower)
+                {
+                    row.bb.isCrossed = 'Crossed Below';
+                }
+                else
+                {
+                    row.bb.isCrossed = '';
+                }
                 return row;
             });
             stockData.reverse();
-            data = {"symbol":symbol,
-                    "close":stockData[0].close,
-                    "volume":stockData[0].volume,
-                    "rsi":stockData[0].rsi,
-                    "timestamp":stockData[0].timestamp,
-                    "sma":stockData[0].sma, 
-                    "bb":stockData[0].bb
+            data = {
+                "symbol":symbol,
+                "close":stockData[0].close,
+                "volume":stockData[0].volume,
+                "rsi":stockData[0].rsi,
+                "timestamp":stockData[0].timestamp,
+                "sma":stockData[0].sma, 
+                "bb":stockData[0].bb
             }; 
-            //allSymbolWithIndicator.push(data);
         })
         .catch(function(error:any){
-            log("loadAllSymbolData error > " +  JSON.stringify(error));
+            log("loadSymbol error > " +  JSON.stringify(error));
         });
         return data;
     });
@@ -376,3 +404,22 @@ async function loadAllSymbolData(response:any,interval='1day',start_date='11-11-
         return arr;
     });
 }
+
+/* fs.readFile('data/stock/1DAY/ACC.txt', 'utf8',  function(err, res) {
+    if (err) throw err;
+    var result = JSON.parse(res);
+    var data = result.data;
+    var list = data.map(getPercChange);
+});
+
+
+function getPercChange(item, index) {
+    var decreaseValue = item.close - item.cp;
+    //item.change =  (decreaseValue / item.close) * 100;
+    item.timestamp = new Date(item.timestamp);
+    //console.log(">> " + item.timestamp +" >> "+item.change);
+    return item;
+}
+   */
+
+
