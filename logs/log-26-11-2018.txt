@@ -1,4 +1,0 @@
-
-Wed Dec 26 2018 17:55:00 GMT+0200 (South Africa Standard Time) NSE 5 MINUTE data update
-Wed Dec 26 2018 17:55:00 GMT+0200 (South Africa Standard Time) loadAllSymbolData ******** undefined
-Wed Dec 26 2018 17:55:00 GMT+0200 (South Africa Standard Time) loadAllSymbolData/ error > {}

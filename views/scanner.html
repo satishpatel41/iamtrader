@@ -82,6 +82,10 @@ $(document).ready( function () {
                   $("#date_txt").html(dataSet[0].timestamp);
                   var table = new Tabulator("#example-table", {
                     data:dataSet,
+                    ajaxLoader: true,
+                    ajaxLoaderLoading: 'updating data',
+                    ajaxProgressiveLoad:"scroll",
+                    placeholder:"No Data Set",
                     height:"90%",
                     width:"96%",
                     layout:"fitColumns",      //fit columns to width of table

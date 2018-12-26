@@ -4,7 +4,6 @@ var fs = require('fs');
 var url = require('url');
 const https = require('https');
 const dataForge = require('data-forge');
-require('data-forge-plot'); 
 require('data-forge-fs');
 var Upstox = require("upstox");
 var api:string = "cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw";
@@ -194,14 +193,51 @@ app.get('/loadAllSymbolData/:interval/:exchange', function (req:any, res:any) {
         //nseSymbolList = nseSymbolList.slice(1, 200);
         list = nseSymbolList;
     }
-    loadAllSymbolData(list,interval,'10-11-2018').then(function (response:any) {
-        res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify(response));
-        res.end();
-    })
-    .catch(function(error:any){
-       log("loadAllSymbolData/ error > " +  JSON.stringify(error));
+
+    var stockData = [];
+
+    if(interval == "5MINUTE") // 1WEEK, 1MONTH
+        stockData =stockObj.data5;
+    else if(interval == "10MINUTE")
+        stockData =stockObj.data10;
+    else if(interval == "30MINUTE")
+        stockData =stockObj.data30;
+    else if(interval == "60MINUTE")
+        stockData = stockObj.data60;  
+    else if(interval == "1DAY")
+        stockData = stockObj.data1day;             
+
+    var data = stockData.filter(function (el) {
+        return (el != null && el.close != null && el.close != undefined && el.close != "");
     });
+          
+    if(data.length > 0)
+    {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(data));
+        res.end();
+    }
+    else{
+        loadAllSymbolData(list,interval,'10-11-2018').then(function (response:any) {
+            if(interval == "5MINUTE") // 1WEEK, 1MONTH
+                stockObj.data5 =response;
+            else if(interval == "10MINUTE")
+                stockObj.data10 =response;
+            else if(interval == "30MINUTE")
+                stockObj.data30 =response;
+            else if(interval == "60MINUTE")
+                stockObj.data60 =response;  
+            else if(interval == "1DAY")
+                 stockObj.data1day =response;    
+
+            res.setHeader('Content-Type', 'application/json');
+            res.send(JSON.stringify(response));
+            res.end();
+        })
+        .catch(function(error:any){
+            log("loadAllSymbolData/ error > " +  JSON.stringify(error));
+        });
+    }
 });
  
 app.get('/getListOfAllSymbol', function (req:any, res:any) {   
@@ -210,7 +246,14 @@ app.get('/getListOfAllSymbol', function (req:any, res:any) {
     res.end();
 });
 
+app.get('/sync', function (req:any, res:any) {   
+    res.setHeader('Content-Type', 'application/json');
+    res.send("Successfully sync data !");
+    res.end();
+});
+
 app.get('/getBalance', function (req:any, res:any) {   
+    syncStockData();
     res.setHeader('Content-Type', 'application/json');
     res.send(JSON.stringify(balance));
     res.end();

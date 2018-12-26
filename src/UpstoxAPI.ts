@@ -298,9 +298,6 @@ function loadSymbol(symbol,exchange,interval='1day',start_date='1-1-2018'){
 
 function getAllData(){
    
-    upstox.getMasterContract({ exchange: "nse_eq",format:"json" })
-    .then(function (response:any) {
-
         // var weekly = schedule.scheduleJob('* 17 * * 5', function(){
         //     log('Weekly data update');
         //     loadAllSymbolData(response.data,'1WEEK','1-1-2015');
@@ -309,55 +306,25 @@ function getAllData(){
         // var Montly = schedule.scheduleJob('0 8 1 * *', function(){
         //     log('Montly data update');
         //     loadAllSymbolData(response.data,'1MONTH','1-1-2015');
-        // });
-        
-        // var daily = schedule.scheduleJob('0 18 * * *', function(){
-        //     log('Daily data update');
-        //     loadAllSymbolData(response.data,'1DAY','1-1-2015');
-        // });
-
-        // var newDate = new Date();
-        // newDate.setDate(newDate.getDate() - 10);//240    
-        
-        // var hourly = schedule.scheduleJob('*/60 * * * *', function(){
-        //     log('NSE 60MINUTE data update');
-        //     loadAllSymbolData(response.data,'60MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
-        // });
-
-        // var min_30 = schedule.scheduleJob('*/30 * * * *', function(){
-        //     log('NSE 30MINUTE data update');
-        //     loadAllSymbolData(response.data,'30MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
-        // });
-
-        // var newDate = new Date();
-        // newDate.setDate(newDate.getDate() - 2);     
-        // var min_10 = schedule.scheduleJob('*/10 * * * *', function(){
-        //     log('NSE 10MINUTE data update');
-        //     loadAllSymbolData(response.data,'10MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
-        // });
-
-        // var newDate = new Date();
-        // newDate.setDate(newDate.getDate() - 1);     
-        // var min_50 = schedule.scheduleJob('*/5 * * * *', function(){
-        //     log('NSE 10MINUTE data update');
-        //     loadAllSymbolData(response.data,'10MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
-        // });
-
-
-        //loadAllSymbolData(nseSymbolList,'1DAY','10-10-2018');
-    })
-    .catch(function (err:any) {
-        log( "getAllData ******** " +  err);
-    }); 
+        // });        
+        syncStockData();
 }
 
+async function syncStockData(){ 
+    setTimeout(function(){ load1dayData(); }, 10000);
+    setTimeout(function(){ load60minData(); }, 7000);
+    setTimeout(function(){ load30minData(); }, 5000);
+    setTimeout(function(){ load10minData(); }, 3000);
+    setTimeout(function(){ load5minData(); }, 10);   
+}
 
 //var allSymbolWithIndicator = [];
 async function loadAllSymbolData(response:any,interval='1day',start_date='11-11-2018'){ 
     var allSymbolWithIndicator = [];
-    log( "loadAllSymbolData ******** " +  response);
+    //log( "loadAllSymbolData ******** " +  start_date);
     var promiseArr = response.map(async symbol => {
         var data = {};
+        //console.log("symbol " + interval +" >> "+symbol);
         await loadSymbol(symbol,'nse_eq',interval,'9-9-2018').then(function (response:any) {
             var stockData =response.data;
             stockData.map(row => {
