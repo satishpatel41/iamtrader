@@ -3,21 +3,14 @@ var api = "cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw";
 var upstox = new Upstox(api);
 var schedule = require('node-schedule');
 var fs = require('fs');
-
 var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-
 var code = '';
 var __dirname = "views"
 var exchanges =  [ 'MCX_FO', 'BSE_EQ', 'NSE_EQ', 'NSE_FO', 'NCD_FO'];
 var login_code = "ce728b73424e719680aa66a51ba4eb469f9875f2";
 var api_secret = "xs5ibb0pk0";
-
-
 var client_id="";
-    
 var watchList = ['banknifty','hindalco','ICICIBANK','sbin','idea','lt','HAVELLS'];
-
-
 
 function getAcceToken(code:any)
 {
@@ -30,15 +23,18 @@ function getAcceToken(code:any)
     
     upstox.getAccessToken(params)
         .then(function (response:any) {
+            params = api_secret = code = null;
+
             var accessToken = response.access_token;
             log("****accessToken*\n" +accessToken);
             upstox.setToken(accessToken);
+            accessToken = null;
             
             start();
             //res.sendFile("index.html", {"root": __dirname});
         })
         .catch(function (err:any) {
-            log( "******** " + err);
+            log( "getAccessToken > " + err);
     });
 }
 
@@ -207,7 +203,7 @@ function start() {
                 log("error"+ error);
             });
         }).catch(function(error:any) {
-        log( "******** " + error);
+        log( "connectSocket #" + error);
     });
 }
 
@@ -223,6 +219,7 @@ function getListOfAllSymbol()
      })
      .catch(function (err:any) {
          log( "Error getListOfAllSymbol > " +  err);
+         getAllData();
     }); 
 }
 
@@ -238,9 +235,11 @@ function getBalance()
         if (err) throw err;
             log('balance is created successfully.');
         });   */
+        getListOfAllSymbol();
     })
     .catch(function (err:any) {
         log(err);
+        getListOfAllSymbol();
     });
 }
 
@@ -253,7 +252,7 @@ function getProfile()
         client_id = response.data.client_id;
         profile = JSON.stringify(response.data);
         getBalance();
-        getListOfAllSymbol();
+        
             
         /* fs.writeFile("data/profile/"+client_id+'.txt', JSON.stringify(response), function (err:any) {
         if (err) throw err;
@@ -280,48 +279,27 @@ function loadSymbol(symbol,exchange,interval='1day',start_date='1-1-2018'){
         "start_date": start_date,
         "format" : "json",
         "interval" : interval
-    })
-
-   /*  var p = new Promise(function(resolve, reject){
-        var list = [];
-        var file = 'data/stock/1DAY/'+symbol+'.txt';
-        console.log(file);
-        fs.readFile(file, 'utf8',  function(err, res) {
-            //if (err) throw err;
-            if(err) reject(err);
-            else
-                resolve(JSON.parse(res));
-        });      
-    });    
-    return p; */
+    })  
 }
 
 function getAllData(){
-   
-        // var weekly = schedule.scheduleJob('* 17 * * 5', function(){
-        //     log('Weekly data update');
-        //     loadAllSymbolData(response.data,'1WEEK','1-1-2015');
-        //     });
-
-        // var Montly = schedule.scheduleJob('0 8 1 * *', function(){
-        //     log('Montly data update');
-        //     loadAllSymbolData(response.data,'1MONTH','1-1-2015');
-        // });        
-        syncStockData();
+  // syncStockData();
 }
 
-async function syncStockData(){ 
-    setTimeout(function(){ load1dayData(); }, 10000);
-    setTimeout(function(){ load60minData(); }, 7000);
-    setTimeout(function(){ load30minData(); }, 5000);
-    setTimeout(function(){ load10minData(); }, 3000);
+function syncStockData(){ 
+    setTimeout(function(){ load1dayData(); }, 60000);
+    setTimeout(function(){ load60minData(); }, 30000);
+    setTimeout(function(){ load30minData(); }, 20000);
+    setTimeout(function(){ load10minData(); }, 10000);
     setTimeout(function(){ load5minData(); }, 10);   
 }
 
 //var allSymbolWithIndicator = [];
 async function loadAllSymbolData(response:any,interval='1day',start_date='11-11-2018'){ 
     var allSymbolWithIndicator = [];
-    //log( "loadAllSymbolData ******** " +  start_date);
+    
+    //log( "loadAllSymbolData ******** " +  response);
+    
     var promiseArr = response.map(async symbol => {
         var data = {};
         //console.log("symbol " + interval +" >> "+symbol);
@@ -333,7 +311,7 @@ async function loadAllSymbolData(response:any,interval='1day',start_date='11-11-
                 row.sma = sma.nextValue(Number(row.close));
                 row.bb = bb.nextValue(Number(row.close)); 
 
-                if(Number(row.close) > row.bb.upper)
+                /* if(Number(row.close) > row.bb.upper)
                 {
                     row.bb.isCrossed = 'Crossed Above';
                 }
@@ -344,7 +322,7 @@ async function loadAllSymbolData(response:any,interval='1day',start_date='11-11-
                 else
                 {
                     row.bb.isCrossed = '';
-                }
+                } */
                 return row;
             });
             stockData.reverse();
@@ -357,10 +335,13 @@ async function loadAllSymbolData(response:any,interval='1day',start_date='11-11-
                 "sma":stockData[0].sma, 
                 "bb":stockData[0].bb
             }; 
+            //stockData = null;
         })
         .catch(function(error:any){
-            log("loadSymbol error > " +  JSON.stringify(error));
+            console.log("loadSymbol error > " +  JSON.stringify(error));
         });
+        //symbol = data = null;
+
         return data;
     });
 
@@ -371,22 +352,4 @@ async function loadAllSymbolData(response:any,interval='1day',start_date='11-11-
         return arr;
     });
 }
-
-/* fs.readFile('data/stock/1DAY/ACC.txt', 'utf8',  function(err, res) {
-    if (err) throw err;
-    var result = JSON.parse(res);
-    var data = result.data;
-    var list = data.map(getPercChange);
-});
-
-
-function getPercChange(item, index) {
-    var decreaseValue = item.close - item.cp;
-    //item.change =  (decreaseValue / item.close) * 100;
-    item.timestamp = new Date(item.timestamp);
-    //console.log(">> " + item.timestamp +" >> "+item.change);
-    return item;
-}
-   */
-
 

@@ -50,7 +50,7 @@ gulp.task('clean', function () {
     ]);
 });
 gulp.task('build',gulpSequence('script','html'));
-gulp.task('default',gulpSequence('build',['server']));
+gulp.task('default',gulpSequence('build','server'));
 gulp.task('release',gulpSequence('clean','script','html'));
 
  

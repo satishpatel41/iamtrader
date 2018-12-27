@@ -65,7 +65,7 @@ app.get('/', function (req:any, res:any) {
     if(code)
     {
         getAcceToken(code);
-
+        
         res.sendFile("index.html", {"root": __dirname});
     }
     else{
@@ -123,15 +123,32 @@ app.get('/loadSymbol/:symbol/:interval', function (req:any, res:any) {
     var interval = req.params.interval; 
     
     var now = new Date();
-    now.setDate(now.getDate() - 20);
-    var start_date = now.getDate()+"-"+now.getMonth+"-"+now.getFullYear();
+    if(interval == "5MINUTE") // 1WEEK, 1MONTH
+        now.setMinutes(now.getMinutes() - 5* 20);
+    else if(interval == "10MINUTE")
+        now.setMinutes(now.getMinutes() - 10 * 20);
+    else if(interval == "30MINUTE")
+        now.setMinutes(now.getMinutes() - 30* 20);
+    else if(interval == "60MINUTE")
+        now.setMinutes(now.getMinutes() - 60* 20);
+    else if(interval == "1DAY")
+        now.setDate(now.getDate() - 20);
+    else if(interval == "1WEEK")
+        now.setDate(now.getDate() - 7*20);
+    else if(interval == "1MONTH")
+        now.setMonth(now.getMonth() - 20);    
+    
+    var start_date = now.getDate()+"-"+now.getMonth()+"-"+now.getFullYear();
 
     initiateIndicator();
-
+   
+    //log("loadSymbol/:symbol start_date > " +  start_date +" > "+symbol +" > "+ interval);
+    
     loadSymbol(symbol,'nse_eq',interval,start_date).then(function (response:any) {
         res.setHeader('Content-Type', 'application/json');
         var stockData =response.data;
-        
+       
+
         var lastObject = {open:'',close:'',low:'',high:'',volume:'',timestamp:'',rsi:'',sma:'',bb:{upper:'',lower:'',isCrossed:'',middel:'',pb:''}};
         stockData.map(row => {
             row.timestamp = new Date(row.timestamp);
@@ -139,7 +156,7 @@ app.get('/loadSymbol/:symbol/:interval', function (req:any, res:any) {
             row.sma = sma.nextValue(Number(row.close));
             row.bb = bb.nextValue(Number(row.close)); 
             
-            if(Number(row.close) >= row.bb.upper && Number(lastObject.close) < Number(lastObject.bb.upper))
+            /* if(Number(row.close) >= row.bb.upper && Number(lastObject.close) < Number(lastObject.bb.upper))
             {
                 row.bb.isCrossed = 'Crossed Above';
             }
@@ -147,10 +164,11 @@ app.get('/loadSymbol/:symbol/:interval', function (req:any, res:any) {
             {
                 row.bb.isCrossed = 'Crossed Below';
             }
-            lastObject = row;
+            lastObject = row; */
             return row;
         });
         stockData.reverse();
+        //console.log("loadSymbol Respone > " +  JSON.stringify(response));
         res.send(JSON.stringify(stockData));
         res.end();
     })
@@ -195,7 +213,7 @@ app.get('/loadAllSymbolData/:interval/:exchange', function (req:any, res:any) {
     }
 
     var stockData = [];
-
+    //console.log('*** NSE stockData *** \n ' + JSON.stringify(stockObj));
     if(interval == "5MINUTE") // 1WEEK, 1MONTH
         stockData =stockObj.data5;
     else if(interval == "10MINUTE")
@@ -218,20 +236,27 @@ app.get('/loadAllSymbolData/:interval/:exchange', function (req:any, res:any) {
         res.end();
     }
     else{
+        console.log('*** Ok No data available.. Fetch it \n ');
         loadAllSymbolData(list,interval,'10-11-2018').then(function (response:any) {
+            
+            var data = response.filter(function (el) {
+                return (el != null && el.close != null && el.close != undefined && el.close != "");
+            });
+   
             if(interval == "5MINUTE") // 1WEEK, 1MONTH
-                stockObj.data5 =response;
+                stockObj.data5 =data;
             else if(interval == "10MINUTE")
-                stockObj.data10 =response;
+                stockObj.data10 =data;
             else if(interval == "30MINUTE")
-                stockObj.data30 =response;
+                stockObj.data30 =data;
             else if(interval == "60MINUTE")
-                stockObj.data60 =response;  
+                stockObj.data60 =data;  
             else if(interval == "1DAY")
-                 stockObj.data1day =response;    
+                 stockObj.data1day =data;    
 
             res.setHeader('Content-Type', 'application/json');
             res.send(JSON.stringify(response));
+            data = null;
             res.end();
         })
         .catch(function(error:any){
@@ -271,7 +296,7 @@ app.post('/scan', function (req:any, res:any) {
 
 app.get('/admin', function (req:any, res:any) {
    var loginUrl = upstox.getLoginUri(redirect_uri);
-    log("**************** loginUri ***********\n" + loginUrl);
+    log("*loginUri " + loginUrl);
     res.status(200).header('Content-type', 'text/html');
     code = req.params.code;
     res.status(302).setHeader('Location', loginUrl);
