@@ -11,6 +11,7 @@ var login_code = "ce728b73424e719680aa66a51ba4eb469f9875f2";
 var api_secret = "xs5ibb0pk0";
 var client_id="";
 var watchList = ['banknifty','hindalco','ICICIBANK','sbin','idea','lt','HAVELLS'];
+var accessToken;
 
 function getAcceToken(code:any)
 {
@@ -25,10 +26,10 @@ function getAcceToken(code:any)
         .then(function (response:any) {
             params = api_secret = code = null;
 
-            var accessToken = response.access_token;
+            accessToken = response.access_token;
             log("****accessToken*\n" +accessToken);
             upstox.setToken(accessToken);
-            accessToken = null;
+            //accessToken = null;
             
             start();
             //res.sendFile("index.html", {"root": __dirname});
@@ -274,12 +275,14 @@ function getProfile()
 
 function loadSymbol(symbol,exchange,interval='1day',start_date='1-1-2018'){ 
     //log("loadSymbol > " + symbol + " > "+ interval +" > "+exchange);
-    return upstox.getOHLC({"exchange": exchange,
-        "symbol": symbol,
-        "start_date": start_date,
-        "format" : "json",
-        "interval" : interval
-    })  
+    if(accessToken){
+        return upstox.getOHLC({"exchange": exchange,
+            "symbol": symbol,
+            "start_date": start_date,
+            "format" : "json",
+            "interval" : interval
+        })  
+    }    
 }
 
 function getAllData(){
@@ -287,31 +290,44 @@ function getAllData(){
 }
 
 function syncStockData(){ 
-    setTimeout(function(){ load1dayData(); }, 60000);
+    /* setTimeout(function(){ load1dayData(); }, 60000);
     setTimeout(function(){ load60minData(); }, 30000);
     setTimeout(function(){ load30minData(); }, 20000);
     setTimeout(function(){ load10minData(); }, 10000);
-    setTimeout(function(){ load5minData(); }, 10);   
+    setTimeout(function(){ load5minData(); }, 10);  */
+    
+    delay(10).then(() => load5minData());
+    delay(10000).then(() => load10minData());
+    delay(20000).then(() => load30minData());
+    delay(30000).then(() => load60minData());
+    delay(60000).then(() => load1dayData());
 }
 
+const delay = t => new Promise(resolve => setTimeout(resolve, t));
+
 //var allSymbolWithIndicator = [];
+var stockData = []; 
+var data = {};
+var promiseArr = [];
+
 async function loadAllSymbolData(response:any,interval='1day',start_date='11-11-2018'){ 
-    var allSymbolWithIndicator = [];
+    //var allSymbolWithIndicator = [];
     
     //log( "loadAllSymbolData ******** " +  response);
-    
-    var promiseArr = response.map(async symbol => {
-        var data = {};
+    promiseArr = [];
+    promiseArr = response.map(async symbol => {
+        data = {};
+        stockData = [];
         //console.log("symbol " + interval +" >> "+symbol);
         await loadSymbol(symbol,'nse_eq',interval,'9-9-2018').then(function (response:any) {
-            var stockData =response.data;
+            stockData =response.data;
             stockData.map(row => {
                 row.timestamp = new Date(row.timestamp);
                 row.rsi = rsi.nextValue(Number(row.close));
                 row.sma = sma.nextValue(Number(row.close));
                 row.bb = bb.nextValue(Number(row.close)); 
 
-                /* if(Number(row.close) > row.bb.upper)
+                if(Number(row.close) > row.bb.upper)
                 {
                     row.bb.isCrossed = 'Crossed Above';
                 }
@@ -322,7 +338,7 @@ async function loadAllSymbolData(response:any,interval='1day',start_date='11-11-
                 else
                 {
                     row.bb.isCrossed = '';
-                } */
+                }
                 return row;
             });
             stockData.reverse();
@@ -335,21 +351,18 @@ async function loadAllSymbolData(response:any,interval='1day',start_date='11-11-
                 "sma":stockData[0].sma, 
                 "bb":stockData[0].bb
             }; 
-            //stockData = null;
+            stockData = null;
         })
         .catch(function(error:any){
             console.log("loadSymbol error > " +  JSON.stringify(error));
         });
-        //symbol = data = null;
+        symbol = null;
 
         return data;
     });
 
     return Promise.all(promiseArr).then(function(res) {
-        var arr = [];
-        arr = res;
-        arr = arr.filter(Boolean);
-        return arr;
+        return res.filter(Boolean);;
     });
 }
 

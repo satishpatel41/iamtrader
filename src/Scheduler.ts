@@ -32,14 +32,16 @@ function load1dayData()
     var start_date = now.getDate()+"-"+(now.getMonth())+"-"+now.getFullYear();
     var interval = '1day';
 
-    loadAllSymbolData(list,interval,start_date).then(function (response:any) {
-        stockObj.data1day = response;
-        log('*** NSE 1 day *** \n ' + JSON.stringify(stockObj));
-        list = now = interval = null;
-    })
-    .catch(function(error:any){
-       log("loadAllSymbolData/ error > " +  JSON.stringify(error));
-    });
+    if(accessToken){    
+        loadAllSymbolData(list,interval,start_date).then(function (response:any) {
+            stockObj.data1day = response;
+            log('*** NSE 1 day *** \n ' + JSON.stringify(stockObj));
+            list = now = interval = null;
+        })
+        .catch(function(error:any){
+           log("loadAllSymbolData/ error > " +  JSON.stringify(error));
+        });
+    }   
 }
 
 function load60minData()
@@ -50,14 +52,16 @@ function load60minData()
     now.setMinutes(now.getMinutes() - 50 * 60);
     var start_date = now.getDate()+"-"+(now.getMonth())+"-"+now.getFullYear();
     var interval = '60MINUTE';
-    loadAllSymbolData(list,interval,start_date).then(function (response:any) {
-        stockObj.data60 = response;
-        log('*** NSE 60 MINUTE *** \n ' + JSON.stringify(stockObj));
-        list = now = interval = null;
-    })
-    .catch(function(error:any){
-       log("loadAllSymbolData/ error > " +  JSON.stringify(error));
-    });
+    if(accessToken){    
+        loadAllSymbolData(list,interval,start_date).then(function (response:any) {
+            stockObj.data60 = response;
+            log('*** NSE 60 MINUTE *** \n ' + JSON.stringify(stockObj));
+            list = now = interval = null;
+        })
+        .catch(function(error:any){
+           log("loadAllSymbolData/ error > " +  JSON.stringify(error));
+        });
+    }   
 }
 
 function load30minData()
@@ -68,14 +72,16 @@ function load30minData()
     now.setMinutes(now.getMinutes() - 50 * 30);
     var start_date = now.getDate()+"-"+(now.getMonth())+"-"+now.getFullYear();
     var interval = '30MINUTE';
-    loadAllSymbolData(list,interval,start_date).then(function (response:any) {
-        stockObj.data30 = response;
-        log('*** NSE 30 MINUTE *** \n ' + JSON.stringify(stockObj));
-        list = now = interval = null;
-    })
-    .catch(function(error:any){
-       log("loadAllSymbolData/ error > " +  JSON.stringify(error));
-    });
+    if(accessToken){    
+        loadAllSymbolData(list,interval,start_date).then(function (response:any) {
+            stockObj.data30 = response;
+            log('*** NSE 30 MINUTE *** \n ' + JSON.stringify(stockObj));
+            list = now = interval = null;
+        })
+        .catch(function(error:any){
+           log("loadAllSymbolData/ error > " +  JSON.stringify(error));
+        });
+    }    
 }
 
 function load10minData()
@@ -87,14 +93,16 @@ function load10minData()
     now.setMinutes(now.getMinutes() - 50 * 10);
     var start_date = now.getDate()+"-"+(now.getMonth())+"-"+now.getFullYear();
 
-    loadAllSymbolData(list,interval,start_date).then(function (response:any) {
-        stockObj.data10 = response;
-        log('*** NSE 10 MINUTE *** \n ' + JSON.stringify(stockObj));
-        list = now = interval = null;
-    })
-    .catch(function(error:any){
-       log("loadAllSymbolData/ error > " +  JSON.stringify(error));
-    });
+    if(accessToken){    
+        loadAllSymbolData(list,interval,start_date).then(function (response:any) {
+            stockObj.data10 = response;
+            log('*** NSE 10 MINUTE *** \n ' + JSON.stringify(stockObj));
+            list = now = interval = null;
+        })
+        .catch(function(error:any){
+            log("loadAllSymbolData/ error > " +  JSON.stringify(error));
+        });
+    }    
 }
 
 
@@ -107,13 +115,15 @@ function load5minData()
     var start_date = now.getDate()+"-"+(now.getMonth())+"-"+now.getFullYear();
 
     var interval = '5MINUTE';
-    loadAllSymbolData(list,interval,start_date).then(function (response:any) {
-        stockObj.data5 = response;
-        log('*** NSE 5 MINUTE *** \n ' +  start_date +" >> "+ JSON.stringify(stockObj));
-        list = now = interval = null;
-        
-    })
-    .catch(function(error:any){
-       log("loadAllSymbolData/ error > " +  start_date +" >> "+JSON.stringify(error));
-    });
+    if(accessToken){
+        loadAllSymbolData(list,interval,start_date).then(function (response:any) {
+            stockObj.data5 = response;
+            log('*** NSE 5 MINUTE *** \n ' +  start_date +" >> "+ JSON.stringify(stockObj));
+            list = now = interval = null;
+            
+        })
+        .catch(function(error:any){
+           log("loadAllSymbolData/ error > " +  start_date +" >> "+JSON.stringify(error));
+        });
+    }    
 }

@@ -53,3 +53,4 @@ Thu Dec 27 2018 19:25:00 GMT+0200 (South Africa Standard Time) NSE 5 MINUTE data
 Thu Dec 27 2018 19:30:00 GMT+0200 (South Africa Standard Time) NSE 5 MINUTE data update
 Thu Dec 27 2018 19:30:01 GMT+0200 (South Africa Standard Time) NSE 10MINUTE data update
 Thu Dec 27 2018 19:30:02 GMT+0200 (South Africa Standard Time) NSE 30MINUTE data update
+Thu Dec 27 2018 19:35:02 GMT+0200 (South Africa Standard Time) NSE 5 MINUTE data update

@@ -285,6 +285,10 @@ function calculateIndicators(row:any)
 }
 
 function log(message:any){
+
+    if(process.env.NODE_ENV=="production")
+        return;
+        
     date = new Date();
     today = date.getDate() +"-"+date.getMonth() +"-"+date.getFullYear();
     time = today +":"+date.getHours() +":"+date.getMinutes();

@@ -25,12 +25,16 @@ $(document).ready( function () {
         } */
 
         var interval = "1day";
+        var symbol = 'sbin';
+
         $( "#intervalDropDown" ).change(function() {
           interval = $("#intervalDropDown").val();
+
+          loadSymbolData(symbol,interval);
         });
 
         $( "#symbolDropdown" ).change(function() {
-          var symbol = $("#symbolDropdown").val();
+          symbol = $("#symbolDropdown").val();
           loadSymbolData(symbol,interval);
         });
        

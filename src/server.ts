@@ -2,7 +2,6 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var fs = require('fs');
 var url = require('url');
-const https = require('https');
 const dataForge = require('data-forge');
 require('data-forge-fs');
 var Upstox = require("upstox");
@@ -12,7 +11,6 @@ const PORT = process.env.PORT || 8080;
 var redirect_uri = "http://localhost:"+PORT;
 var nifty = "https://www.nseindia.com/content/indices/ind_nifty50list.csv";
 var fno = "https://www.nseindia.com/content/fo/fo_mktlots.csv";
-var jsdom = require('jsdom').jsdom;
 
 if(process.env.NODE_ENV=="production")
 {
@@ -71,6 +69,7 @@ app.get('/', function (req:any, res:any) {
     else{
         res.sendFile("index.html", {"root": __dirname});
     }
+    q = null;
 });
 
 app.get('/welcome', function (req:any, res:any) {
@@ -118,6 +117,9 @@ app.get('/scan', function (req:any, res:any) {
     res.sendFile("scanner.html", {"root": __dirname});
 });
 
+var  lastObject = {open:'',close:'',low:'',high:'',volume:'',timestamp:'',rsi:'',sma:'',bb:{upper:'',lower:'',isCrossed:'',middel:'',pb:''}};
+var stockData = [];
+
 app.get('/loadSymbol/:symbol/:interval', function (req:any, res:any) { 
     var symbol = req.params.symbol;  
     var interval = req.params.interval; 
@@ -143,20 +145,19 @@ app.get('/loadSymbol/:symbol/:interval', function (req:any, res:any) {
     initiateIndicator();
    
     //log("loadSymbol/:symbol start_date > " +  start_date +" > "+symbol +" > "+ interval);
-    
+    stockData = [];
     loadSymbol(symbol,'nse_eq',interval,start_date).then(function (response:any) {
         res.setHeader('Content-Type', 'application/json');
-        var stockData =response.data;
+        stockData =response.data;
        
-
-        var lastObject = {open:'',close:'',low:'',high:'',volume:'',timestamp:'',rsi:'',sma:'',bb:{upper:'',lower:'',isCrossed:'',middel:'',pb:''}};
+        lastObject = {open:'',close:'',low:'',high:'',volume:'',timestamp:'',rsi:'',sma:'',bb:{upper:'',lower:'',isCrossed:'',middel:'',pb:''}};
         stockData.map(row => {
             row.timestamp = new Date(row.timestamp);
             row.rsi = rsi.nextValue(Number(row.close));
             row.sma = sma.nextValue(Number(row.close));
             row.bb = bb.nextValue(Number(row.close)); 
             
-            /* if(Number(row.close) >= row.bb.upper && Number(lastObject.close) < Number(lastObject.bb.upper))
+            if(Number(row.close) >= row.bb.upper && Number(lastObject.close) < Number(lastObject.bb.upper))
             {
                 row.bb.isCrossed = 'Crossed Above';
             }
@@ -164,12 +165,12 @@ app.get('/loadSymbol/:symbol/:interval', function (req:any, res:any) {
             {
                 row.bb.isCrossed = 'Crossed Below';
             }
-            lastObject = row; */
+            lastObject = row;
             return row;
         });
         stockData.reverse();
-        //console.log("loadSymbol Respone > " +  JSON.stringify(response));
         res.send(JSON.stringify(stockData));
+        stockData = null;
         res.end();
     })
     .catch(function(error:any){
@@ -196,6 +197,7 @@ function initiateIndicator()
         stdDev : 2 
     }
     bb = new technicalindicators.BollingerBands(inputBB);
+    inputBB = inputRSI = inputSMA = null;
 }
 
 app.get('/loadAllSymbolData/:interval/:exchange', function (req:any, res:any) { 
@@ -256,7 +258,7 @@ app.get('/loadAllSymbolData/:interval/:exchange', function (req:any, res:any) {
 
             res.setHeader('Content-Type', 'application/json');
             res.send(JSON.stringify(response));
-            data = null;
+            exchange = list = interval = data = null;
             res.end();
         })
         .catch(function(error:any){
