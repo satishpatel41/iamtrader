@@ -1,7 +1,8 @@
+//require("Utility.js");
 var Upstox = require("upstox");
+
 var api = "cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw";
 var upstox = new Upstox(api);
-var schedule = require('node-schedule');
 var fs = require('fs');
 var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 var code = '';
@@ -45,7 +46,7 @@ function start() {
        
     var bankNiftyCall:any;
           
-    upstox.getMasterContract({exchange: "nse_fo1"})
+    upstox.getMasterContract({exchange: "nse_fo"})
     .then(function(response:any) {
         //console.log("NSE FO " + JSON.stringify(response));
         
@@ -54,24 +55,23 @@ function start() {
       //  var response = JSON.parse(response);
         //console.log('\n 1.1' + response);
         var  data=csvTojs(response.data);
+
+        //console.log("NSE FO " + JSON.stringify(data));
+
         var now = new Date();
         var thisMonth = months[now.getMonth()].slice(0,3).toUpperCase();
         var monthPattern = new RegExp(thisMonth, 'gi');
-        
-        var csvOptions = { columnNames: ["symbol", "name", "closing_price", "expiry", "strike_price", "lot_size", "instrument_type"] };
-       // var transformedData =[];//new dataForge.DataFrame(data);
-        //.toJSON()
-        /* .toArray()
-        */
+        //console.log("monthPattern" + monthPattern);
+      
        var transformedData = JSON.parse(JSON.stringify(transformedData));
         
 
-       // console.log(' >  ' + transformedData);
+        //console.log(' >  ' + transformedData);
 
         var dataFrame = dataForge.fromJSON(transformedData)
         .where(row => {
      
-           // console.log('\n row > ' + JSON.stringify(row));
+           //console.log('\n row > ' + JSON.stringify(row));
             row = JSON.stringify(row);
            // console.log('\n row > ' + JSON.stringify(row));
            // console.log('\n symbol > ' + row.symbol);
@@ -94,38 +94,10 @@ function start() {
             if (err) throw err;
             console.log('nse_fo File is created successfully.');
         }); 
+
+        checkBankNiftyExpiry();
        
-        // var j = schedule.scheduleJob('0 18 * * *', function(){
-        //     log('Daily data update');
-        //     loadAllSymbolData(transformedData,'1DAY','1-1-2005');
-        // });
-
-        // var newDate = new Date();
-        // newDate.setDate(newDate.getDate() - 10);//240     
-        
-        // var j = schedule.scheduleJob('*/60 * * * *', function(){
-        //     log('NSE 60MINUTE data update');
-        //     loadAllSymbolData(transformedData,'60MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
-        // });
-
-        // var j = schedule.scheduleJob('*/30 * * * *', function(){
-        //     log('NSE 30MINUTE data update');
-        //     loadAllSymbolData(transformedData,'30MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
-        // });
-
-        // var newDate = new Date();
-        // newDate.setDate(newDate.getDate() - 5);     
-        // var j = schedule.scheduleJob('*/10 * * * *', function(){
-        //     log('NSE 10MINUTE data update');
-        //     loadAllSymbolData(transformedData,'10MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
-        // });
-
-        // var newDate = new Date();
-        // newDate.setDate(newDate.getDate() - 5);     
-        // var j = schedule.scheduleJob('*/5 * * * *', function(){
-        //     log('NSE 10MINUTE data update');
-        //     loadAllSymbolData(transformedData,'5MINUTE',newDate.getDate()+"-"+newDate.getMonth()+"-"+newDate.getFullYear());
-        // });
+    
     })
     .catch(function(err:any) {
         console.log("nse fo error " + JSON.stringify(err));
@@ -177,14 +149,17 @@ function start() {
                 log("tradeUpdate"+ message);
             });
 
+            //console.log("niftyList" + niftyList);
+            var niftyStr = niftyList.join();
+            //console.log("join" + niftyStr);
+
             upstox.subscribeFeed({
-                "exchange": "NSE_FO",
-                "symbol": 'BANKNIFTY27DECFUT',//NIFTY29NOVFUT NIFTY18NOVFUT,BANKNIFTY18NOVFUT
+                "exchange": "nse_eq",
+                "symbol": niftyStr,//'BANKNIFTY27DECFUT',//NIFTY29NOVFUT NIFTY18NOVFUT,BANKNIFTY18NOVFUT
                 "type": "ltp"
             })
             .then(function (response:any) {
                 console.log('feedsymbols subscribeFeed response ', response);
-                //res.send({ error: error });
             })
             .catch(function (error:any) {
                 //res.send({ error: error });
@@ -197,7 +172,7 @@ function start() {
             });
             upstox.on("disconnected", function(message:any) {
                 //listener after socket connection is disconnected
-                log("disconnected"+ message);
+                log("disconnected > "+ message);
             });
             upstox.on("error", function(error:any) {
                 //error listener
@@ -272,9 +247,14 @@ function getProfile()
     });
 }
 
+function getMaster(ex = "nse_fo"){ 
+    if(accessToken){
+        return upstox.getMasterContract({exchange: ex});
+    }    
+}
 
-function loadSymbol(symbol,exchange,interval='1day',start_date='1-1-2018'){ 
-    //log("loadSymbol > " + symbol + " > "+ interval +" > "+exchange);
+function loadSymbol(symbol,exchange,interval='1day',start_date='12-12-2018'){ 
+    log("loadSymbol > " + symbol + " > "+ interval +" > "+exchange +" > "+ start_date);
     if(accessToken){
         return upstox.getOHLC({"exchange": exchange,
             "symbol": symbol,
@@ -310,7 +290,7 @@ var stockData = [];
 var data = {};
 var promiseArr = [];
 
-async function loadAllSymbolData(response:any,interval='1day',start_date='11-11-2018'){ 
+async function loadAllSymbolData(response:any,interval='1DAY',start_date='11-11-2018'){ 
     //var allSymbolWithIndicator = [];
     
     //log( "loadAllSymbolData ******** " +  response);
@@ -318,8 +298,10 @@ async function loadAllSymbolData(response:any,interval='1day',start_date='11-11-
     promiseArr = response.map(async symbol => {
         data = {};
         stockData = [];
-        //console.log("symbol " + interval +" >> "+symbol);
-        await loadSymbol(symbol,'nse_eq',interval,'9-9-2018').then(function (response:any) {
+        
+        console.log("symbol " + interval +" >> "+symbol +" >> "+start_date);
+
+        await loadSymbol(symbol,'nse_eq',interval,start_date).then(function (response:any) {
             stockData =response.data;
             stockData.map(row => {
                 row.timestamp = new Date(row.timestamp);

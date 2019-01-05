@@ -4,9 +4,12 @@
 function csvTojs(csv) {
   var lines=csv;//.split(",");
   var result = [];
+
   var headers = lines[0].split(",");
 
-  for(var i=1; i<lines[1].length; i++) {
+    
+
+  for(var i=1; i<lines.length; i++) {
     var obj = {};
 
     var row = lines[i],

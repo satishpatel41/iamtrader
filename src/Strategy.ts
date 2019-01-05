@@ -3,7 +3,7 @@ var technicalindicators = require('technicalindicators');
 var fs = require('fs');
 var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 var date = new Date();
-var today = date.getDate() +"-"+date.getMonth() +"-"+date.getFullYear();
+var today = date.getDate() +"-"+(date.getMonth() +  1)+"-"+date.getFullYear();
 var time = date +":"+date.getHours() +":"+date.getMinutes();
 var days = [
     'Sunday',
@@ -14,6 +14,13 @@ var days = [
     'Friday',
     'Saturday',
 ];
+
+var strategyObj = {
+    symbol:'BANKNIFTY19JANFUT',
+    indicators:[{indicator:'rsi',settings:'14',value:'60',op:'>='}
+               ,{indicator:'sma',settings:'20',value:'close',op:'>='}],
+    interval:'15min'
+};
 
 function backTesting(stockData:any,path:String){ 
 
@@ -290,7 +297,7 @@ function log(message:any){
         return;
         
     date = new Date();
-    today = date.getDate() +"-"+date.getMonth() +"-"+date.getFullYear();
+    today = date.getDate() +"-"+(date.getMonth() +1)+"-"+date.getFullYear();
     time = today +":"+date.getHours() +":"+date.getMinutes();
     var path = "logs/log-"+today+".txt";
     try {

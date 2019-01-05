@@ -16,15 +16,8 @@ $(document).ready( function () {
 
         var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
        
-        
-        /* if ("serviceWorker" in navigator) {
-          navigator.serviceWorker
-            .register("sw.js")
-            .then(console.log)
-            .catch(console.error);
-        } */
-
-        var interval = "1day";
+      
+        var interval = "1DAY";
         var symbol = 'sbin';
 
         $( "#intervalDropDown" ).change(function() {
@@ -33,8 +26,8 @@ $(document).ready( function () {
           loadSymbolData(symbol,interval);
         });
 
-        $( "#symbolDropdown" ).change(function() {
-          symbol = $("#symbolDropdown").val();
+        $( "#symbolTxt" ).change(function() {
+          symbol = $("#symbolTxt").val();
           loadSymbolData(symbol,interval);
         });
        
@@ -48,7 +41,7 @@ $(document).ready( function () {
                   'Select an option'
               );
 
-              loadSymbolData("sbin","1day");
+              loadSymbolData("sbin",interval);
           }
         });
 
@@ -132,13 +125,16 @@ $(document).ready( function () {
     <br></br>
     <br></br>
     <div class="row">
-          <div class="col-sm-4">
+          <div class="col-sm-2">
             <label>Symbol</label>
-            <select  id="symbolDropdown" type="button" class="btn-group dropup"></select>
+            <!----select  id="symbolDropdown" type="button" class="form-control" ></select-->
+
+            <input type="text" id="symbolTxt" list="symbolDropdown" class="form-control" placeholder="Search symbol">
+            <datalist id="symbolDropdown"></datalist>
           </div>
-          <div class="col-sm-4">
+          <div class="col-sm-2">
             <label>Interval</label>
-            <select id="intervalDropDown" class="btn-group dropup">
+            <select id="intervalDropDown" class="form-control" >
                 <option value="5MINUTE">5MINUTE</option>
                 <option value="10MINUTE">10MINUTE</option>
                 <option value="30MINUTE">30MINUTE</option>
