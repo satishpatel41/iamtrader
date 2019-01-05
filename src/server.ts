@@ -261,7 +261,7 @@ app.get('/loadSymbol/:symbol/:interval', function (req:any, res:any) {
         now.setDate(now.getDate() - 20);  
     
     var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
-    console.log("start_date > " + interval +" >> "+start_date);
+    //console.log("start_date > " + interval +" >> "+start_date);
     initiateIndicator();
     stockData = [];
     loadSymbol(symbol,'nse_eq',interval,start_date).then(function (response:any) {
