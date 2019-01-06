@@ -13,7 +13,12 @@ function closeDb(){
 function insertDB(query,param){
     return new Promise(function(resolve, reject) {
         db.run(query, param,function(err){
-            console.log("Insert error > " + err);
+            if(err)
+                console.log("Insert error > " + err);
+            else{
+                console.log("Successfully inserted");
+                resolve("success");
+            }               
         });
     })        
 }

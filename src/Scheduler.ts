@@ -11,7 +11,6 @@ scheduled: true,
 timezone: "Asia/Kolkata"
 });
 
-
 cron.schedule('*/10 * * * *', () => {
     load10minData();
     console.log('running a task every 10 minutes');
@@ -29,7 +28,6 @@ scheduled: true,
 timezone: "Asia/Kolkata"
 });
 
-
 cron.schedule('0 */1 * * *', () => {
     load60minData();
     console.log('running a task every 1 hour');
@@ -45,7 +43,6 @@ cron.schedule('0 17 * * *', () => {
 scheduled: true,
 timezone: "Asia/Kolkata"
 });
-
 
 function load1dayData()
 {
@@ -118,14 +115,14 @@ function load10minData()
     var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
 
     if(accessToken){    
-        /* loadAllSymbolData(list,interval,start_date).then(function (response:any) {
+        loadAllSymbolData(list,interval,start_date).then(function (response:any) {
             stockObj.data10 = response;
             log('*** NSE 10 MINUTE *** \n ' + JSON.stringify(stockObj));
             list = now = interval = null;
         })
         .catch(function(error:any){
             log("loadAllSymbolData/ error > " +  JSON.stringify(error));
-        }); */
+        });
     }    
 }
 

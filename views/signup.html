@@ -100,92 +100,96 @@ a {
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript">
-    $(document).ready( function () {
-    
-            var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
+$(document).ready( function () {
+        var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
+        $(".alert-danger").hide(); $(".alert-success").hide();
 
-            $(".alert").hide();
+        function validate(){
+            var isValidEmail = ValidateEmail($("#emailField").val());
+            var isPasswordValid = ($("#psw").val() === $("#psw-repeat").val());
+            var isPhoneValid = validatePhone($("#mobileField").val());
 
-            function validate(){
-                var isValidEmail = ValidateEmail($("#emailField").val());
-                var isPasswordValid = ($("#psw").val() === $("#psw-repeat").val());
-                var isPhoneValid = validatePhone($("#mobileField").val());
+            return isValidEmail && isPasswordValid && isPhoneValid;
+        }
 
-                console.log(isValidEmail +" > "+ isPasswordValid +">"+isPhoneValid);
+        function validatePhone(phone) {
+            var error = "";
+            var stripped = phone.replace(/[\(\)\.\-\ ]/g, '');
 
-                return isValidEmail && isPasswordValid && isPhoneValid;
+            if (stripped == "") {
+                error = "You didn't enter a phone number.";
+            } else if (isNaN(parseInt(stripped))) {
+                phone = "";
+                error = "The phone number contains illegal characters.";
+
+            } else if (!(stripped.length == 10)) {
+                phone = "";
+                error = "The phone number is the wrong length. Make sure you included an area code.\n";
             }
-
-            function validatePhone(phone) {
-                var error = "";
-                var stripped = phone.replace(/[\(\)\.\-\ ]/g, '');
-
-                if (stripped == "") {
-                    error = "You didn't enter a phone number.";
-                } else if (isNaN(parseInt(stripped))) {
-                    phone = "";
-                    error = "The phone number contains illegal characters.";
-
-                } else if (!(stripped.length == 10)) {
-                    phone = "";
-                    error = "The phone number is the wrong length. Make sure you included an area code.\n";
-                }
-                if(error != ""){
-                    $("#error_txt").text(error);
-                    return false;
-                }
-                else{
-                    return true;
-                }
-               
+            if(error != ""){
+                $("#error_txt").text(error);
+                return false;
             }
+            else{
+                return true;
+            }
+            
+        }
 
-            function ValidateEmail(mail)   
+        function ValidateEmail(mail)   
+        {  
+            if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail))  
             {  
-                if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail))  
-                {  
-                    return (true)  
-                }  
-                $(".alert").show();
-                $("#error_txt").text("You have entered an invalid email address!");
-                //alert("You have entered an invalid email address!")  
-                return (false)  
-            } 
+                return (true)  
+            }  
+            $(".alert-danger").show();
+            $("#error_txt").text("You have entered an invalid email address!");
+            //alert("You have entered an invalid email address!")  
+            return (false)  
+        } 
 
-            $('#okButton').on('click', function(event) {
-                $(".alert").hide();
+        $('#okButton').on('click', function(event) {
+            $(".alert-danger").hide();
 
-                var isValid = validate();    
-                event.preventDefault(); // To prevent following the link (optional)
-                if(isValid){
-                    var userObj = {
-                        email:$("#emailField").val(),
-                        psw:$("#psw").val(),
-                        mobile:$("#mobileField").val(),
-                        name:$("#nameField").val(),
-                        pswRepeat:$("#psw-repeat").val()
-                    };
+            var isValid = validate();    
+            event.preventDefault(); // To prevent following the link (optional)
+            if(isValid){
+                var userObj = {
+                    email:$("#emailField").val(),
+                    psw:$("#psw").val(),
+                    mobile:$("#mobileField").val(),
+                    name:$("#nameField").val(),
+                    pswRepeat:$("#psw-repeat").val()
+                };
 
-                    console.log(server);
-                    $.ajax({
-                        type: "post",
-                        data: {data:JSON.stringify(userObj)},
-                        url: server + '/signup',//+JSON.stringify(strategyObj),
-                        success: function(msg){
-                        alert(msg);
-                        $(".alert").show();
-                        $("#error_txt").text("Success ! Please verify your email !");
+                $.ajax({
+                    type: "post",
+                    data: JSON.stringify(userObj),
+                    url: server + '/signup',
+                    contentType: 'application/json',
+                    success: function(msg){
+                        //alert(msg);
+                        if(msg == "success")
+                        { 
+                            $(".alert-success").show();
+                                $("#message_txt").text("Success ! Please verify your email !");
                         }
-                    });
-                } 
-                else{
-                    $(".alert").show();
-                    $("#error_txt").text("Invalid input !");
-                }   
-            });
-              
-    });
-    </script>
+                        else{
+                                $(".alert-danger").show();
+                                $("#error_txt").text("There is some issue with service!");
+                        }
+                       
+                    }
+                });
+            } 
+            else{
+                $(".alert-danger").show();
+                $("#error_txt").text("Invalid input !");
+            }   
+        });
+            
+});
+</script>
 <body>
 
 <form id="signUpForm" >
@@ -214,14 +218,19 @@ a {
 
     <button  id="okButton" class="registerbtn">Register</button>
 
-    <div class="alert">
+    <div class="alert alert-danger">
             <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
             <strong>Error!</strong> <label id="error_txt"></label>
           </div>
    </div>
+   <div class="alert alert-success">
+        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+        <strong>Success!</strong> <label id="message_txt"></label>
+      </div>
+</div>
   
   <div class="container signin">
-    <p>Already have an account? <a href="#">Sign in</a>.</p>
+    <p>Already have an account? <a href="/login">Sign in</a>.</p>
   </div>
 </form>
 

@@ -107,6 +107,28 @@ input[type=submit]:hover {
   padding: 8px 10px;
 }
 
+
+/* Set a style for the submit button */
+.registerbtn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    opacity: 0.9;
+}
+
+.registerbtn:hover {
+    opacity: 1;
+}
+
+/* Add a blue text color to links */
+a {
+    color: dodgerblue;
+}
+
 /* hide some text on medium and large screens */
 .hide-md-lg {
   display: none;
@@ -137,13 +159,80 @@ input[type=submit]:hover {
 }
 </style>
 </head>
+<script type="text/javascript">
+$(document).ready( function () {
+  var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
+  $(".alert-danger").hide(); 
+  $(".alert-success").hide(); 
+  function validate(){
+      var isValidEmail = ValidateEmail($("#emailField").val());
+      var isPasswordValid = ($("#passwordField").val() !== "");
+      
+      return isValidEmail && isPasswordValid;
+  }
+
+  function ValidateEmail(mail)   
+  {  
+      if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail))  
+      {  
+          return (true)  
+      }  
+      $(".alert-danger").show();
+      $("#error_txt").text("You have entered an invalid email address!");
+      //alert("You have entered an invalid email address!")  
+      return (false)  
+  } 
+
+
+  $('#loginButton').on('click', function(event) {
+    $(".alert-danger").hide(); 
+    $(".alert-success").hide();
+
+    var isValid = validate();    
+    event.preventDefault(); // To prevent following the link (optional)
+    if(isValid){
+        var userObj = {
+            username:$("#emailField").val(),
+            password:$("#passwordField").val()
+        };
+
+        $.ajax({
+            type: "post",
+            data: JSON.stringify(userObj),
+            contentType: 'application/json',
+            url: server + '/login',
+            success: function(user){
+              if(user != 'error'){
+                localStorage.setItem('user', user.name);  
+                localStorage.setItem('uid', user.uid);  
+               
+                $(".alert-success").show();
+                $("#message_txt").text("Login Success !");
+                var url = server+'/index'
+                setTimeout(function(){window.location.replace(url)}, 1000); 
+              }
+              else{
+                  $(".alert-danger").show();
+                  $("#error_txt").text("Email / password is incorrect !");
+              }  
+            }
+        });
+    } 
+    else{
+        $(".alert-danger").show();
+        $("#error_txt").text("Invalid input !");
+    }   
+  });
+
+});  
+</script>
 <body>
 
 <h2>Responsive Social Login Form</h2>
 <p>Resize the browser window to see the responsive effect. When the screen is less than 650px wide, make the two columns stack on top of each other instead of next to each other.</p>
 
 <div class="container">
-  <form action="/login" method="POST">
+  <form>
     <div class="row">
       <h2 style="text-align:center">Login with Social Media or Manually</h2>
       <div class="vl">
@@ -167,9 +256,20 @@ input[type=submit]:hover {
           <p>Or sign in manually:</p>
         </div>
 
-        <input type="text" name="username" placeholder="Username" required autofocus>
-        <input type="password" name="password" placeholder="Password" required>
-        <input type="submit" value="Login">
+        <input type="text" name="email" placeholder="Email" id="emailField" required autofocus>
+        <input type="password" name="password" placeholder="Password" id="passwordField" required>
+       
+        <button  id="loginButton" class="registerbtn">Login</button>
+        
+          <div class="alert alert-danger">
+              <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+              <strong>Error!</strong> <label id="error_txt"></label>
+          </div>
+          <div class="alert alert-success">
+              <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+              <strong>Success!</strong> <label id="message_txt"></label>
+            </div>
+      </div>
       </div>
       
     </div>
@@ -179,7 +279,7 @@ input[type=submit]:hover {
 <div class="bottom-container">
   <div class="row">
     <div class="col">
-      <a href="#" style="color:white" class="btn">Sign up</a>
+      <a href="/signup" style="color:white" class="btn">Sign up</a>
     </div>
     <div class="col">
       <a href="#" style="color:white" class="btn">Forgot password?</a>

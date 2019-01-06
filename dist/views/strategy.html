@@ -11,16 +11,16 @@
 <link href="https://unpkg.com/tabulator-tables@4.1.3/dist/css/semantic-ui/tabulator_semantic-ui.min.css" rel="stylesheet">
 <style>
     .loader {
-      border: 16px solid #f3f3f3;
+      border: 10px solid #f3f3f3;
       border-radius: 50%;
-      border-top: 16px solid #3498db;
-      width: 60px;
-      height: 60px;
+      border-top: 10px solid #3498db;
+      width: 50px;
+      height: 50px;
       -webkit-animation: spin 2s linear infinite; /* Safari */
       animation: spin 2s linear infinite;
       position: fixed;
-      left: 50%;
-      top: 50%;
+      left: 45%;
+      top: 45%;
       transform: translate(-50%, -50%);
     }
     
@@ -41,16 +41,10 @@
 $(document).ready( function () {
 
         var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
-       
-      
-
+        $('#userTxt').text(localStorage.getItem('user'));
         var nseSymbols = [];
-
-      
         loadMasterData();
-        
-
-
+      
         function csvTojs(csv) {
               var lines=csv;//.split(",");
               var result = [];
@@ -110,16 +104,17 @@ $(document).ready( function () {
 
         function buySell(oType){
               var strategyObj = {
+                  uid:localStorage.getItem('uid'),
                   symbol:$("#symbolTxt").val(),
                   exchange:'nse_fo',
                   orderType:oType,
+                  name:$("#nameTxt").val(),
                   symbolToBuySell:$("#optionsTxt").val(),
                   indicators:[{indicator:$("#indiDropDown").val(),settings:'14',value:$("#valueTxt").val(),op:$("#opDropDown").val()}],
                             //,{indicator:'sma',settings:'20',value:'close',op:'>='}],
                   interval:$("#intervalDropDown").val()
               };
-              
-              console.log(JSON.stringify(strategyObj));
+             
 
               $.ajax({
                 type: "post",
@@ -130,8 +125,6 @@ $(document).ready( function () {
                 }
               });
         }
-
-
         
 //OPTSTK FUTIDX
         function loadMasterData(){
@@ -209,9 +202,20 @@ $(document).ready( function () {
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
         <li class="active"><a href="#">Home</a></li>
-        <li><a href="#scanner">Scanner</a></li>
-        <li><a href="#strategy">Strategy</a></li>
-        <li><a href="#contactus">Contact Us</a></li>
+        <li><a href="/scan">Scanner</a></li>
+        <li><a href="/strategy">Strategy</a></li>
+        <li><a href="/gainerloser">Top Gainer / Looser</a></li>
+        <li><a href="/contactus">Contact Us</a></li>  
+      </ul>
+      <ul class="nav navbar-nav pull-right">
+          <li class="dropdown pull-right"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome, <span id="userTxt"></span> <b class="caret"></b></a>
+            <ul class="dropdown-menu pull-right">
+                <li><a href="/profile"><i class="icon-cog"></i> Profile</a></li>
+                <li><a href="/preferences"><i class="icon-envelope"></i> Preferences</a></li>
+                <li class="divider"></li>
+                <li><a href="/logout"><i class="icon-off"></i> Logout</a></li>
+            </ul>
+        </li>
       </ul>
     </div> 
   </div>
@@ -224,11 +228,9 @@ $(document).ready( function () {
   <br></br>
   <div class="row">
       <div class="col-sm-2">
-         
         <select id="exchangeDropDown" class="form-control" >
           <option value="FUTIDX">FUTURE INDEX</option>
           <option value="OPTSTK">FUTURE STOCK</option>
-         
         </select>
       </div>
     
@@ -238,7 +240,6 @@ $(document).ready( function () {
       </div>
     
       <div class="col-sm-2">
-       
         <select id="intervalDropDown" class="form-control" >
             <option value="5MINUTE">5MINUTE</option>
             <option value="10MINUTE">10MINUTE</option>
@@ -277,29 +278,22 @@ $(document).ready( function () {
       <div class="col-sm-2">
         <input type="number" name="points" step="1" min=0 max=100 id="valueTxt" class="form-control" placeholder="Enter Value" required>
       </div> 
-      
-     
   </div>
-  <div class="row">
-    <div class="col-sm">
-        
-    </div> 
-  </div>    
-  <br></br>
-
+  <br></br><br></br>
   <div class="row">
     <div class="col-sm-2">
       <input type="text" id="optionsTxt" list="optionsDropdown" class="form-control" placeholder="Search symbol to Buy/ Sell">
       <datalist id="optionsDropdown"></datalist>
     </div>
+    <div class="col-sm-2">
+        <input type="text" id="nameTxt" class="form-control" placeholder="Enter Name for Strategy">
+    </div>
     <div class="col-sm-4">
         <button type="button" class="btn btn-success" id="buyButton">BUY</button>
         <button type="button" class="btn btn-danger" id="sellButton">SELL</button>
     </div>
-
   </div>  
-    
-    
+     
   <div class="row">
     <div class="col-sm">
         <div id="example-table"></div>

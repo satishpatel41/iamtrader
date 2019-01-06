@@ -1,9 +1,9 @@
-//require("Utility.js");
 var express = require('express');
 var bodyParser = require('body-parser');
 var fs = require('fs');
 var url = require('url');
 const dataForge = require('data-forge');
+var session = require('express-session');
 require('data-forge-fs');
 var Upstox = require("upstox");
 var api:string = "cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw";
@@ -12,19 +12,17 @@ const PORT = process.env.PORT || 8080;
 var redirect_uri = "http://localhost:"+PORT;
 var nifty = "https://www.nseindia.com/content/indices/ind_nifty50list.csv";
 var fno = "https://www.nseindia.com/content/fo/fo_mktlots.csv";
-
-
-
 if(process.env.NODE_ENV=="production")
 {
     api = "cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw";
     redirect_uri = "https://robo-trader.herokuapp.com/";
 }
-
 var app = express();
 app.use(express.static('public'));
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+app.use(session({secret: "343ji43j4n3jn4jk3n1233"}));
+
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -32,12 +30,9 @@ app.use(function(req, res, next) {
 });
 
 var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-
 var date = new Date();
 var today = date.getDate() +"-"+(date.getMonth() + 1) +"-"+date.getFullYear();
-var time = date +":"+date.getHours() +":"+date.getMinutes();
-
-      
+var time = date +":"+date.getHours() +":"+date.getMinutes();   
 var fnoArr=  dataForge.readFileSync("data/list/fo_mktlots.csv")
 .parseCSV()
 .toArray();
@@ -55,20 +50,27 @@ var niftyList =  dataForge.readFileSync("data/list/ind_nifty50list.csv")
 .toArray();
 
 niftyList = niftyList.map(x => x.Symbol);
-
 //console.log("Res niftyList" + niftyList);
-
 
 app.get('/', function (req:any, res:any) {
     var q = url.parse(req.url, true).query;
     code = q.code;
+
+    if(req.session.page_views){
+        req.session.page_views++;
+        console.log("page > " + req.session.page_views);
+        //res.send("You visited this page " + req.session.page_views + " times");
+     } else {
+        req.session.page_views = 1;
+        //res.send("Welcome to this page for the first time!");
+     }
+
     //checkBankNiftyExpiry();
     //res.send('<b>My code </b>  : ' + code);
 
     if(code)
     {
-        getAcceToken(code);
-        
+        getAcceToken(code);        
         res.sendFile("index.html", {"root": __dirname});
     }
     else{
@@ -77,7 +79,7 @@ app.get('/', function (req:any, res:any) {
     q = null;
 });
 
-app.get('/welcome', function (req:any, res:any) {
+app.get('/welcome', checkSignIn,function (req:any, res:any) {
     res.send('<b>Hello</b> welcome to my http server made with express');
 });
 
@@ -85,27 +87,41 @@ app.get('/login', function (req:any, res:any) {
      res.sendFile("login.html", {"root": __dirname});
 });
 
+app.get('/logout', function(req, res){
+    req.session.destroy(function(){
+       console.log("user logged out.")
+    });
+    res.redirect('/login');
+});
+
+function checkSignIn(req, res,next){
+    if(req.session.user){
+        next();     //If session exists, proceed to page
+    } else {
+        var err = new Error("Not logged in!");
+        console.log(req.session.user);
+        res.sendFile("login.html", {"root": __dirname});
+    }
+}
+
 app.post('/login', function (req:any, res:any) {
     var email = req.body.username;
     var psw = req.body.password;
-   
+    
     if(email){
         var query = "select * from User where email=? and password=?";
         var param = [email,psw];
-        getFirst(query,param).then(responses => {
-            console.log("result > " + JSON.stringify(responses));
-
-            if(responses == undefined)
+        getFirst(query,param).then(user => {
+            console.log("result > " + JSON.stringify(user));
+            if(user == undefined)
             {
-                alert("Email/ password is not correct !")
+                res.send("error")
             }
             else{
-                res.send('<b>Hello</b> welcome ' + responses['name']);
+                req.session.user = user;
+                res.send(user);
             }
-          });
-      
-      
-        //res.sendFile("index.html", {"root": __dirname});
+          });     
     }
     else
         res.sendFile("login.html", {"root": __dirname});
@@ -124,56 +140,101 @@ app.post('/signup', function (req:any, res:any) {
    
     if(email)
     {
-        var query = "INSERT INTO User (name,mobile,email,password)VALUES(?,?,?,?)";
-        var param = [name,mobile,email,psw];
-        console.log(query +"> "+ param);
-        
-        insertDB(query,param).then(responses => {
-            console.log("result > " + JSON.stringify(responses));
+        var query = "select * from User where email=?";
+        var param = [email];
+        var isMatchEmail = false;
+        getFirst(query,param).then(user => {
+                console.log("result > " + JSON.stringify(user));
+                if(user == undefined)
+                {
+                    //Do nothing
+                }
+                else{
+                    res.send("error");
+                    isMatchEmail = true;
+                }
+            });
 
-            if(responses == undefined)
-            {
-                alert("Query is incorrect")
-            }
-            else{
-                res.send('Successflly inserted');
-            }
-          });
+            var query = "INSERT INTO User (name,mobile,email,password)VALUES(?,?,?,?)";
+            var param = [name,mobile,email,psw];
+            console.log(query +"> "+ param);
+            
+            if(!isMatchEmail){  
+                insertDB(query,param).then(responses => {
+                    console.log("result > " + JSON.stringify(responses));
+
+                    if(responses == 'success')
+                    {
+                        res.send('success');
+                    }
+                    else{
+                        res.send("error");
+                    }
+                });
+        }    
         //res.send('<b>username </b>  : ' + email +" > "+ mobile+" > "+ name+" > "+ psw);
     }
     else
         res.sendFile("signup.html", {"root": __dirname});
 });
 
-app.get('/contactus', function (req:any, res:any) {
+app.get('/contactus', checkSignIn,function (req:any, res:any) {
     res.sendFile("contactus.html", {"root": __dirname});
 });
 
-app.get('/index', function (req:any, res:any) {
+app.get('/index', checkSignIn,function (req:any, res:any) {
     res.sendFile("index.html", {"root": __dirname});
 });
 
-app.get('/scan', function (req:any, res:any) {
+app.get('/scan', checkSignIn,function (req:any, res:any) {
     res.sendFile("scanner.html", {"root": __dirname});
 });
 
-app.get('/strategy', function (req:any, res:any) {
+app.get('/strategy', checkSignIn,function (req:any, res:any) {
     res.sendFile("strategy.html", {"root": __dirname});
 });
 
-app.get('/gainerloser', function (req:any, res:any) {
+app.get('/gainerloser', checkSignIn,function (req:any, res:any) {
     res.sendFile("gainerloser.html", {"root": __dirname});
 });
-
 
 var  lastObject = {open:'',close:'',low:'',high:'',volume:'',timestamp:'',rsi:'',sma:'',bb:{upper:'',lower:'',isCrossed:'',middel:'',pb:''}};
 var stockData = [];
 
-
 app.post('/createStrategy', function (req:any, res:any) {
     var strategyObj = JSON.parse(req.body.data);
-    
+
+    var uid = strategyObj.uid;
+    var name = strategyObj.name;
+    var symbol= strategyObj.symbol;
+    var exchange = strategyObj.exchange;
+    var orderType = strategyObj.orderType;
+    var symbolToBuySell  = strategyObj.symbolToBuySell;
+    var indicator= strategyObj.indicators[0].indicator;
+    var settings = strategyObj.indicators[0].settings;
+    var value = strategyObj.indicators[0].value;
+    var op = strategyObj.indicators[0].op;
     var interval = strategyObj.interval;
+
+    var query = "INSERT INTO Strategy (uid,name,symbol,exchange,orderType,symbolToBuySell,indicator,settings,value,op,interval)VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+    var param = [uid,name,symbol,exchange,orderType,symbolToBuySell,indicator,settings,value,op,interval];
+    console.log(query +"> "+ JSON.stringify(param));
+    
+    insertDB(query,param).then(responses => {
+        console.log("result > " + JSON.stringify(responses));
+
+        if(responses == 'success')
+        {
+            res.send('success');
+        }
+        else{
+            res.send("error");
+        }
+    });
+
+
+    
+    //var interval = strategyObj.interval;
     var now = new Date();
     if(interval == "5MINUTE") // 1WEEK, 1MONTH
          now.setDate(now.getDate() - 2);//now.setMinutes(now.getMinutes() - 5 * 20);
@@ -371,14 +432,12 @@ app.get('/getFutureContract/:exchange', function (req:any, res:any) {
         var now = new Date();
         var thisMonth = months[now.getMonth()].slice(0,3).toUpperCase();
         var monthPattern = new RegExp(thisMonth, 'gi');
-        console.log("monthPattern" + monthPattern);
-
          
         var data=csvTojs(obj.data);
         //console.log(data);
-        var data = data.filter(x => (String(x.instrument_type) === exchange && String(x.symbol).search(monthPattern)));
+        var data = data.filter(x => (String(x.instrument_type) === exchange));
         
-        console.log(data);
+        //console.log(data);
         var arr = data.map(x => x.symbol);
         //console.log(arr);
 
@@ -448,7 +507,7 @@ app.get('/loadAllSymbolData/:interval/:exchange', function (req:any, res:any) {
         res.end();
     }
     else{
-        console.log('*** Ok No data available.. Fetch it \n ');
+        console.log('*No data available.. Fetch it : ' + interval);
         var now = new Date();
         if(interval == "5MINUTE") // 1WEEK, 1MONTH
              now.setDate(now.getDate() - 2);//now.setMinutes(now.getMinutes() - 5 * 20);

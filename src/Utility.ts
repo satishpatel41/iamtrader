@@ -54,5 +54,5 @@ function csvTojs(csv) {
 function getPercentageChange(oldNumber, newNumber){
   var decreaseValue = newNumber - oldNumber;
 
-  return ((decreaseValue / oldNumber) * 100).toFixed(2) +"%";
+  return ((decreaseValue / oldNumber) * 100).toFixed(2);
 }

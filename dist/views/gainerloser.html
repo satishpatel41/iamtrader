@@ -11,16 +11,16 @@
 <link href="https://unpkg.com/tabulator-tables@4.1.3/dist/css/semantic-ui/tabulator_semantic-ui.min.css" rel="stylesheet">
 <style>
     .loader {
-      border: 16px solid #f3f3f3;
+      border: 10px solid #f3f3f3;
       border-radius: 50%;
-      border-top: 16px solid #3498db;
-      width: 120px;
-      height: 120px;
+      border-top: 10px solid #3498db;
+      width: 50px;
+      height: 50px;
       -webkit-animation: spin 2s linear infinite; /* Safari */
       animation: spin 2s linear infinite;
       position: fixed;
-      left: 50%;
-      top: 50%;
+      left: 45%;
+      top: 45%;
       transform: translate(-50%, -50%);
     }
     
@@ -34,6 +34,25 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    .arrow-up {
+      margin-top: -6px;
+      position: absolute;
+      width: 6px;
+      height: 19px;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 5px solid green;
+    }
+
+    .arrow-down {
+      margin-top: 9px;
+      position: absolute;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid #f00;
+    }
+
 </style>
 <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.1.3/dist/js/tabulator.min.js"></script>
 
@@ -41,57 +60,18 @@
 $(document).ready( function () {
 
         var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
-       
+        $('#userTxt').text(localStorage.getItem('user'));
         var interval = "1DAY";
         var exchange = "nifty";
 
         var nseSymbols = [];
-
-     
 
          $( "#exchangeDropDown" ).change(function() {
           exchange = $("#exchangeDropDown").val();
           loadAllSymbolData(interval,exchange);
         });
 
-        
-
         loadAllSymbolData(interval,exchange);
-
-        //Custom filter example
-        function customFilter(data){
-         return data.car && data.rating < 3;
-        }
-
-        //Trigger setFilter function with correct parameters
-        function updateFilter(){
-
-          var filter = $("#filter-field").val() == "function" ? customFilter : $("#filter-field").val();
-
-          if($("#filter-field").val() == "function" ){
-            $("#filter-type").prop("disabled", true);
-            $("#filter-value").prop("disabled", true);
-          }else{
-            $("#filter-type").prop("disabled", false);
-            $("#filter-value").prop("disabled", false);
-        }
-
-        table.setFilter(filter, $("#filter-type").val(), $("#filter-value").val());
-        }
-
-        //Update filters on value change
-        $("#filter-field, #filter-type").change(updateFilter);
-        $("#filter-value").keyup(updateFilter);
-
-        //Clear filters on "Clear Filters" button click
-        $("#filter-clear").click(function(){
-          $("#filter-field").val("");
-          $("#filter-type").val("=");
-          $("#filter-value").val("");
-
-          table.clearFilter();
-        });
-
 
         function loadAllSymbolData(interval,exchange){
           $(".loader").show();
@@ -111,7 +91,7 @@ $(document).ready( function () {
                     placeholder:"No Data Set",
                     height:"90%",
                     width:"96%",
-                    layout:"fitColumns",      //fit columns to width of table
+                    layout:"fitDataFill",      //fit columns to width of table
                     responsiveLayout:"hide",  //hide columns that dont fit on the table
                     tooltips:true,            //show tool tips on cells
                     history:true,             //allow undo and redo actions on the table
@@ -124,7 +104,14 @@ $(document).ready( function () {
                     columns:[
                         {title:"Symbol", field:"symbol"},
                         {title:"Close", field:"close"},
-                        {title:"Change", field:"change"}
+                        {title:"Change", field:"change",formatter:function(cell, formatterParams)
+                        {
+                            if(cell.getValue() > 0)
+                              return "<p><span class='arrow-up'></span><span style='margin: 16px;'>"+cell.getValue() +"%</span></p>";
+                            else 
+                            return "<p><span class='arrow-down'></span><span style='margin: 16px;'>"+cell.getValue() +"%</span></p>";
+                        } 
+                      }
                     ]
                 });
             }
@@ -149,9 +136,20 @@ $(document).ready( function () {
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
         <li class="active"><a href="#">Home</a></li>
-        <li><a href="#scanner">Scanner</a></li>
-        <li><a href="#strategy">Strategy</a></li>
-        <li><a href="#contactus">Contact Us</a></li>
+        <li><a href="/scan">Scanner</a></li>
+        <li><a href="/strategy">Strategy</a></li>
+        <li><a href="/gainerloser">Top Gainer / Looser</a></li>
+        <li><a href="/contactus">Contact Us</a></li>  
+      </ul>
+      <ul class="nav navbar-nav pull-right">
+          <li class="dropdown pull-right"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome, <span id="userTxt"></span> <b class="caret"></b></a>
+            <ul class="dropdown-menu pull-right">
+                <li><a href="/profile"><i class="icon-cog"></i> Profile</a></li>
+                <li><a href="/preferences"><i class="icon-envelope"></i> Preferences</a></li>
+                <li class="divider"></li>
+                <li><a href="/logout"><i class="icon-off"></i> Logout</a></li>
+            </ul>
+        </li>
       </ul>
     </div> 
   </div>

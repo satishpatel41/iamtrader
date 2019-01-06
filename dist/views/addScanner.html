@@ -36,40 +36,6 @@ $(document).ready( function () {
 
         loadAllSymbolData(interval,exchange);
 
-        //Custom filter example
-        function customFilter(data){
-         return data.car && data.rating < 3;
-        }
-
-        //Trigger setFilter function with correct parameters
-        function updateFilter(){
-
-          var filter = $("#filter-field").val() == "function" ? customFilter : $("#filter-field").val();
-
-          if($("#filter-field").val() == "function" ){
-            $("#filter-type").prop("disabled", true);
-            $("#filter-value").prop("disabled", true);
-          }else{
-            $("#filter-type").prop("disabled", false);
-            $("#filter-value").prop("disabled", false);
-        }
-
-        table.setFilter(filter, $("#filter-type").val(), $("#filter-value").val());
-        }
-
-        //Update filters on value change
-        $("#filter-field, #filter-type").change(updateFilter);
-        $("#filter-value").keyup(updateFilter);
-
-        //Clear filters on "Clear Filters" button click
-        $("#filter-clear").click(function(){
-          $("#filter-field").val("");
-          $("#filter-type").val("=");
-          $("#filter-value").val("");
-
-          table.clearFilter();
-        });
-
 
         function loadAllSymbolData(interval,exchange){
           $.get({
@@ -83,7 +49,7 @@ $(document).ready( function () {
                     data:dataSet,
                     height:"90%",
                     width:"96%",
-                    layout:"fitColumns",      //fit columns to width of table
+                    //layout:"fitColumns",      //fit columns to width of table
                     responsiveLayout:"hide",  //hide columns that dont fit on the table
                     tooltips:true,            //show tool tips on cells
                     history:true,             //allow undo and redo actions on the table

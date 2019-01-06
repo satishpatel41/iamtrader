@@ -61,8 +61,7 @@ function start() {
         var now = new Date();
         var thisMonth = months[now.getMonth()].slice(0,3).toUpperCase();
         var monthPattern = new RegExp(thisMonth, 'gi');
-        //console.log("monthPattern" + monthPattern);
-      
+        
        var transformedData = JSON.parse(JSON.stringify(transformedData));
         
 
