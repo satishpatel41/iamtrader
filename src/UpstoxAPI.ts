@@ -254,7 +254,7 @@ function getMaster(ex = "nse_fo"){
 }
 
 function loadSymbol(symbol,exchange,interval='1day',start_date='12-12-2018'){ 
-    log("loadSymbol > " + symbol + " > "+ interval +" > "+exchange +" > "+ start_date);
+    //log("loadSymbol > " + symbol + " > "+ interval +" > "+exchange +" > "+ start_date);
     if(accessToken){
         return upstox.getOHLC({"exchange": exchange,
             "symbol": symbol,
@@ -289,7 +289,8 @@ const delay = t => new Promise(resolve => setTimeout(resolve, t));
 var stockData = []; 
 var data = {};
 var promiseArr = [];
-
+var prevObject = {change:'',open:'',close:'',low:'',high:'',volume:'',timestamp:'',rsi:'',sma:'',bb:{upper:'',lower:'',isCrossed:'',middel:'',pb:''}};
+        
 async function loadAllSymbolData(response:any,interval='1DAY',start_date='11-11-2018'){ 
     //var allSymbolWithIndicator = [];
     
@@ -299,15 +300,18 @@ async function loadAllSymbolData(response:any,interval='1DAY',start_date='11-11-
         data = {};
         stockData = [];
         
-        console.log("symbol " + interval +" >> "+symbol +" >> "+start_date);
+        //console.log("symbol " + interval +" >> "+symbol +" >> "+start_date);
 
         await loadSymbol(symbol,'nse_eq',interval,start_date).then(function (response:any) {
             stockData =response.data;
+            prevObject = {change:'',open:'',close:'',low:'',high:'',volume:'',timestamp:'',rsi:'',sma:'',bb:{upper:'',lower:'',isCrossed:'',middel:'',pb:''}};
+
             stockData.map(row => {
                 row.timestamp = new Date(row.timestamp);
                 row.rsi = rsi.nextValue(Number(row.close));
                 row.sma = sma.nextValue(Number(row.close));
                 row.bb = bb.nextValue(Number(row.close)); 
+                row.change = getPercentageChange(Number(prevObject.close),Number(row.close)); 
 
                 if(Number(row.close) > row.bb.upper)
                 {
@@ -321,6 +325,7 @@ async function loadAllSymbolData(response:any,interval='1DAY',start_date='11-11-
                 {
                     row.bb.isCrossed = '';
                 }
+                prevObject = row;
                 return row;
             });
             stockData.reverse();
@@ -331,7 +336,8 @@ async function loadAllSymbolData(response:any,interval='1DAY',start_date='11-11-
                 "rsi":stockData[0].rsi,
                 "timestamp":stockData[0].timestamp,
                 "sma":stockData[0].sma, 
-                "bb":stockData[0].bb
+                "bb":stockData[0].bb,
+                "change":stockData[0].change
             }; 
             stockData = null;
         })

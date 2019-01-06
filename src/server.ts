@@ -86,11 +86,27 @@ app.get('/login', function (req:any, res:any) {
 });
 
 app.post('/login', function (req:any, res:any) {
-    var username = req.body.username;
-    var password = req.body.password;
+    var email = req.body.username;
+    var psw = req.body.password;
    
-    if(username)
-        res.send('<b>username </b>  : ' + username +" > "+ password);
+    if(email){
+        var query = "select * from User where email=? and password=?";
+        var param = [email,psw];
+        getFirst(query,param).then(responses => {
+            console.log("result > " + JSON.stringify(responses));
+
+            if(responses == undefined)
+            {
+                alert("Email/ password is not correct !")
+            }
+            else{
+                res.send('<b>Hello</b> welcome ' + responses['name']);
+            }
+          });
+      
+      
+        //res.sendFile("index.html", {"root": __dirname});
+    }
     else
         res.sendFile("login.html", {"root": __dirname});
 });
@@ -102,10 +118,29 @@ app.get('/signup', function (req:any, res:any) {
 app.post('/signup', function (req:any, res:any) {
     var email = req.body.email;
     var psw = req.body.psw;
+    var mobile = req.body.mobile;
+    var name = req.body.name;
     var pswRepeat = req.body.pswRepeat;
    
     if(email)
-        res.send('<b>username </b>  : ' + email +" > "+ psw);
+    {
+        var query = "INSERT INTO User (name,mobile,email,password)VALUES(?,?,?,?)";
+        var param = [name,mobile,email,psw];
+        console.log(query +"> "+ param);
+        
+        insertDB(query,param).then(responses => {
+            console.log("result > " + JSON.stringify(responses));
+
+            if(responses == undefined)
+            {
+                alert("Query is incorrect")
+            }
+            else{
+                res.send('Successflly inserted');
+            }
+          });
+        //res.send('<b>username </b>  : ' + email +" > "+ mobile+" > "+ name+" > "+ psw);
+    }
     else
         res.sendFile("signup.html", {"root": __dirname});
 });
@@ -124,6 +159,10 @@ app.get('/scan', function (req:any, res:any) {
 
 app.get('/strategy', function (req:any, res:any) {
     res.sendFile("strategy.html", {"root": __dirname});
+});
+
+app.get('/gainerloser', function (req:any, res:any) {
+    res.sendFile("gainerloser.html", {"root": __dirname});
 });
 
 
@@ -267,7 +306,7 @@ app.get('/loadSymbol/:symbol/:interval', function (req:any, res:any) {
     loadSymbol(symbol,'nse_eq',interval,start_date).then(function (response:any) {
         res.setHeader('Content-Type', 'application/json');
         stockData =response.data;
-       
+        //console.log(stockData);
         lastObject = {open:'',close:'',low:'',high:'',volume:'',timestamp:'',rsi:'',sma:'',bb:{upper:'',lower:'',isCrossed:'',middel:'',pb:''}};
         stockData.map(row => {
             row.timestamp = new Date(row.timestamp);
@@ -275,7 +314,7 @@ app.get('/loadSymbol/:symbol/:interval', function (req:any, res:any) {
             row.sma = sma.nextValue(Number(row.close));
             row.bb = bb.nextValue(Number(row.close)); 
             
-            if(Number(row.close) >= row.bb.upper && Number(lastObject.close) < Number(lastObject.bb.upper))
+           /*  if(Number(row.close) >= row.bb.upper && Number(lastObject.close) < Number(lastObject.bb.upper))
             {
                 row.bb.isCrossed = 'Crossed Above';
             }
@@ -283,7 +322,7 @@ app.get('/loadSymbol/:symbol/:interval', function (req:any, res:any) {
             {
                 row.bb.isCrossed = 'Crossed Below';
             }
-            lastObject = row;
+            lastObject = row; */
             return row;
         });
         stockData.reverse();
@@ -324,7 +363,7 @@ function initiateIndicator()
 app.get('/getFutureContract/:exchange', function (req:any, res:any) { 
     var exchange = req.params.exchange;  
 
-    console.log("getMaster exchange > " +  JSON.stringify(exchange));
+    //console.log("getMaster exchange > " +  JSON.stringify(exchange));
 
     fs.readFile('data/index/nse_fo.txt','utf8', function(err, response) {
         
@@ -332,13 +371,14 @@ app.get('/getFutureContract/:exchange', function (req:any, res:any) {
         var now = new Date();
         var thisMonth = months[now.getMonth()].slice(0,3).toUpperCase();
         var monthPattern = new RegExp(thisMonth, 'gi');
-        //console.log("monthPattern" + monthPattern);
+        console.log("monthPattern" + monthPattern);
 
          
         var data=csvTojs(obj.data);
         //console.log(data);
-        var data = data.filter(x => String(x.instrument_type) === exchange);
-        //console.log(data);
+        var data = data.filter(x => (String(x.instrument_type) === exchange && String(x.symbol).search(monthPattern)));
+        
+        console.log(data);
         var arr = data.map(x => x.symbol);
         //console.log(arr);
 
@@ -457,7 +497,7 @@ app.get('/loadAllSymbolData/:interval/:exchange', function (req:any, res:any) {
  
 app.get('/getListOfAllSymbol', function (req:any, res:any) {   
     res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(nseSymbolList));
+    res.send(JSON.stringify(fnoList));
     res.end();
 });
 

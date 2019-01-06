@@ -39,22 +39,22 @@
 
 <script type="text/javascript">
 $(document).ready( function () {
-        var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;       
+
+        var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
+       
         var interval = "1DAY";
         var exchange = "nifty";
 
         var nseSymbols = [];
 
-        $( "#intervalDropDown" ).change(function() {
-          interval = $("#intervalDropDown").val();
-          loadAllSymbolData(interval,exchange);
-        });
+     
 
          $( "#exchangeDropDown" ).change(function() {
           exchange = $("#exchangeDropDown").val();
           loadAllSymbolData(interval,exchange);
         });
 
+        
 
         loadAllSymbolData(interval,exchange);
 
@@ -98,7 +98,7 @@ $(document).ready( function () {
           $.get({
             url: server+'/loadAllSymbolData/'+interval+'/'+exchange,
             success: function(response){
-                  $(".loader").hide();
+                 $(".loader").hide();
                   var dataSet = response.filter(function (el) {
                     return (el != null && el.close != null && el.close != undefined && el.close != "");
                   });
@@ -122,13 +122,9 @@ $(document).ready( function () {
                       {column:"timestamp", dir:"asc"},
                     ],  
                     columns:[
-                        //{title:"Date", field:"timestamp"},
                         {title:"Symbol", field:"symbol"},
                         {title:"Close", field:"close"},
-                        {title:"Volume", field:"volume"},
-                        {title:"RSI", field:"rsi"},
-                        {title:"SMA", field:"sma"},
-                        {title:"Bolinger Band", field:"bb.isCrossed"}
+                        {title:"Change", field:"change"}
                     ]
                 });
             }
@@ -172,25 +168,10 @@ $(document).ready( function () {
         <select id="exchangeDropDown" class="form-control" >
             <option value="nifty" selected="selected">Nifty</option>
             <option value="fno">FNO Stocks</option>
-            <option value="nse">NSE</option>
+           
           </select>
       </div> 
 
-
-      <div class="col-sm-2">
-        <label>interval</label>
-        <select id="intervalDropDown" class="form-control" >
-            <option value="5MINUTE">5MINUTE</option>
-            <option value="10MINUTE">10MINUTE</option>
-            <option value="30MINUTE">30MINUTE</option>
-            <option value="60MINUTE">60MINUTE</option>
-            <option value="1DAY" selected="selected">1DAY</option>
-            <option value="1WEEK">1WEEK</option>
-            <option value="1MONTH">1MONTH</option>
-          </select>
-      </div> 
-      
-      
 
       <div class="col-sm-4">
         <label>Update till :</label>

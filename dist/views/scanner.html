@@ -9,15 +9,38 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <link href="https://unpkg.com/tabulator-tables@4.1.3/dist/css/tabulator.min.css" rel="stylesheet">
 <link href="https://unpkg.com/tabulator-tables@4.1.3/dist/css/semantic-ui/tabulator_semantic-ui.min.css" rel="stylesheet">
-
+<style>
+    .loader {
+      border: 16px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 16px solid #3498db;
+      width: 60px;
+      height: 60px;
+      -webkit-animation: spin 2s linear infinite; /* Safari */
+      animation: spin 2s linear infinite;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    /* Safari */
+    @-webkit-keyframes spin {
+      0% { -webkit-transform: rotate(0deg); }
+      100% { -webkit-transform: rotate(360deg); }
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+</style>
 <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.1.3/dist/js/tabulator.min.js"></script>
 
 <script type="text/javascript">
 $(document).ready( function () {
-
-        var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
-       
-        var interval = "1day";
+        var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;       
+        var interval = "1DAY";
         var exchange = "nifty";
 
         var nseSymbols = [];
@@ -32,7 +55,6 @@ $(document).ready( function () {
           loadAllSymbolData(interval,exchange);
         });
 
-        
 
         loadAllSymbolData(interval,exchange);
 
@@ -72,9 +94,11 @@ $(document).ready( function () {
 
 
         function loadAllSymbolData(interval,exchange){
+          $(".loader").show();
           $.get({
             url: server+'/loadAllSymbolData/'+interval+'/'+exchange,
             success: function(response){
+                  $(".loader").hide();
                   var dataSet = response.filter(function (el) {
                     return (el != null && el.close != null && el.close != undefined && el.close != "");
                   });
@@ -129,8 +153,8 @@ $(document).ready( function () {
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
         <li class="active"><a href="#">Home</a></li>
-        <li><a href="#login">Login</a></li>
-        <li><a href="#signup">SignUp</a></li>
+        <li><a href="#scanner">Scanner</a></li>
+        <li><a href="#strategy">Strategy</a></li>
         <li><a href="#contactus">Contact Us</a></li>
       </ul>
     </div> 
@@ -180,5 +204,6 @@ $(document).ready( function () {
     </div> 
   </div>    
 </div>
+<div class="loader"></div>
 </body>
 </html>

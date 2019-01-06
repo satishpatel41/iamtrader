@@ -16,8 +16,8 @@ gulp.task("script", function () {
             sourceMap:false,
             out: "app.min.js"
     }))
-    .pipe(uglify())
-    .on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })
+    //.pipe(uglify())
+    //.on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })
     .pipe(gulp.dest("./dist"));
 });
 
