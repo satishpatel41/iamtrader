@@ -55,12 +55,15 @@ function load1dayData()
 
     if(accessToken){    
         loadAllSymbolData(list,interval,start_date).then(function (response:any) {
-            stockObj.data1day = response;
-            log('*** NSE 1 day *** \n ' + JSON.stringify(stockObj));
+            //stockObj.data1day = response;
+            //client.set("data1day", response);
+            //req.session.data1day = response;
+            store.set('data1day', response); 
+            //log('*** NSE 1 day *** \n ' + JSON.stringify(stockObj));
             list = now = interval = null;
         })
         .catch(function(error:any){
-           log("loadAllSymbolData/ error > " +  JSON.stringify(error));
+           log("load1dayData/ error > " +  JSON.stringify(error));
         });
     }   
 }
@@ -75,12 +78,14 @@ function load60minData()
     var interval = '60MINUTE';
     if(accessToken){    
         loadAllSymbolData(list,interval,start_date).then(function (response:any) {
-            stockObj.data60 = response;
-            log('*** NSE 60 MINUTE *** \n ' + JSON.stringify(stockObj));
+            //stockObj.data60 = response;
+            //client.set("data60", response);
+            store.set('data60', response); 
+            //log('*** NSE 60 MINUTE *** \n ' + JSON.stringify(stockObj));
             list = now = interval = null;
         })
         .catch(function(error:any){
-           log("loadAllSymbolData/ error > " +  JSON.stringify(error));
+           log("load60minData/ error > " +  JSON.stringify(error));
         });
     }   
 }
@@ -95,12 +100,14 @@ function load30minData()
     var interval = '30MINUTE';
     if(accessToken){    
         loadAllSymbolData(list,interval,start_date).then(function (response:any) {
-            stockObj.data30 = response;
-            log('*** NSE 30 MINUTE *** \n ' + JSON.stringify(stockObj));
+            //stockObj.data30 = response;
+            store.set('data30', response); 
+            //client.set("data30", response);
+            //log('*** NSE 30 MINUTE *** \n ' + JSON.stringify(stockObj));
             list = now = interval = null;
         })
         .catch(function(error:any){
-           log("loadAllSymbolData/ error > " +  JSON.stringify(error));
+           log("load30minData/ error > " +  JSON.stringify(error));
         });
     }    
 }
@@ -116,12 +123,14 @@ function load10minData()
 
     if(accessToken){    
         loadAllSymbolData(list,interval,start_date).then(function (response:any) {
-            stockObj.data10 = response;
-            log('*** NSE 10 MINUTE *** \n ' + JSON.stringify(stockObj));
+            //stockObj.data10 = response;
+            //client.set("data10", response);
+            store.set('data10', response); 
+            //log('*** NSE 10 MINUTE *** \n ' + JSON.stringify(stockObj));
             list = now = interval = null;
         })
         .catch(function(error:any){
-            log("loadAllSymbolData/ error > " +  JSON.stringify(error));
+            log("load10minData/ error > " +  JSON.stringify(error));
         });
     }    
 }
@@ -137,14 +146,16 @@ function load5minData()
 
     var interval = '5MINUTE';
     if(accessToken){
-        /* loadAllSymbolData(list,interval,start_date).then(function (response:any) {
-            stockObj.data5 = response;
-            log('*** NSE 5 MINUTE *** \n ' +  start_date +" >> "+ JSON.stringify(stockObj));
+        loadAllSymbolData(list,interval,start_date).then(function (response:any) {
+            //stockObj.data5 = response;
+            //client.set("data5", response);
+            store.set('data5', response); 
+            //log('*** NSE 5 MINUTE *** \n ' +  start_date +" >> "+ JSON.stringify(stockObj));
             list = now = interval = null;
             
         })
         .catch(function(error:any){
-           log("loadAllSymbolData/ error > " +  start_date +" >> "+JSON.stringify(error));
-        }); */
+           log("load5minData/ error > " +  start_date +" >> "+JSON.stringify(error));
+        });
     }    
 }

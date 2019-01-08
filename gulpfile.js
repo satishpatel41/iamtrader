@@ -3,9 +3,17 @@ var server = require('gulp-express');
 var ts = require("gulp-typescript");
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
+//var connect = require('gulp-connect-pm2');
+var exec    = require('child_process').exec;
+
 var del = require('del');
 var gulpSequence = require('gulp-sequence').use(gulp);
 
+/* gulp.task('connect', function() {
+    connect.server();
+  });
+  */
+  
 gulp.task("script", function () {
     var tsResult = gulp.src("src/*.ts")
     .pipe(ts({
@@ -43,6 +51,13 @@ gulp.task('server', function () {
     gulp.watch(['app/images/**/*'], server.notify);
     gulp.watch(['app.min.js', 'routes/**/*.js'], [server.run]);
 });
+
+/* gulp.task('server', function() {
+    connect.server({
+      root: 'dist/app.min.js',
+      livereload: true
+    });
+  }); */
 
 gulp.task('clean', function () {
     return del([

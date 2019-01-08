@@ -208,8 +208,12 @@ $(document).ready( function () {
                
                 $(".alert-success").show();
                 $("#message_txt").text("Login Success !");
-                var url = server+'/index'
-                setTimeout(function(){window.location.replace(url)}, 1000); 
+
+                var url = server+'/index';
+                if(user.isSuperAdmin == '1')
+                  url = server+'/admin';
+                  
+                setTimeout(function(){window.location.replace(url)}, 100); 
               }
               else{
                   $(".alert-danger").show();
@@ -228,8 +232,7 @@ $(document).ready( function () {
 </script>
 <body>
 
-<h2>Responsive Social Login Form</h2>
-<p>Resize the browser window to see the responsive effect. When the screen is less than 650px wide, make the two columns stack on top of each other instead of next to each other.</p>
+<h2>Login</h2>
 
 <div class="container">
   <form>
