@@ -42,6 +42,15 @@ $(document).ready( function () {
 
         var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
         $('#userTxt').text(localStorage.getItem('user'));
+        if(localStorage.getItem('isAdmin') != 1){
+          $('#buyButton').hide();
+          $('#sellButton').hide();
+          $('#symbolToBuyOption').hide();
+        }
+        else{
+
+        }
+
         var nseSymbols = [];
         loadMasterData();
       
@@ -201,10 +210,10 @@ $(document).ready( function () {
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="/index">Home</a></li>
+        <li ><a href="/index">Home</a></li>
         <li><a href="/scan">Scanner</a></li>
-        <!-- <li><a href="/strategy">Strategy</a></li> -->
-        <li><a href="/gainerloser">Top Gainer / Looser</a></li>
+        <li class="active"><a href="/strategy">Strategy</a></li>
+        <li ><a href="/gainerloser">Top Gainer / Looser</a></li>
         <li><a href="/contactus">Contact Us</a></li>  
       </ul>
       <ul class="nav navbar-nav pull-right">
@@ -280,7 +289,7 @@ $(document).ready( function () {
       </div> 
   </div>
   <br></br><br></br>
-  <div class="row">
+  <div class="row" id="symbolToBuyOption">
     <div class="col-sm-2">
       <input type="text" id="optionsTxt" list="optionsDropdown" class="form-control" placeholder="Search symbol to Buy/ Sell">
       <datalist id="optionsDropdown"></datalist>

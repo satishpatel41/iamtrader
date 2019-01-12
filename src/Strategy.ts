@@ -1,6 +1,7 @@
 
 var technicalindicators = require('technicalindicators');
 var fs = require('fs');
+
 var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 var date = new Date();
 var today = date.getDate() +"-"+(date.getMonth() +  1)+"-"+date.getFullYear();
@@ -297,8 +298,9 @@ function log(message:any){
         return;
         
     date = new Date();
+   
     today = date.getDate() +"-"+(date.getMonth() +1)+"-"+date.getFullYear();
-    time = today +":"+date.getHours() +":"+date.getMinutes();
+  
     var path = "logs/log-"+today+".txt";
     try {
         if (fs.existsSync(path)) {

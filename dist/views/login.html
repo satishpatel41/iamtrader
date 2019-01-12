@@ -205,6 +205,7 @@ $(document).ready( function () {
               if(user != 'error'){
                 localStorage.setItem('user', user.name);  
                 localStorage.setItem('uid', user.uid);  
+                localStorage.setItem('isAdmin', user.isSuperAdmin);  
                
                 $(".alert-success").show();
                 $("#message_txt").text("Login Success !");

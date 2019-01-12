@@ -1,4 +1,5 @@
 var express = require('express');
+var moment = require('moment-timezone');
 var bodyParser = require('body-parser');
 var fs = require('fs');
 var url = require('url');
@@ -6,21 +7,14 @@ var cluster = require('cluster');
 const dataForge = require('data-forge');
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
-
 const Store = require('data-store');
+var async = require('async');
+const querystring = require('querystring');
 const store = new Store({ path: 'config.json' });
-
-
 require('data-forge-fs');
 var Upstox = require("upstox");
 var api:string = "cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw";
 var upstox = new Upstox(api);
-//var redis = require('redis');
-//var client = redis.createClient({host: process.env.REDIS_HOST || '127.0.0.1'});
-/* var client = redis.createClient({host : 'localhost', port : 6379});
-client.on('connect', function() {
-    console.log('connected');
-}); */
 const PORT = process.env.PORT || 8080;
 var redirect_uri = "http://localhost:"+PORT;
 var nifty = "https://www.nseindia.com/content/indices/ind_nifty50list.csv";
@@ -31,10 +25,7 @@ if(process.env.NODE_ENV=="production")
     redirect_uri = "https://robo-trader.herokuapp.com/";
 }
 
-
-
-var numReqs = 0;
- 
+var numReqs = 0; 
 if (cluster.isMaster) {
   // Fork workers.
   let cpus = require('os').cpus().length;
@@ -71,7 +62,7 @@ if (cluster.isMaster) {
                 saveUninitialized: false,
                 secret: "00777",
                 cookie: {
-                    maxAge: 1000 * 60 * 60 * 24
+                    maxAge: 1000 * 60 * 60 * 1//24
                 }
             }    
             ));
@@ -86,44 +77,40 @@ if (cluster.isMaster) {
         var date = new Date();
         var today = date.getDate() +"-"+(date.getMonth() + 1) +"-"+date.getFullYear();
         var time = date +":"+date.getHours() +":"+date.getMinutes();   
+        
         var fnoArr=  dataForge.readFileSync("data/list/fo_mktlots.csv")
         .parseCSV()
         .toArray();
 
+        //console.log("fnoArr " + fnoArr);
+
         var fnoList = [];
         fnoArr.forEach(function(item) {   
-        if(item.Symbol)
-            fnoList.push(item.Symbol)
-        //else
-          //  fnoList.push(item.SYMBOL)
+            //console.log(JSON.stringify(item));
+            if(item.SYMBOL)
+                fnoList.push(item.SYMBOL)
+            //else
+             // fnoList.push(item.Symbol)
         });
+        store.set('fnoList',fnoList);
+
+        //console.log("fnoList " + fnoList);
 
         var niftyList =  dataForge.readFileSync("data/list/ind_nifty50list.csv")
         .parseCSV()
         .toArray();
 
         niftyList = niftyList.map(x => x.Symbol);
-        //console.log("Res niftyList" + niftyList);
+        store.set('niftyList',niftyList);
+       // console.log("Res niftyList" + niftyList);
 
         app.get('/', function (req:any, res:any) {
         var q = url.parse(req.url, true).query;
         code = q.code;
 
-       /*  var hour = 3600000;
-        req.session.cookie.expires = new Date(Date.now() + hour);
-        req.session.cookie.maxAge = hour; */
         console.log("session > " + JSON.stringify(req.session.cookie));
 
-
-        /* if(req.session.page_views){
-            req.session.page_views++;
-            console.log("page > " + req.session.page_views);
-            } else {
-            req.session.page_views = 1;
-        } */
-
         //checkBankNiftyExpiry();
-        //res.send('<b>My code </b>  : ' + code);
 
         if(code)
         {
@@ -309,8 +296,8 @@ if (cluster.isMaster) {
         else if(interval == "1WEEK")
             now.setDate(now.getDate() - 7*20);
         else if(interval == "1MONTH")
-            now.setMonth(now.getMonth() - 20);    
-
+            now.setMonth(now.getMonth() - 20);   
+        
         var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
 
         initiateIndicator();
@@ -321,7 +308,9 @@ if (cluster.isMaster) {
             
             lastObject = {open:'',close:'',low:'',high:'',volume:'',timestamp:'',rsi:'',sma:'',bb:{upper:'',lower:'',isCrossed:'',middel:'',pb:''}};
             stockData.map(row => {
-                row.timestamp = new Date(row.timestamp);
+                var india = moment.tz(new Date(row.timestamp), "Asia/Kolkata");
+                india.format(); 
+                row.timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();//new Date(row.timestamp);
                 row.rsi = rsi.nextValue(Number(row.close));
                 row.sma = sma.nextValue(Number(row.close));
                 row.bb = bb.nextValue(Number(row.close)); 
@@ -397,87 +386,100 @@ if (cluster.isMaster) {
     });
 
     app.get('/loadSymbol/:symbol/:interval', function (req:any, res:any) { 
-    var symbol = req.params.symbol;  
-    var interval = req.params.interval; 
+        var symbol = req.params.symbol;  
+        var interval = req.params.interval; 
 
-    var now = new Date();
-    if(interval == "5MINUTE") // 1WEEK, 1MONTH
-        now.setMinutes(now.getMinutes() - 5* 20);
-    else if(interval == "10MINUTE")
-        now.setMinutes(now.getMinutes() - 10 * 20);
-    else if(interval == "30MINUTE")
-        now.setMinutes(now.getMinutes() - 30* 20);
-    else if(interval == "60MINUTE")
-        now.setMinutes(now.getMinutes() - 60* 20);
-    else if(interval == "1DAY")
-        now.setDate(now.getDate() - 20);
-    else if(interval == "1WEEK")
-        now.setDate(now.getDate() - 7*20);
-    else if(interval == "1MONTH")
-        now.setMonth(now.getMonth() - 20);  
-    else 
-        now.setDate(now.getDate() - 20);  
+        var now = new Date();
+        if(interval == "5MINUTE") // 1WEEK, 1MONTH
+            now.setMinutes(now.getMinutes() - 5* 20);
+        else if(interval == "10MINUTE")
+            now.setMinutes(now.getMinutes() - 10 * 20);
+        else if(interval == "30MINUTE")
+            now.setMinutes(now.getMinutes() - 30* 20);
+        else if(interval == "60MINUTE")
+            now.setMinutes(now.getMinutes() - 60* 20);
+        else if(interval == "1DAY")
+            now.setDate(now.getDate() - 20);
+        else if(interval == "1WEEK")
+            now.setDate(now.getDate() - 7*20);
+        else if(interval == "1MONTH")
+            now.setMonth(now.getMonth() - 20);  
+        else 
+            now.setDate(now.getDate() - 20);  
 
-    var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
-    //console.log("start_date > " + interval +" >> "+start_date);
-    initiateIndicator();
-    stockData = [];
-    loadSymbol(symbol,'nse_eq',interval,start_date).then(function (response:any) {
-        res.setHeader('Content-Type', 'application/json');
-        stockData =response.data;
-        //console.log(stockData);
-        lastObject = {open:'',close:'',low:'',high:'',volume:'',timestamp:'',rsi:'',sma:'',bb:{upper:'',lower:'',isCrossed:'',middel:'',pb:''}};
-        stockData.map(row => {
-            row.timestamp = new Date(row.timestamp);
-            row.rsi = rsi.nextValue(Number(row.close));
-            row.sma = sma.nextValue(Number(row.close));
-            row.bb = bb.nextValue(Number(row.close)); 
-            
-            /*  if(Number(row.close) >= row.bb.upper && Number(lastObject.close) < Number(lastObject.bb.upper))
-            {
-                row.bb.isCrossed = 'Crossed Above';
+        var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
+        //console.log("start_date > " + interval +" >> "+start_date);
+        initiateIndicator();
+        stockData = [];
+        loadSymbol(symbol,'nse_eq',interval,start_date).then(function (response:any) {
+            res.setHeader('Content-Type', 'application/json');
+            stockData =response.data;
+            //console.log(stockData);
+            lastObject = {open:'',close:'',low:'',high:'',volume:'',timestamp:'',rsi:'',sma:'',bb:{upper:'',lower:'',isCrossed:'',middel:'',pb:''}};
+            stockData.map(row => {
+                var india = moment.tz(new Date(row.timestamp), "Asia/Kolkata");
+                india.format(); 
+                row.timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();//new Date(row.timestamp);
+                row.rsi = rsi.nextValue(Number(row.close));
+                row.sma = sma.nextValue(Number(row.close));
+                row.bb = bb.nextValue(Number(row.close)); 
+                
+                if(Number(row.close) >= row.bb.upper)// && Number(lastObject.close) < Number(lastObject.bb.upper))
+                {
+                    row.bb.isCrossed = 'Crossed Above';
+                }
+                else if(Number(row.close) <= row.bb.lower)// && Number(lastObject.close) > Number(lastObject.bb.lower))
+                {
+                    row.bb.isCrossed = 'Crossed Below';
+                }
+                //lastObject = row;
+                return row;
+            });
+            stockData.reverse();
+            res.send(JSON.stringify(stockData));
+            stockData = null;
+            res.end();
+        })
+        .catch(function(error:any){
+            if(error.code == '401'){
+                accessToken = '';
+                store.set('accessToken', accessToken); 
+
+                var loginUrl = upstox.getLoginUri(redirect_uri);
+                res.status(200).header('Content-type', 'text/html');
+                code = req.params.code;
+                res.status(302).setHeader('Location', loginUrl);
+                res.end();
             }
-            else if(Number(row.close) <= row.bb.lower && Number(lastObject.close) > Number(lastObject.bb.lower))
-            {
-                row.bb.isCrossed = 'Crossed Below';
-            }
-            lastObject = row; */
-            return row;
+            log("/loadSymbol/:symbol/:interval error > " +  JSON.stringify(error));
         });
-        stockData.reverse();
-        res.send(JSON.stringify(stockData));
-        stockData = null;
-        res.end();
-    })
-    .catch(function(error:any){
-        log("/loadSymbol/:symbol/:interval error > " +  JSON.stringify(error));
-    });
 
     });
-
 
     function initiateIndicator()
     {
-    var inputRSI:Object = {
-        values : [],
-        period : 14
-    };
-    rsi = new technicalindicators.RSI(inputRSI);
-    var inputSMA:Object = {
-        values : [],
-        period : 20
-    };
-    sma= new technicalindicators.SMA(inputSMA);
+        //console.log("initiateIndicator");
+        var inputRSI:Object = {
+            values : [],
+            period : 14
+        };
+        rsi = new technicalindicators.RSI(inputRSI);
+        var inputSMA:Object = {
+            values : [],
+            period : 20
+        };
+        //console.log("rsi");
+        sma= new technicalindicators.SMA(inputSMA);
 
-    var inputBB:Object = {
-        period : 14, 
-        values : [],
-        stdDev : 2 
+        var inputBB:Object = {
+            period : 14, 
+            values : [],
+            stdDev : 2 
+        }
+        //console.log("sma");
+        bb = new technicalindicators.BollingerBands(inputBB);
+        inputBB = inputRSI = inputSMA = null;
     }
-    bb = new technicalindicators.BollingerBands(inputBB);
-    inputBB = inputRSI = inputSMA = null;
-    }
-
 
     app.get('/getFutureContract/:exchange', function (req:any, res:any) { 
     var exchange = req.params.exchange;  
@@ -526,66 +528,67 @@ if (cluster.isMaster) {
 
     });
 
-
     var result = [];
     var map = new Map();
 
     app.get('/loadAllSymbolData/:interval/:exchange', function (req:any, res:any) { 
+    console.log('params: ' + JSON.stringify(req.params));
+     
     var interval = req.params.interval;  
     var exchange = req.params.exchange;  
 
     var list = [];
     if(exchange == "nifty")
-        list = niftyList;
+        list =  store.get('niftyList');//niftyList;
     else if(exchange == "fno")
-        list = fnoList;
+        list = store.get('fnoList');//fnoList;
     else{
-        //nseSymbolList = nseSymbolList.slice(1, 200);
-        list = nseSymbolList;
+        list = store.get('nseSymbolList');
     }
 
     var stockData = [];
-    //console.log('*** NSE stockData *** \n ' + JSON.stringify(stockObj));
-    if(interval == "5MINUTE") // 1WEEK, 1MONTH
-        stockData =store.get('data5');//stockObj.data5;
+    if(interval == "5MINUTE") 
+        stockData =store.get('data5');
     else if(interval == "10MINUTE")
-        stockData =store.get('data10');//stockObj.data10;
+        stockData =store.get('data10');
     else if(interval == "30MINUTE")
-        stockData =store.get('data30');//stockObj.data30;
+        stockData =store.get('data30');
     else if(interval == "60MINUTE")
-        stockData = store.get('data60');//stockObj.data60;  
+        stockData = store.get('data60');
     else if(interval == "1DAY")
-        stockData = store.get('data1day');//stockObj.data1day;             
+        stockData = store.get('data1day');         
     else if(interval == "1WEEK")
-        stockData = store.get('data1week');//stockObj.data1day;             
+        stockData = store.get('data1week');       
     else if(interval == "1MONTH")
-        stockData = store.get('data1month');//stockObj.data1day;             
+        stockData = store.get('data1month');        
 
-
-    var data = stockData.filter(function (el) {
-        return (el != null && el.close != null && el.close != undefined && el.close != "");
-    });
-            
-    if(data.length > 0)
+    var data = [];
+    if(stockData && stockData != undefined && stockData.length > 0)
+    {
+        stockData.filter(function (el) {
+            return (el != null && el.close != null && el.close != undefined && el.close != "");
+        });
+    }
+        
+    //console.log('*stockData interval : ' +interval +">"+ stockData.length);
+    if(stockData && stockData.length > 0)
     {
         res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify(data));
+        res.send(JSON.stringify(stockData));
         res.end();
     }
     else{ 
         console.log('*No data available.. Fetch it : ' + interval);
-        //console.log( JSON.stringify(store.get('data1day')));
         
-
         var now = new Date();
-        if(interval == "5MINUTE") // 1WEEK, 1MONTH
-                now.setDate(now.getDate() - 2);//now.setMinutes(now.getMinutes() - 5 * 20);
+        if(interval == "5MINUTE")
+                now.setDate(now.getDate() - 2);
         else if(interval == "10MINUTE")
-                now.setDate(now.getDate() - 3);//now.setMinutes(now.getMinutes() - 10 * 20);
+                now.setDate(now.getDate() - 3);
         else if(interval == "30MINUTE")
-            now.setDate(now.getDate() - 4);//now.setMinutes(now.getMinutes() - 30* 20);
+            now.setDate(now.getDate() - 4);
         else if(interval == "60MINUTE")
-            now.setDate(now.getDate() - 4);//now.setMinutes(now.getMinutes() - 60* 20);
+            now.setDate(now.getDate() - 4);
         else if(interval == "1DAY")
             now.setDate(now.getDate() - 20);
         else if(interval == "1WEEK")
@@ -594,69 +597,37 @@ if (cluster.isMaster) {
             now.setMonth(now.getMonth() - 20);    
         
         var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
-
-        loadAllSymbolData(list,interval,start_date).then(function (response:any) {
             
-            var data = response.filter(function (el) {
-                return (el != null && el.close != null && el.close != undefined && el.close != "");
-            });
-
-            if(interval == "5MINUTE") // 1WEEK, 1MONTH
+        console.log("start_date :: "+interval +"> "+start_date);
+        loadAllSymbolData(list,interval,start_date).then(function (response:any) {
+            console.log("loadAllSymbolData"+JSON.stringify(response));
+            var data = [];
+           
+            if(interval == "5MINUTE")
             {
-                //stockObj.data5 =data;
-                //client.set("data5", response);
-                //req.session.data5 =data;
-                store.set('data5', data); 
+                store.set('data5', response); 
             }
             else if(interval == "10MINUTE"){
-                //stockObj.data10 =data;
-                //client.set("data10", response);
-                //req.session.data10 =data;
-                store.set('data10', data); 
+                store.set('data10', response); 
             }
             else if(interval == "30MINUTE"){
-                //stockObj.data30 =data;
-                //client.set("data30", response);
-                //req.session.data30 =data;
-                store.set('data30', data); 
+                store.set('data30', response); 
             }
             else if(interval == "60MINUTE"){
-                //stockObj.data60 =data; 
-                //client.set("data60", response);
-                //req.session.data60 =data;
-                store.set('data60', data); 
+                store.set('data60', response); 
             }
             else if(interval == "1DAY"){
-                //stockObj.data1day =data; 
-                //client.set("data1day", response);  
-                //req.session.data1day =data;
-                store.set('data1day', data); 
+                store.set('data1day', response); 
             } 
             else if(interval == "1WEEK"){
-                //stockObj.data1day =data; 
-                //client.set("data1day", response);  
-                //req.session.data1day =data;
-                store.set('data1week', data); 
+                store.set('data1week', response); 
             } 
             else if(interval == "1MONTH"){
-                //stockObj.data1day =data; 
-                //client.set("data1day", response);  
-                //req.session.data1day =data;
-                store.set('data1month', data); 
+                store.set('data1month', response); 
             } 
-
-
-            result = [];
-            map = new Map();
-            for (const item of response) {
-                if(!map.has(item.symbol)){
-                    map.set(item.symbol, true);    // set any value to Map
-                    result.push(item);
-                }
-            }
                     
             res.setHeader('Content-Type', 'application/json');
-            res.send(JSON.stringify(result));
+            res.send(JSON.stringify(response));
             exchange = list = interval = data = null;
             res.end();
         })
@@ -668,7 +639,13 @@ if (cluster.isMaster) {
 
     app.get('/getListOfAllSymbol', function (req:any, res:any) {   
         res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify(fnoList));
+        
+        fnoList =  store.get('fnoList');
+        if(fnoList.length > 0)
+            res.send(JSON.stringify(fnoList));
+        else
+            res.send(JSON.stringify(getListOfAllSymbol()));
+            
         res.end();
     });
 
@@ -686,9 +663,9 @@ if (cluster.isMaster) {
     });
 
     app.get('/getProfile', function (req:any, res:any) {   
-    res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(profile));
-    res.end();
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(profile));
+        res.end();
     });
 
     app.post('/scan', function (req:any, res:any) {
@@ -696,12 +673,20 @@ if (cluster.isMaster) {
     });
 
     app.get('/admin', function (req:any, res:any) {
-        var loginUrl = upstox.getLoginUri(redirect_uri);
-        log("*loginUri " + loginUrl);
-        res.status(200).header('Content-type', 'text/html');
-        code = req.params.code;
-        res.status(302).setHeader('Location', loginUrl);
-        res.end();
+        if(store.get('accessToken') != ''){
+             accessToken = store.get('accessToken');
+             upstox.setToken(accessToken);
+             getListOfAllSymbol();
+             res.sendFile("index.html", {"root": __dirname});
+        }
+        else{
+            var loginUrl = upstox.getLoginUri(redirect_uri);
+            log("*loginUri " + loginUrl);
+            res.status(200).header('Content-type', 'text/html');
+            code = req.params.code;
+            res.status(302).setHeader('Location', loginUrl);
+            res.end();
+        }
     });
 
     // Change the 404 message modifing the middleware
@@ -713,7 +698,6 @@ if (cluster.isMaster) {
     app.listen(PORT, function () {
     log('App listening on port '+PORT);
     });
-
 }
 
 // Listen for dying workers
@@ -725,9 +709,3 @@ cluster.on('exit', function (worker) {
     cluster.fork();
 
 });
-
-
-
-
-
-

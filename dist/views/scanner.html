@@ -62,7 +62,15 @@ $(document).ready( function () {
         
         function loadAllSymbolData(interval,exchange){
           $(".loader").show();
+
+          var reqObj = {
+            interval:interval,
+            exchange:exchange
+        };
+
           $.get({
+          //  data: JSON.stringify(reqObj),
+           // contentType: 'application/json',
             url: server+'/loadAllSymbolData/'+interval+'/'+exchange,
             success: function(response){
                   $(".loader").hide();
@@ -120,7 +128,7 @@ $(document).ready( function () {
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
         <li class="active"><a href="#">Home</a></li>
-        <!-- <li><a href="/scan">Scanner</a></li> -->
+        <li><a href="/scan">Scanner</a></li>
         <li><a href="/strategy">Strategy</a></li>
         <li><a href="/gainerloser">Top Gainer / Looser</a></li>
         <li><a href="/contactus">Contact Us</a></li>   
@@ -149,8 +157,8 @@ $(document).ready( function () {
       <div class="col-sm-2">
         <label>Exchange</label>
         <select id="exchangeDropDown" class="form-control" >
-            <option value="nifty" selected="selected">Nifty</option>
-            <option value="fno">FNO Stocks</option>
+            <option value="nifty" selected="selected" >Nifty</option>
+            <option value="fno" >FNO Stocks</option>
             <option value="nse">NSE</option>
           </select>
       </div> 

@@ -1,6 +1,4 @@
-//require("Utility.js");
 var Upstox = require("upstox");
-
 var api = "cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw";
 var upstox = new Upstox(api);
 var fs = require('fs');
@@ -28,6 +26,8 @@ function getAcceToken(code:any)
             params = api_secret = code = null;
 
             accessToken = response.access_token;
+            store.set('accessToken', accessToken); 
+
             log("****accessToken*\n" +accessToken);
             upstox.setToken(accessToken);
             //accessToken = null;
@@ -63,8 +63,6 @@ function start() {
         var monthPattern = new RegExp(thisMonth, 'gi');
         
        var transformedData = JSON.parse(JSON.stringify(transformedData));
-        
-
         //console.log(' >  ' + transformedData);
 
         var dataFrame = dataForge.fromJSON(transformedData)
@@ -83,11 +81,8 @@ function start() {
                 return row;
             }
         }); 
-
-
         
        log("FNO data >> \n \n" + transformedData);
-
 
         fs.writeFile("data/index/nse_fo.txt", JSON.stringify(response), function (err:any) {
             if (err) throw err;
@@ -95,8 +90,6 @@ function start() {
         }); 
 
         checkBankNiftyExpiry();
-       
-    
     })
     .catch(function(err:any) {
         console.log("nse fo error " + JSON.stringify(err));
@@ -190,10 +183,11 @@ function getListOfAllSymbol()
     .then(function (response:any) {
         var list = response.data;
         nseSymbolList = list.map(x => x.symbol);
+        store.set('nseSymbolList', nseSymbolList); 
         getAllData();
      })
      .catch(function (err:any) {
-         log( "Error getListOfAllSymbol > " +  err);
+         log( "Error getListOfAllSymbol > " +  JSON.stringify(err));
          getAllData();
     }); 
 }
@@ -253,7 +247,7 @@ function getMaster(ex = "nse_fo"){
 }
 
 function loadSymbol(symbol,exchange,interval='1day',start_date='12-12-2018'){ 
-    //log("loadSymbol > " + symbol + " > "+ interval +" > "+exchange +" > "+ start_date);
+    log("loadSymbol > " + symbol + " > "+ interval +" > "+exchange +" > "+ start_date);
     if(accessToken){
         return upstox.getOHLC({"exchange": exchange,
             "symbol": symbol,
@@ -269,12 +263,6 @@ function getAllData(){
 }
 
 function syncStockData(){ 
-    /* setTimeout(function(){ load1dayData(); }, 60000);
-    setTimeout(function(){ load60minData(); }, 30000);
-    setTimeout(function(){ load30minData(); }, 20000);
-    setTimeout(function(){ load10minData(); }, 10000);
-    setTimeout(function(){ load5minData(); }, 10);  */
-    
     delay(10).then(() => load5minData());
     delay(10000).then(() => load10minData());
     delay(20000).then(() => load30minData());
@@ -284,49 +272,66 @@ function syncStockData(){
 
 const delay = t => new Promise(resolve => setTimeout(resolve, t));
 
-//var allSymbolWithIndicator = [];
 var stockData = []; 
 var data = {};
 var promiseArr = [];
-var prevObject = {change:'',open:'',close:'',low:'',high:'',volume:'',timestamp:'',rsi:'',sma:'',bb:{upper:'',lower:'',isCrossed:'',middel:'',pb:''}};
-        
+ 
 async function loadAllSymbolData(response:any,interval='1DAY',start_date='11-11-2018'){ 
-    //var allSymbolWithIndicator = [];
-    
-    //log( "loadAllSymbolData ******** " +  response);
+    console.log('* Step 1 : loadSymbol ');
     promiseArr = [];
-    promiseArr = response.map(async symbol => {
-        data = {};
-        stockData = [];
-        
-        //console.log("symbol " + interval +" >> "+symbol +" >> "+start_date);
-
-        await loadSymbol(symbol,'nse_eq',interval,start_date).then(function (response:any) {
+    return Promise.all(response.map(function(symbol) { 
+      return loadSymbol(symbol,'nse_eq',interval,start_date).then(function (response:any) {
             stockData =response.data;
-            prevObject = {change:'',open:'',close:'',low:'',high:'',volume:'',timestamp:'',rsi:'',sma:'',bb:{upper:'',lower:'',isCrossed:'',middel:'',pb:''}};
-
+            //console.log('**** loadSymbol response  > ' +symbol +":: "+stockData);
+            
+            var inputRSI:Object = {
+                values : [],
+                period : 14
+            };
+            rsi = new technicalindicators.RSI(inputRSI);
+            var inputSMA:Object = {
+                values : [],
+                period : 20
+            };
+           
+            sma= new technicalindicators.SMA(inputSMA);
+    
+            var inputBB:Object = {
+                period : 14, 
+                values : [],
+                stdDev : 2 
+            }
+           
+            bb = new technicalindicators.BollingerBands(inputBB);
+            inputBB = inputRSI = inputSMA = null;
+            //console.log('**** 1   > ');
             stockData.map(row => {
-                row.timestamp = new Date(row.timestamp);
+                console.log('**** 2   > ');
+                var india = moment.tz(new Date(row.timestamp), "Asia/Kolkata");
+                india.format(); 
+                if(india.minute() > 0)
+                    row.timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();
+                else
+                    row.timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year();
+                
                 row.rsi = rsi.nextValue(Number(row.close));
                 row.sma = sma.nextValue(Number(row.close));
                 row.bb = bb.nextValue(Number(row.close)); 
-                row.change = getPercentageChange(Number(prevObject.close),Number(row.close)); 
-
-                if(Number(row.close) > row.bb.upper)
+                //row.change = getPercentageChange(Number(lastObject.close),Number(row.close)); 
+                //console.log('**** 3   > ');
+                if(row.bb && Number(row.close) >= Number(row.bb.upper))// && lastObject && Number(lastObject.close) < Number(lastObject.bb.upper))
                 {
                     row.bb.isCrossed = 'Crossed Above';
                 }
-                else if(Number(row.close) < row.bb.lower)
+                else if(row.bb && Number(row.close) <= Number(row.bb.lower))// && lastObject && Number(lastObject.close) > Number(lastObject.bb.lower))
                 {
                     row.bb.isCrossed = 'Crossed Below';
                 }
-                else
-                {
-                    row.bb.isCrossed = '';
-                }
-                prevObject = row;
+                //lastObject = row;
+                //console.log('**** 4   > ');
                 return row;
             });
+            //console.log('**** 5   > ');
             stockData.reverse();
             data = {
                 "symbol":symbol,
@@ -338,18 +343,11 @@ async function loadAllSymbolData(response:any,interval='1DAY',start_date='11-11-
                 "bb":stockData[0].bb,
                 "change":stockData[0].change
             }; 
+            console.log("\n data   > " + JSON.stringify(data));
             stockData = null;
-        })
-        .catch(function(error:any){
-            console.log("loadSymbol error > " +  JSON.stringify(error));
+            promiseArr.push(data);
+            return data;
         });
-        symbol = null;
-
-        return data;
-    });
-
-    return Promise.all(promiseArr).then(function(res) {
-        return res.filter(Boolean);;
-    });
+    }));
 }
 
