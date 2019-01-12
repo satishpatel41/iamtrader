@@ -44,8 +44,6 @@ if (cluster.isMaster) {
     console.log('worker ' + worker.pid + ' died');
   });
 } else {
-        // Worker processes have a http server.
-        
         var app = express();
         app.use(express.static('public'));
         app.use(bodyParser.json()); // support json encoded bodies
@@ -53,9 +51,9 @@ if (cluster.isMaster) {
         app.use(session(
             {
                 store: new FileStore({
- 
+
                     path: './session-store'
-         
+            
                 }),
                 name: '_fs_cookie', // cookie will show up as foo site
                 resave: false,
@@ -65,7 +63,7 @@ if (cluster.isMaster) {
                     maxAge: 1000 * 60 * 60 * 1//24
                 }
             }    
-            ));
+        ));
     
         app.use(function(req, res, next) {
             res.header("Access-Control-Allow-Origin", "*");
@@ -82,19 +80,12 @@ if (cluster.isMaster) {
         .parseCSV()
         .toArray();
 
-        //console.log("fnoArr " + fnoArr);
-
         var fnoList = [];
         fnoArr.forEach(function(item) {   
-            //console.log(JSON.stringify(item));
             if(item.SYMBOL)
                 fnoList.push(item.SYMBOL)
-            //else
-             // fnoList.push(item.Symbol)
         });
         store.set('fnoList',fnoList);
-
-        //console.log("fnoList " + fnoList);
 
         var niftyList =  dataForge.readFileSync("data/list/ind_nifty50list.csv")
         .parseCSV()
@@ -102,25 +93,24 @@ if (cluster.isMaster) {
 
         niftyList = niftyList.map(x => x.Symbol);
         store.set('niftyList',niftyList);
-       // console.log("Res niftyList" + niftyList);
-
+       
         app.get('/', function (req:any, res:any) {
-        var q = url.parse(req.url, true).query;
-        code = q.code;
+            var q = url.parse(req.url, true).query;
+            code = q.code;
 
-        console.log("session > " + JSON.stringify(req.session.cookie));
+            console.log("session > " + JSON.stringify(req.session.cookie));
 
-        //checkBankNiftyExpiry();
+            //checkBankNiftyExpiry();
 
-        if(code)
-        {
-            getAcceToken(code);        
-            res.sendFile("index.html", {"root": __dirname});
-        }
-        else{
-            res.sendFile("index.html", {"root": __dirname});
-        }
-        q = null;
+            if(code)
+            {
+                getAcceToken(code);        
+                res.sendFile("index.html", {"root": __dirname});
+            }
+            else{
+                res.sendFile("index.html", {"root": __dirname});
+            }
+            q = null;
     });
 
     app.get('/welcome', checkSignIn,function (req:any, res:any) {
@@ -139,7 +129,6 @@ if (cluster.isMaster) {
     });
 
     function checkSignIn(req, res,next){
-
         if(req.session.user){
             next();     //If session exists, proceed to page
         } else {
@@ -163,10 +152,19 @@ if (cluster.isMaster) {
                     res.send("error")
                 }
                 else{
-                    //client.set('user', user);
-
-                    req.session.user = user;
-                    res.send(user);
+                    console.log("Login token > " + store.get('accessToken'));
+                    /* if(store.get('accessToken') && store.get('accessToken') != '')
+                    { */
+                        req.session.user = user;
+                        res.send(user);
+                   /*  }
+                    else{
+                        var loginUrl = upstox.getLoginUri(redirect_uri);
+                        res.status(200).header('Content-type', 'text/html');
+                        //code = req.params.code;
+                        //res.status(302).setHeader('Location', loginUrl);
+                        //res.end();
+                    } */
                 }
             });     
     }
@@ -248,7 +246,7 @@ if (cluster.isMaster) {
     var  lastObject = {open:'',close:'',low:'',high:'',volume:'',timestamp:'',rsi:'',sma:'',bb:{upper:'',lower:'',isCrossed:'',middel:'',pb:''}};
     var stockData = [];
 
-    app.post('/createStrategy', function (req:any, res:any) {
+    app.post('/createStrategy',checkSignIn, function (req:any, res:any) {
         var strategyObj = JSON.parse(req.body.data);
 
         var uid = strategyObj.uid;
@@ -285,6 +283,10 @@ if (cluster.isMaster) {
         var now = new Date();
         if(interval == "5MINUTE") // 1WEEK, 1MONTH
                 now.setDate(now.getDate() - 2);//now.setMinutes(now.getMinutes() - 5 * 20);
+        else if(interval == "3MINUTE")
+            now.setDate(now.getDate() - 1);//now.setMinutes(now.getMinutes() - 10 * 20);
+        else if(interval == "15MINUTE")
+             now.setDate(now.getDate() - 2);//now.setMinutes(now.getMinutes() - 10 * 20);
         else if(interval == "10MINUTE")
                 now.setDate(now.getDate() - 3);//now.setMinutes(now.getMinutes() - 10 * 20);
         else if(interval == "30MINUTE")
@@ -385,15 +387,19 @@ if (cluster.isMaster) {
 
     });
 
-    app.get('/loadSymbol/:symbol/:interval', function (req:any, res:any) { 
+    app.get('/loadSymbol/:symbol/:interval',checkSignIn, function (req:any, res:any) { 
         var symbol = req.params.symbol;  
         var interval = req.params.interval; 
 
         var now = new Date();
         if(interval == "5MINUTE") // 1WEEK, 1MONTH
             now.setMinutes(now.getMinutes() - 5* 20);
+        else if(interval == "3MINUTE")
+            now.setMinutes(now.getMinutes() - 3 * 20);
         else if(interval == "10MINUTE")
             now.setMinutes(now.getMinutes() - 10 * 20);
+        else if(interval == "15MINUTE")
+            now.setMinutes(now.getMinutes() - 15 * 20);    
         else if(interval == "30MINUTE")
             now.setMinutes(now.getMinutes() - 30* 20);
         else if(interval == "60MINUTE")
@@ -481,7 +487,7 @@ if (cluster.isMaster) {
         inputBB = inputRSI = inputSMA = null;
     }
 
-    app.get('/getFutureContract/:exchange', function (req:any, res:any) { 
+    app.get('/getFutureContract/:exchange', checkSignIn,function (req:any, res:any) { 
     var exchange = req.params.exchange;  
 
     //console.log("getMaster exchange > " +  JSON.stringify(exchange));
@@ -531,7 +537,7 @@ if (cluster.isMaster) {
     var result = [];
     var map = new Map();
 
-    app.get('/loadAllSymbolData/:interval/:exchange', function (req:any, res:any) { 
+    app.get('/loadAllSymbolData/:interval/:exchange', checkSignIn,function (req:any, res:any) { 
     console.log('params: ' + JSON.stringify(req.params));
      
     var interval = req.params.interval;  
@@ -549,8 +555,12 @@ if (cluster.isMaster) {
     var stockData = [];
     if(interval == "5MINUTE") 
         stockData =store.get('data5');
+    else if(interval == "3MINUTE")
+        stockData =store.get('data3');
     else if(interval == "10MINUTE")
         stockData =store.get('data10');
+    else if(interval == "15MINUTE")
+        stockData =store.get('data15');    
     else if(interval == "30MINUTE")
         stockData =store.get('data30');
     else if(interval == "60MINUTE")
@@ -583,8 +593,12 @@ if (cluster.isMaster) {
         var now = new Date();
         if(interval == "5MINUTE")
                 now.setDate(now.getDate() - 2);
+        else if(interval == "3MINUTE")
+                now.setDate(now.getDate() - 2);
         else if(interval == "10MINUTE")
-                now.setDate(now.getDate() - 3);
+                now.setDate(now.getDate() - 3); 
+        else if(interval == "15MINUTE")
+                now.setDate(now.getDate() - 3);               
         else if(interval == "30MINUTE")
             now.setDate(now.getDate() - 4);
         else if(interval == "60MINUTE")
@@ -600,15 +614,21 @@ if (cluster.isMaster) {
             
         console.log("start_date :: "+interval +"> "+start_date);
         loadAllSymbolData(list,interval,start_date).then(function (response:any) {
-            console.log("loadAllSymbolData"+JSON.stringify(response));
+            console.log("\n loadAllSymbolData **"+JSON.stringify(response));
             var data = [];
            
             if(interval == "5MINUTE")
             {
                 store.set('data5', response); 
             }
+            else if(interval == "3MINUTE"){
+                store.set('data3', response); 
+            }
             else if(interval == "10MINUTE"){
                 store.set('data10', response); 
+            }
+            else if(interval == "15MINUTE"){
+                store.set('data15', response); 
             }
             else if(interval == "30MINUTE"){
                 store.set('data30', response); 
@@ -637,7 +657,7 @@ if (cluster.isMaster) {
     }
     });
 
-    app.get('/getListOfAllSymbol', function (req:any, res:any) {   
+    app.get('/getListOfAllSymbol', checkSignIn,function (req:any, res:any) {   
         res.setHeader('Content-Type', 'application/json');
         
         fnoList =  store.get('fnoList');
@@ -649,7 +669,7 @@ if (cluster.isMaster) {
         res.end();
     });
 
-    app.get('/sync', function (req:any, res:any) {   
+    app.get('/sync',checkSignIn, function (req:any, res:any) {   
         syncStockData();
         res.setHeader('Content-Type', 'application/json');
         res.send("Successfully sync data !");
@@ -672,8 +692,8 @@ if (cluster.isMaster) {
 
     });
 
-    app.get('/admin', function (req:any, res:any) {
-        if(store.get('accessToken') != ''){
+    app.get('/admin', checkSignIn,function (req:any, res:any) {
+        if(store.get('accessToken') && store.get('accessToken') != ''){
              accessToken = store.get('accessToken');
              upstox.setToken(accessToken);
              getListOfAllSymbol();

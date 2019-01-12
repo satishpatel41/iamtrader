@@ -36,6 +36,7 @@
     "gulp-uglify": "^3.0.1",
     "jquery": "^3.3.1",
     "jsdom": "^13.1.0",
+    "moment": "^2.23.0",
     "moment-timezone": "^0.5.23",
     "node-cron": "^2.0.3",
     "nodemailer": "^4.7.0",
@@ -47,7 +48,7 @@
     "ts-loader": "^5.3.1",
     "tsify": "^4.0.1",
     "typescript": "^3.2.1",
-    "upstox": "^1.2.3",
+    "upstox": "https://github.com/upstox/upstox-nodejs#staging",
     "url": "^0.11.0"
   },
   "scripts": {

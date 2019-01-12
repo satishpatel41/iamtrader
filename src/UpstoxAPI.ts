@@ -24,6 +24,9 @@ function getAcceToken(code:any)
     upstox.getAccessToken(params)
         .then(function (response:any) {
             params = api_secret = code = null;
+            
+            // Set API version as this to use new APIs
+            upstox.setApiVersion(upstox.Constants.VERSIONS.Version_1_5_6);
 
             accessToken = response.access_token;
             store.set('accessToken', accessToken); 
@@ -264,7 +267,9 @@ function getAllData(){
 
 function syncStockData(){ 
     delay(10).then(() => load5minData());
+    delay(1000).then(() => load3minData());
     delay(10000).then(() => load10minData());
+    delay(15000).then(() => load15minData());
     delay(20000).then(() => load30minData());
     delay(30000).then(() => load60minData());
     delay(60000).then(() => load1dayData());
@@ -304,9 +309,9 @@ async function loadAllSymbolData(response:any,interval='1DAY',start_date='11-11-
            
             bb = new technicalindicators.BollingerBands(inputBB);
             inputBB = inputRSI = inputSMA = null;
-            //console.log('**** 1   > ');
+            //console.log('**** stockData   > ' + stockData.length);
             stockData.map(row => {
-                console.log('**** 2   > ');
+                
                 var india = moment.tz(new Date(row.timestamp), "Asia/Kolkata");
                 india.format(); 
                 if(india.minute() > 0)
@@ -314,6 +319,8 @@ async function loadAllSymbolData(response:any,interval='1DAY',start_date='11-11-
                 else
                     row.timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year();
                 
+                //console.log('**** row   > ' + india +" : "+ JSON.stringify(row));
+
                 row.rsi = rsi.nextValue(Number(row.close));
                 row.sma = sma.nextValue(Number(row.close));
                 row.bb = bb.nextValue(Number(row.close)); 
@@ -343,7 +350,7 @@ async function loadAllSymbolData(response:any,interval='1DAY',start_date='11-11-
                 "bb":stockData[0].bb,
                 "change":stockData[0].change
             }; 
-            console.log("\n data   > " + JSON.stringify(data));
+            console.log("data   > " + JSON.stringify(data));
             stockData = null;
             promiseArr.push(data);
             return data;

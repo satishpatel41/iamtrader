@@ -57,8 +57,7 @@ function load1dayData()
     var list = niftyList;
     var now = new Date();
     now.setDate(now.getDate() - 21);
-    /* var india = moment.tz(now, "Asia/Kolkata");
-    india.format(); */
+    
     var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
     var interval = '1DAY';
 
@@ -81,8 +80,7 @@ function load60minData()
     var list = niftyList;
     var now = new Date();
     now.setMinutes(now.getMinutes() - 50 * 60);
-    /* var india = moment.tz(now, "Asia/Kolkata");
-    india.format(); */
+  
     var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
     var interval = '60MINUTE';
     if(accessToken){    
@@ -104,8 +102,7 @@ function load30minData()
     var list = niftyList;
     var now = new Date();
     now.setMinutes(now.getMinutes() - 50 * 30);
-   /*  var india = moment.tz(now, "Asia/Kolkata");
-    india.format(); */
+  
     var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
     var interval = '30MINUTE';
     if(accessToken){    
@@ -128,8 +125,7 @@ function load10minData()
     var interval = '10MINUTE';
     var now = new Date();
     now.setMinutes(now.getMinutes() - 50 * 10);
-   /*  var india = moment.tz(now, "Asia/Kolkata");
-    india.format(); */
+   
     var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
 
     if(accessToken){    
@@ -151,8 +147,7 @@ function load5minData()
     var list = niftyList;
     var now = new Date();
     now.setMinutes(now.getMinutes() - 50 * 5);
- /*    var india = moment.tz(now, "Asia/Kolkata");
-    india.format(); */
+
     var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
 
     var interval = '5MINUTE';
@@ -160,6 +155,54 @@ function load5minData()
         loadAllSymbolData(list,interval,start_date).then(function (response:any) {
             if(response.length > 0)
               store.set('data5', response); 
+            
+            list = now = interval = null;
+            
+        })
+        .catch(function(error:any){
+           log("load5minData/ error > " +  start_date +" >> "+JSON.stringify(error));
+        });
+    }    
+}
+
+function load3minData()
+{
+    log('NSE 3 MINUTE data update');
+    var list = niftyList;
+    var now = new Date();
+    now.setMinutes(now.getMinutes() - 50 * 3);
+
+    var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
+
+    var interval = '3MINUTE';
+    if(accessToken){
+        loadAllSymbolData(list,interval,start_date).then(function (response:any) {
+            if(response.length > 0)
+              store.set('data3', response); 
+            
+            list = now = interval = null;
+            
+        })
+        .catch(function(error:any){
+           log("load5minData/ error > " +  start_date +" >> "+JSON.stringify(error));
+        });
+    }    
+}
+
+function load15minData()
+{
+    log('NSE 15 MINUTE data update');
+    var list = niftyList;
+    var now = new Date();
+    now.setMinutes(now.getMinutes() - 50 * 15);
+
+    var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
+
+    var interval = '15MINUTE';
+    if(accessToken){
+        loadAllSymbolData(list,interval,start_date).then(function (response:any) {
+            if(response.length > 0)
+              store.set('data15', response); 
             
             list = now = interval = null;
             
