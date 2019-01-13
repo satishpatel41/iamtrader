@@ -1,6 +1,7 @@
 var express = require('express');
 var moment = require('moment-timezone');
 var bodyParser = require('body-parser');
+var chalk = require('chalk');
 var fs = require('fs');
 var url = require('url');
 var cluster = require('cluster');
@@ -29,7 +30,7 @@ var numReqs = 0;
 if (cluster.isMaster) {
   // Fork workers.
   let cpus = require('os').cpus().length;
-  console.log("cpus "  +cpus);
+  console.log(chalk.green("cpus "  +cpus));
   for (var i = 0; i < cpus; i++) {
     var worker = cluster.fork();
  
@@ -41,7 +42,7 @@ if (cluster.isMaster) {
   }
  
   cluster.on('death', function(worker) {
-    console.log('worker ' + worker.pid + ' died');
+    console.log(chalk.red('worker ' + worker.pid + ' died'));
   });
 } else {
         var app = express();
@@ -98,7 +99,7 @@ if (cluster.isMaster) {
             var q = url.parse(req.url, true).query;
             code = q.code;
 
-            console.log("session > " + JSON.stringify(req.session.cookie));
+            console.log(chalk.green("session > " + JSON.stringify(req.session.cookie)));
 
             //checkBankNiftyExpiry();
 
@@ -123,7 +124,7 @@ if (cluster.isMaster) {
 
     app.get('/logout', function(req, res){
          req.session.destroy(function(){
-            console.log("user logged out.")
+            console.log(chalk.blue("user logged out."));
         });
         res.redirect('/login');
     });
@@ -133,7 +134,7 @@ if (cluster.isMaster) {
             next();     //If session exists, proceed to page
         } else {
             //var err = new Error("Not logged in!");
-            console.log(JSON.stringify(req.session) +" session \n"+  req.session.user);
+            console.log(chalk.blue(JSON.stringify(req.session) +" session \n"+  req.session.user));
             res.sendFile("login.html", {"root": __dirname});
         }       
     }
@@ -152,7 +153,7 @@ if (cluster.isMaster) {
                     res.send("error")
                 }
                 else{
-                    console.log("Login token > " + store.get('accessToken'));
+                    console.log(chalk.green("Login token > " + store.get('accessToken')));
                     /* if(store.get('accessToken') && store.get('accessToken') != '')
                     { */
                         req.session.user = user;
@@ -372,7 +373,7 @@ if (cluster.isMaster) {
                     })
                     .catch(function(err) {
                         // Something went wrong.
-                        console.log(err);
+                        console.log(chalk.red(err));
                     });
             } 
 
@@ -604,7 +605,7 @@ if (cluster.isMaster) {
         else if(interval == "60MINUTE")
             now.setDate(now.getDate() - 4);
         else if(interval == "1DAY")
-            now.setDate(now.getDate() - 20);
+            now.setDate(now.getDate() - 30);
         else if(interval == "1WEEK")
             now.setDate(now.getDate() - 7*20);
         else if(interval == "1MONTH")

@@ -1,10 +1,17 @@
 var cron = require('node-cron');
-
 var list = fnoList;
+
+cron.schedule('*/3 * * * *', () => {
+    load3minData();
+    console.log(chalk.blue('running a task every 3 minutes'));
+}, {
+scheduled: true,
+timezone: "Asia/Kolkata"
+});
 
 cron.schedule('*/5 * * * *', () => {
     load5minData();
-    console.log('running a task every 5 minutes');
+    console.log(chalk.blue('running a task every 5 minutes'));
 }, {
 scheduled: true,
 timezone: "Asia/Kolkata"
@@ -12,7 +19,15 @@ timezone: "Asia/Kolkata"
 
 cron.schedule('*/10 * * * *', () => {
     load10minData();
-    console.log('running a task every 10 minutes');
+    console.log(chalk.blue('running a task every 10 minutes'));
+}, {
+scheduled: true,
+timezone: "Asia/Kolkata"
+});
+
+cron.schedule('*/15 * * * *', () => {
+    load15minData();
+    console.log(chalk.blue('running a task every 15 minutes'));
 }, {
 scheduled: true,
 timezone: "Asia/Kolkata"
@@ -21,7 +36,7 @@ timezone: "Asia/Kolkata"
 
 cron.schedule('*/30 * * * *', () => {
     load30minData();
-    console.log('running a task every 30 minutes');
+    console.log(chalk.blue('running a task every 30 minutes'));
 }, {
 scheduled: true,
 timezone: "Asia/Kolkata"
@@ -29,7 +44,7 @@ timezone: "Asia/Kolkata"
 
 cron.schedule('0 */1 * * *', () => {
     load60minData();
-    console.log('running a task every 1 hour');
+    console.log(chalk.blue('running a task every 1 hour'));
 }, {
 scheduled: true,
 timezone: "Asia/Kolkata"
@@ -37,7 +52,7 @@ timezone: "Asia/Kolkata"
 
 cron.schedule('59 23 * * *', () => {
     store.unlink();
-    console.log('Clean cache data');
+    console.log(chalk.yellow('Clean cache data'));
 }, {
 scheduled: true,
 timezone: "Asia/Kolkata"
@@ -45,7 +60,7 @@ timezone: "Asia/Kolkata"
 
 cron.schedule('0 17 * * *', () => {
     load1dayData();
-    console.log('running a task every 1 day');
+    console.log(chalk.blue('running a task every 1 day'));
 }, {
 scheduled: true,
 timezone: "Asia/Kolkata"
@@ -79,7 +94,8 @@ function load60minData()
     log('NSE 60MINUTE data update');
     var list = niftyList;
     var now = new Date();
-    now.setMinutes(now.getMinutes() - 50 * 60);
+    //now.setMinutes(now.getMinutes() - 50 * 60);
+    now.setDate(now.getDate() - 5);
   
     var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
     var interval = '60MINUTE';
@@ -101,7 +117,8 @@ function load30minData()
     log('NSE 30MINUTE data update');
     var list = niftyList;
     var now = new Date();
-    now.setMinutes(now.getMinutes() - 50 * 30);
+    //now.setMinutes(now.getMinutes() - 50 * 30);
+    now.setDate(now.getDate() - 4);
   
     var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
     var interval = '30MINUTE';
@@ -124,7 +141,8 @@ function load10minData()
     var list = niftyList;
     var interval = '10MINUTE';
     var now = new Date();
-    now.setMinutes(now.getMinutes() - 50 * 10);
+    //now.setMinutes(now.getMinutes() - 50 * 10);
+    now.setDate(now.getDate() - 3);
    
     var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
 
@@ -146,7 +164,8 @@ function load5minData()
     log('NSE 5 MINUTE data update');
     var list = niftyList;
     var now = new Date();
-    now.setMinutes(now.getMinutes() - 50 * 5);
+    //now.setMinutes(now.getMinutes() - 50 * 5);
+    now.setDate(now.getDate() - 3);
 
     var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
 
@@ -170,7 +189,8 @@ function load3minData()
     log('NSE 3 MINUTE data update');
     var list = niftyList;
     var now = new Date();
-    now.setMinutes(now.getMinutes() - 50 * 3);
+    //now.setMinutes(now.getMinutes() - 50 * 3);
+    now.setDate(now.getDate() - 3);
 
     var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
 
@@ -184,7 +204,7 @@ function load3minData()
             
         })
         .catch(function(error:any){
-           log("load5minData/ error > " +  start_date +" >> "+JSON.stringify(error));
+           log("load3minData/ error > " +  start_date +" >> "+JSON.stringify(error));
         });
     }    
 }
@@ -208,7 +228,7 @@ function load15minData()
             
         })
         .catch(function(error:any){
-           log("load5minData/ error > " +  start_date +" >> "+JSON.stringify(error));
+           log("load15minData/ error > " +  start_date +" >> "+JSON.stringify(error));
         });
     }    
 }

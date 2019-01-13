@@ -3,7 +3,7 @@ let db = new sqlite3.Database('db/upstox.db', (err) => {
 if (err) {
     return console.error(err.message);
 }
-console.log('Connected to the in-memory SQlite database.');
+console.log(chalk.green('Connected to the in-memory SQlite database.'));
 });
 
 function closeDb(){
@@ -14,9 +14,9 @@ function insertDB(query,param){
     return new Promise(function(resolve, reject) {
         db.run(query, param,function(err){
             if(err)
-                console.log("Insert error > " + err);
+                console.log(chalk.red("Insert error > " + err));
             else{
-                console.log("Successfully inserted");
+                console.log(chalk.blue("Successfully inserted"));
                 resolve("success");
             }               
         });

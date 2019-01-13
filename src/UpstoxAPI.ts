@@ -286,74 +286,95 @@ async function loadAllSymbolData(response:any,interval='1DAY',start_date='11-11-
     promiseArr = [];
     return Promise.all(response.map(function(symbol) { 
       return loadSymbol(symbol,'nse_eq',interval,start_date).then(function (response:any) {
-            stockData =response.data;
-            //console.log('**** loadSymbol response  > ' +symbol +":: "+stockData);
+            try {
             
-            var inputRSI:Object = {
-                values : [],
-                period : 14
-            };
-            rsi = new technicalindicators.RSI(inputRSI);
-            var inputSMA:Object = {
-                values : [],
-                period : 20
-            };
-           
-            sma= new technicalindicators.SMA(inputSMA);
-    
-            var inputBB:Object = {
-                period : 14, 
-                values : [],
-                stdDev : 2 
-            }
-           
-            bb = new technicalindicators.BollingerBands(inputBB);
-            inputBB = inputRSI = inputSMA = null;
-            //console.log('**** stockData   > ' + stockData.length);
-            stockData.map(row => {
+                stockData =response.data;
+                console.log('* loadSymbol symbol  > ' +symbol +" :: "+interval +" :: "+start_date+" :: "+ stockData.length);// +":: "+stockData);
                 
-                var india = moment.tz(new Date(row.timestamp), "Asia/Kolkata");
-                india.format(); 
-                if(india.minute() > 0)
-                    row.timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();
-                else
-                    row.timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year();
+                var inputRSI:Object = {
+                    values : [],
+                    period : 14
+                };
+                rsi = new technicalindicators.RSI(inputRSI);
+                var inputSMA:Object = {
+                    values : [],
+                    period : 20
+                };
+                sma= new technicalindicators.SMA(inputSMA);
+                var inputBB:Object = {
+                    period : 14, 
+                    values : [],
+                    stdDev : 2 
+                }
+                bb = new technicalindicators.BollingerBands(inputBB);
+                inputBB = inputRSI = inputSMA = null;
+                //console.log('**** stockData   > ' + stockData.length);
+                stockData.map(row => {
+                    
+                /*  var india = moment.tz(new Date(row.timestamp), "Asia/Kolkata");
+                    india.format(); 
+                    if(india.minute() > 0)
+                        row.timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();
+                    else
+                        row.timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year(); */
+                    
+                    //console.log('**** row   > ' + india +" : "+ JSON.stringify(row));
+                    if(row && Number(row.close) > 0){
+                        row.rsi = rsi.nextValue(Number(row.close));
+                        row.sma = sma.nextValue(Number(row.close));
+                        row.bb = bb.nextValue(Number(row.close)); 
+                    }
+                    //row.change = getPercentageChange(Number(lastObject.close),Number(row.close)); 
+                    //console.log('**** 3   > ');
+                    if(row.bb && Number(row.close) >= Number(row.bb.upper))// && lastObject && Number(lastObject.close) < Number(lastObject.bb.upper))
+                    {
+                        row.bb.isCrossed = 'Crossed Above';
+                    }
+                    else if(row.bb && Number(row.close) <= Number(row.bb.lower))// && lastObject && Number(lastObject.close) > Number(lastObject.bb.lower))
+                    {
+                        row.bb.isCrossed = 'Crossed Below';
+                    }
+                    //lastObject = row;
+                    //console.log('**** 4   > ');
+                    return row;
+                });
+                //console.log('**** 5   > ');
+                stockData.reverse();
+                var timestamp;
+                if(stockData && stockData[0] && stockData[0].timestamp)
+                     timestamp = stockData[0].timestamp > 0 ? stockData[0].timestamp :(new Date().getTime());
                 
-                //console.log('**** row   > ' + india +" : "+ JSON.stringify(row));
+                if(timestamp > 0){
+                    var india = moment.tz(new Date(timestamp), "Asia/Kolkata");
+                    india.format(); 
+                    if(india.minute() > 0)
+                        timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();
+                    else
+                        timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year();
 
-                row.rsi = rsi.nextValue(Number(row.close));
-                row.sma = sma.nextValue(Number(row.close));
-                row.bb = bb.nextValue(Number(row.close)); 
-                //row.change = getPercentageChange(Number(lastObject.close),Number(row.close)); 
-                //console.log('**** 3   > ');
-                if(row.bb && Number(row.close) >= Number(row.bb.upper))// && lastObject && Number(lastObject.close) < Number(lastObject.bb.upper))
-                {
-                    row.bb.isCrossed = 'Crossed Above';
-                }
-                else if(row.bb && Number(row.close) <= Number(row.bb.lower))// && lastObject && Number(lastObject.close) > Number(lastObject.bb.lower))
-                {
-                    row.bb.isCrossed = 'Crossed Below';
-                }
-                //lastObject = row;
-                //console.log('**** 4   > ');
-                return row;
-            });
-            //console.log('**** 5   > ');
-            stockData.reverse();
-            data = {
-                "symbol":symbol,
-                "close":stockData[0].close,
-                "volume":stockData[0].volume,
-                "rsi":stockData[0].rsi,
-                "timestamp":stockData[0].timestamp,
-                "sma":stockData[0].sma, 
-                "bb":stockData[0].bb,
-                "change":stockData[0].change
-            }; 
-            console.log("data   > " + JSON.stringify(data));
-            stockData = null;
-            promiseArr.push(data);
-            return data;
+                    if(isNaN(timestamp))
+                         timestamp = new Date(timestamp);
+                    //console.log(timestamp +" > "+ stockData[0].timestamp + " : "+ india);    
+                }   
+                
+                data = {
+                    "symbol":symbol,
+                    "close":stockData[0].close,
+                    "volume":stockData[0].volume,
+                    "rsi":stockData[0].rsi,
+                    "timestamp":timestamp,
+                    "sma":stockData[0].sma, 
+                    "bb":stockData[0].bb,
+                    "change":stockData[0].change
+                }; 
+                console.log("data   > " + JSON.stringify(data));
+                stockData = null;
+                promiseArr.push(data);
+                return data;
+              } catch (err) {
+                console.log("Step 1 : err   > " + err);
+                //return err;
+              }
         });
     }));
 }
