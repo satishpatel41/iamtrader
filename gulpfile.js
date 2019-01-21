@@ -1,11 +1,11 @@
 var gulp = require("gulp");
 var server = require('gulp-express');
 var ts = require("gulp-typescript");
-var uglify = require('gulp-uglify');
+var uglify = require('gulp-terser');
 var rename = require('gulp-rename');
-//var connect = require('gulp-connect-pm2');
+const concat = require('gulp-concat');
 var exec    = require('child_process').exec;
-
+const minify = require("gulp-babel-minify");
 var del = require('del');
 var gulpSequence = require('gulp-sequence').use(gulp);
 
@@ -14,8 +14,20 @@ var gulpSequence = require('gulp-sequence').use(gulp);
   });
   */
   
+
+ gulp.task("script", () =>
+    gulp.src("src/*.js")
+    .pipe(minify({
+        mangle: {
+        keepClassName: true
+        }
+    })) 
+    .pipe(concat('app.min.js'))
+    .pipe(gulp.dest("./dist"))
+);
+  /*   
 gulp.task("script", function () {
-    var tsResult = gulp.src("src/*.ts")
+    var tsResult = gulp.src("src/*.js")
     .pipe(ts({
             noImplicitAny: false,
             lib: ["es2015","dom"],
@@ -27,18 +39,20 @@ gulp.task("script", function () {
     //.pipe(uglify())
     //.on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })
     .pipe(gulp.dest("./dist"));
-});
-
+}); */
+/* gulp.task("script", function () {
+    var script =  gulp.src('src/*.js')
+    .pipe(concat('app.min.js'))
+    .pipe(uglify())
+    .on('error', function (err) { console.log(err.toString()); })
+    .pipe(gulp.dest('dist'));
+});  */
 gulp.task("html", function () {
     var tsResult = gulp.src("views/*.html")
-    .pipe(gulp.dest('./dist/views/'));
+    .pipe(gulp.dest('./dist/'));
 });
 
-gulp.task("stockData", function () {
-    var tsResult = gulp.src("data/*.csv")
-    .pipe(gulp.dest('./dist/data/'));
-});
- 
+
 gulp.task('server', function () {
     server.run(['dist/app.min.js']);
     gulp.watch(['app/**/*.html'], server.notify);
@@ -65,7 +79,7 @@ gulp.task('clean', function () {
     ]);
 });
 gulp.task('build',gulpSequence('script','html'));
-gulp.task('default',gulpSequence('build','server'));
+gulp.task('default',gulpSequence('clean','build','server'));
 gulp.task('release',gulpSequence('clean','script','html'));
 
  
