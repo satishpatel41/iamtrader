@@ -31,6 +31,20 @@ function getAcceToken(code)
 
             accessToken = response.access_token;
             store.set('accessToken', accessToken); 
+            var d  = new Date();
+            
+            var india = moment.tz(d, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
+            india.format(); 
+            
+            india = india.set({
+                'date' : india.date() + 1,
+                'hour' : 9,
+                'minute'  : 05, 
+                'second' : 05
+             });
+     
+
+            store.set('tokenValidity', india); 
 
             console.log("****accessToken*\n" +accessToken);
             upstox.setToken(accessToken);
@@ -346,7 +360,7 @@ async function loadAllSymbolData(response,interval='1DAY',start_date='11-11-2018
                
                 if(stockData[0].timestamp > 0){
                     var d =new Date(Number(stockData[0].timestamp));
-                    var india = moment.tz(d, "Asia/Kolkata");
+                    var india = moment.tz(d, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
                     india.format(); 
                     //console.log(india +" : "+ stockData[0].timestamp +" : "+ d);
                     if(india.minute() > 0)

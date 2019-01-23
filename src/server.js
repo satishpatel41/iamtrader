@@ -717,6 +717,17 @@ if (cluster.isMaster) {
     });
 
     app.get('/admin', checkSignIn,function (req, res) {
+        var india = moment.tz(store.get('tokenValidity'), 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
+        var d =new Date();
+        var now1 = moment.tz(d, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
+        now1.format(); 
+        console.log("tokenValidity "  +now1.isBefore(india));
+        if(now1.isBefore(india))
+        {
+            accessToken = '';
+            upstox.setToken(accessToken);
+        }
+
         if(store.get('accessToken') && store.get('accessToken') != ''){
              accessToken = store.get('accessToken');
              upstox.setToken(accessToken);
@@ -733,7 +744,7 @@ if (cluster.isMaster) {
         }
     });
 
-    // Change the 404 message modifing the middleware
+    // Change the 404 message modifing the middlewar
     app.use(function(req, res, next) {
         res.status(404).send("Sorry, that route doesn't exist. Have a nice day :)");
     });
