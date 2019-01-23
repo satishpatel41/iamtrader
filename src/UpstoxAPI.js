@@ -292,12 +292,12 @@ var data = {};
 var promiseArr = [];
  
 async function loadAllSymbolData(response,interval='1DAY',start_date='11-11-2018'){ 
-    console.log('* Step 1 : loadSymbol ');
+    //console.log('* Step 1 : loadSymbol ');
     promiseArr = [];
     return Promise.all(response.map(function(symbol) { 
       return loadSymbol(symbol,'nse_eq',interval,start_date).then(function (response) {
             try {
-                    console.log('* loadSymbol ' + JSON.stringify(response));
+                    //console.log('* loadSymbol ' + JSON.stringify(response));
                     stockData =response.data;
                     //console.log('* loadSymbol symbol  > ' +symbol +" :: "+interval +" :: "+start_date+" :: "+ stockData);// +":: "+stockData);
 

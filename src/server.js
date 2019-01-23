@@ -30,7 +30,7 @@ if(process.env.NODE_ENV=="production")
 var numReqs = 0; 
 if (cluster.isMaster) {
   // Fork workers.
-  let cpus = require('os').cpus().length;
+  let cpus = 1;//require('os').cpus().length;
   console.log(chalk.green("cpus "  +cpus));
   for (var i = 0; i < cpus; i++) {
     var worker = cluster.fork();
@@ -444,7 +444,7 @@ if (cluster.isMaster) {
         loadSymbol(symbol,'nse_eq',interval,start_date).then(function (response) {
             res.setHeader('Content-Type', 'application/json');
             stockData =response.data;
-            console.log("loadSymbol stockData : " + stockData.length);
+            //console.log("loadSymbol stockData : " + response);
             lastObject = {open:'',close:'',low:'',high:'',volume:'',timestamp:'',rsi:'',sma:'',bb:{upper:'',lower:'',isCrossed:'',middel:'',pb:''}};
             stockData.map(row => {
                 var india = moment.tz(new Date(Number(row.timestamp)), "Asia/Kolkata");
