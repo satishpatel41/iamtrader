@@ -259,22 +259,47 @@ if (cluster.isMaster) {
         var exchange = strategyObj.exchange;
         var orderType = strategyObj.orderType;
         var symbolToBuySell  = strategyObj.symbolToBuySell;
-        var indicator= strategyObj.indicators[0].indicator;
-        var settings = strategyObj.indicators[0].settings;
-        var value = strategyObj.indicators[0].value;
-        var op = strategyObj.indicators[0].op;
         var interval = strategyObj.interval;
-
-        var query = "INSERT INTO Strategy (uid,name,symbol,exchange,orderType,symbolToBuySell,indicator,settings,value,op,interval)VALUES(?,?,?,?,?,?,?,?,?,?,?)";
-        var param = [uid,name,symbol,exchange,orderType,symbolToBuySell,indicator,settings,value,op,interval];
-        console.log(query +"> "+ JSON.stringify(param));
-
+        
+        var query = "INSERT INTO Strategy (uid,name,symbol,exchange,orderType,symbolToBuySell,interval)VALUES(?,?,?,?,?,?,?)";
+        var param = [uid,name,symbol,exchange,orderType,symbolToBuySell,interval];
+        
         insertDB(query,param).then(responses => {
-            console.log("result > " + JSON.stringify(responses));
-
+          
             if(responses == 'success')
             {
-                res.send('success');
+                var query1 = "select sid from Strategy where uid=?";
+                var param1 = [uid];
+
+                getFirst(query1,param1).then(obj => {
+                    //console.log("result > " + obj.sid);
+                    if(obj.sid == undefined)
+                    {
+                        res.send("error")
+                    }
+                    else{
+                        console.log(obj.sid);
+                         var sid = obj.sid;
+                        strategyObj.indicators.map(async (obj) => {
+
+                            var indicator= obj.indicator;
+                            var settings = obj.settings;
+                            var value = obj.value;
+                            var op = obj.op;
+                            
+                            var q = "INSERT INTO Indicators (sid,indicator,settings,value,op)VALUES(?,?,?,?,?)";
+                            var p = [sid,indicator,settings,value,op];
+                            //console.log(q +"> "+ JSON.stringify(p));
+
+                            insertDB(q,p).then(responses => {
+                                console.log("result > " + JSON.stringify(responses));
+                            }); 
+                        });
+
+                        res.send('success');
+                       
+                    }
+                });  
             }
             else{
                 res.send("error");
@@ -449,7 +474,7 @@ if (cluster.isMaster) {
             stockData.map(row => {
                 var india = moment.tz(new Date(Number(row.timestamp)), "Asia/Kolkata");
                 india.format(); 
-                row.timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();//new Date(row.timestamp);
+               // row.timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();//new Date(row.timestamp);
                 row.rsi = rsi.nextValue(Number(row.close));
                 row.sma = sma.nextValue(Number(row.close));
                 row.bb = bb.nextValue(Number(row.close)); 
@@ -719,9 +744,9 @@ if (cluster.isMaster) {
     app.get('/admin', checkSignIn,function (req, res) {
         var india = moment.tz(store.get('tokenValidity'), 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
         var d =new Date();
-        var now1 = moment.tz(d, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
+        var now1 = moment.tz(d, 'YYYY-DD-MM HH:mm',"Asia/Kolkata");
         now1.format(); 
-        console.log("tokenValidity "  +now1.isBefore(india));
+        console.log("tokenValidity "  +now1 +":"+india+":"+ now1.isBefore(india));
         if(now1.isBefore(india))
         {
             accessToken = '';

@@ -40,17 +40,15 @@
 
 <script type="text/javascript">
 
-//var items = [1,2,3,4,5];
-var items =  [
-      {"name": "red", "first": true, "url": "#Red"},
-      {"name": "green", "link": true, "url": "#Green"},
-      {"name": "blue", "link": true, "url": "#Blue"}
-];
+
 
 $(document).ready( function () {
-        var template = document.getElementById('items_tmp').innerHTML;
-        Mustache.render(template, {items});
-            
+    var items =  {'items':[1]};
+    var template = $("#items_tmp").html();
+	  var html = Mustache.to_html(template, items);
+		$("#target").html(html);
+
+
         var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
         $('#userTxt').text(localStorage.getItem('user'));
         if(localStorage.getItem('isAdmin') != 1){
@@ -122,7 +120,28 @@ $(document).ready( function () {
           buySell("s")
         });
 
+        $('#addButton').on('click', function(event) {
+          event.preventDefault(); // To prevent following the link (optional)
+          items.items = [];
+          items.items.push(items.items.length + 1);
+          template = $("#items_tmp").html();
+          html = Mustache.to_html(template, items);
+          $("#target").append(html);
+    
+        });
+
         function buySell(oType){
+          var indicatorArr = [];
+          for (var i=0;i<$(".indicatorsRow").length;i++)
+          {
+            var obj  = {};
+            obj.indicator = $(".indiDropDown")[i].value;
+            obj.settings = '14';
+            obj.value = $(".valueTxt")[i].value;
+            obj.op = $(".opDropDown")[i].value;
+
+            indicatorArr.push(obj);
+          }
               var strategyObj = {
                   uid:localStorage.getItem('uid'),
                   symbol:$("#symbolTxt").val(),
@@ -130,23 +149,23 @@ $(document).ready( function () {
                   orderType:oType,
                   name:$("#nameTxt").val(),
                   symbolToBuySell:$("#optionsTxt").val(),
-                  indicators:[{indicator:$("#indiDropDown").val(),settings:'14',value:$("#valueTxt").val(),op:$("#opDropDown").val()}],
-                            //,{indicator:'sma',settings:'20',value:'close',op:'>='}],
-                  interval:$("#intervalDropDown").val()
+                  indicators:indicatorArr,
+                  interval:$(".intervalDropDown").val()
               };
              
+                console.log($(".indiDropDown").val() +" :: "+ indicatorArr);
 
               $.ajax({
                 type: "post",
                 data: {data:JSON.stringify(strategyObj)},
                 url: server + '/createStrategy',//+JSON.stringify(strategyObj),
                 success: function(msg){
-                  alert(msg);
+                  //alert(msg);
                 }
               });
         }
         
-//OPTSTK FUTIDX
+        //OPTSTK FUTIDX
         function loadMasterData(){
           $(".loader").show();
           $.ajax({
@@ -228,12 +247,12 @@ $(document).ready( function () {
         <li><a href="/contactus">Contact Us</a></li>  
       </ul>
       <ul class="nav navbar-nav pull-right">
-          <li class="dropdown pull-right"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome, <span id="userTxt"></span> <b class="caret"></b></a>
+          <li class="dropdown pull-right"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome, <span id="userTxt"></span> <span class="glyphicon glyphicon-user"></span><b class="caret"></b></a>
             <ul class="dropdown-menu pull-right">
                 <li><a href="/profile"><i class="icon-cog"></i> Profile</a></li>
                 <li><a href="/preferences"><i class="icon-envelope"></i> Preferences</a></li>
                 <li class="divider"></li>
-                <li><a href="/logout"><i class="icon-off"></i> Logout</a></li>
+                <li><a href="/logout"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
             </ul>
         </li>
       </ul>
@@ -242,92 +261,94 @@ $(document).ready( function () {
 </nav>
   
 <div class="container">
-  <div class="row"></div>
-  <div class="row"></div>
-  <br></br>
-  <br></br>
-  <div class="row">
-      <div class="col-sm-2">
-        <select id="exchangeDropDown" class="form-control" >
-          <option value="FUTIDX">FUTURE INDEX</option>
-          <option value="OPTSTK">FUTURE STOCK</option>
-        </select>
+      <div class="row"></div>
+      <div class="row"></div>
+      <br/><br/><br/>
+      <div class="row">
+          <div class="col-sm-2">
+            <select id="exchangeDropDown" class="form-control" >
+              <option value="FUTIDX">FUTURE INDEX</option>
+              <option value="OPTSTK">FUTURE STOCK</option>
+            </select>
+          </div>
+        
+          <div class="col-sm-2">
+            <input type="text" id="symbolTxt" list="symbolDropdown" placeholder="Search symbol" class="form-control" required>
+            <datalist id="symbolDropdown"></datalist>
+          </div>  
+          
+          <button type="button" id="addButton"><span class="glyphicon glyphicon-plus"></span></button>
       </div>
-    
+
+
+      <script id="items_tmp" type="text/template">
+      {{#items}}
+        <div class="indicatorsRow row">
+          <div class="col-sm-2"> 
+            <select class="form-control intervalDropDown" >
+                <option value="5MINUTE">5MINUTE</option>
+                <option value="10MINUTE">10MINUTE</option>
+                <option value="30MINUTE">30MINUTE</option>
+                <option value="60MINUTE">60MINUTE</option>
+                <option value="1DAY" selected="selected">1DAY</option>
+                <option value="1WEEK">1WEEK</option>
+                <option value="1MONTH">1MONTH</option>
+              </select>
+          </div> 
+          
+          <div class="col-sm-2">
+            <select class="form-control indiDropDown" >
+                <option value="Indicator" selected="selected">Indicator</option> 
+                <option value="rsi" selected="selected">RSI</option>
+                <option value="bb">Bolinger Band</option>
+                <option value="sma">SMA</option>
+                <option value="close">CLOSE</option>
+                <option value="open">OPEN</option>
+                <option value="low">LOW</option>
+                <option value="high">HIGH</option>
+                <option value="volume">VOLUME</option>
+              </select>
+          </div> 
+
+          <div class="col-sm-2">
+            <select class="form-control opDropDown" >
+                <option value=">" selected="selected">&gt;</option>
+                <option value="<">&lt;</option>
+                <option value="=">=</option>
+                <option value=">=">>=</option>
+                <option value="<="><=</option>
+                <option value="==">==</option>
+              </select>
+          </div> 
+          <div class="col-sm-2">
+            <input type="number" name="points" step="1" min=0 max=100 class="form-control valueTxt" placeholder="Enter Value" required>
+          </div>  
+        </div> 
+        <br/>
+      {{/items}}
+      </script>
+      <br/>
+      <div class="row" id="target"></div>
+      <br/>
+      <div class="row" id="symbolToBuyOption">
       <div class="col-sm-2">
-        <input type="text" id="symbolTxt" list="symbolDropdown" placeholder="Search symbol" class="form-control" required>
-        <datalist id="symbolDropdown"></datalist>
+        <input type="text" id="optionsTxt" list="optionsDropdown" class="form-control" placeholder="Search symbol to Buy/ Sell">
+        <datalist id="optionsDropdown"></datalist>
       </div>
-    
-      
-  </div>
-  <br></br>
-  <script type="text/html" id="items_tmp">
-  {{#items}}
-  <div class="row">
-    <div class="col-sm-2">
-      <select id="intervalDropDown" class="form-control" >
-          <option value="5MINUTE">5MINUTE</option>
-          <option value="10MINUTE">10MINUTE</option>
-          <option value="30MINUTE">30MINUTE</option>
-          <option value="60MINUTE">60MINUTE</option>
-          <option value="1DAY" selected="selected">1DAY</option>
-          <option value="1WEEK">1WEEK</option>
-          <option value="1MONTH">1MONTH</option>
-        </select>
-    </div> 
-    
-    <div class="col-sm-2">
-      <select id="indiDropDown" class="form-control" >
-          <option value="Indicator" selected="selected">Indicator</option> 
-          <option value="rsi" selected="selected">RSI</option>
-          <option value="bb">Bolinger Band</option>
-          <option value="sma">SMA</option>
-          <option value="close">CLOSE</option>
-          <option value="open">OPEN</option>
-          <option value="low">LOW</option>
-          <option value="high">HIGH</option>
-          <option value="volume">VOLUME</option>
-        </select>
-    </div> 
-
-    <div class="col-sm-2">
-      <select id="opDropDown" class="form-control" >
-          <option value=">" selected="selected">&gt;</option>
-          <option value="<">&lt;</option>
-          <option value="=">=</option>
-          <option value=">=">>=</option>
-          <option value="<="><=</option>
-          <option value="==">==</option>
-        </select>
-    </div> 
-    <div class="col-sm-2">
-      <input type="number" name="points" step="1" min=0 max=100 id="valueTxt" class="form-control" placeholder="Enter Value" required>
-    </div>  
-  </div> 
-  {{/items}}
-</script>
-  <br></br>
-
-  <div class="row" id="symbolToBuyOption">
-    <div class="col-sm-2">
-      <input type="text" id="optionsTxt" list="optionsDropdown" class="form-control" placeholder="Search symbol to Buy/ Sell">
-      <datalist id="optionsDropdown"></datalist>
-    </div>
-    <div class="col-sm-2">
-        <input type="text" id="nameTxt" class="form-control" placeholder="Enter Name for Strategy">
-    </div>
-    <div class="col-sm-4">
-        <button type="button" class="btn btn-success" id="buyButton">BUY</button>
-        <button type="button" class="btn btn-danger" id="sellButton">SELL</button>
-    </div>
-  </div>  
-     
-  <div class="row">
-    <div class="col-sm">
-        <div id="example-table"></div>
-    </div> 
-  </div>    
+      <div class="col-sm-2">
+          <input type="text" id="nameTxt" class="form-control" placeholder="Enter Name for Strategy">
+      </div>
+      <div class="col-sm-4">
+          <button type="button" class="btn btn-success" id="buyButton">BUY</button>
+          <button type="button" class="btn btn-danger" id="sellButton">SELL</button>
+      </div>
+      </div>  
+        
+      <div class="row">
+      <div class="col-sm">
+          <div id="example-table"></div>
+      </div> 
+      </div>    
 </div>
 <div class="loader"></div>
 </body>

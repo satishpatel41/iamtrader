@@ -10,6 +10,14 @@
 <link href="https://unpkg.com/tabulator-tables@4.1.3/dist/css/tabulator.min.css" rel="stylesheet">
 <link href="https://unpkg.com/tabulator-tables@4.1.3/dist/css/semantic-ui/tabulator_semantic-ui.min.css" rel="stylesheet">
 <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.1.3/dist/js/tabulator.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+<!-- <script src="https://raw.githubusercontent.com/chartjs/chartjs-chart-financial/master/docs/Chart.Financial.js"></script>
+<script src="https://raw.githubusercontent.com/chartjs/chartjs-chart-financial/master/docs/utils.js"></script>
+<script src="https://raw.githubusercontent.com/chartjs/chartjs-chart-financial/master/docs/Chart.js"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.23/moment-timezone-with-data-2012-2022.min.js"></script>
+
+
+<script src="https://www.chartjs.org/dist/2.7.3/Chart.bundle.js"></script>
 <style>
     .loader {
       border: 10px solid #f3f3f3;
@@ -36,6 +44,10 @@
       100% { transform: rotate(360deg); }
     }
 </style>
+
+
+
+
 <script type="text/javascript">
 $(document).ready( function () {
         var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
@@ -53,6 +65,9 @@ $(document).ready( function () {
           symbol = $("#symbolTxt").val();
           loadSymbolData(symbol,interval);
         });
+
+
+       
 
         $(".loader").show();
         $.ajax({
@@ -80,6 +95,8 @@ $(document).ready( function () {
           }
         }
 
+        var ctx;
+
         function loadSymbolData(symbolName,interval){
           $(".loader").show();
           $.get({
@@ -91,6 +108,144 @@ $(document).ready( function () {
 
                 $(".loader").hide();
                 dataSet.filter((obj) => obj );
+
+                var xArr = dataSet.map(obj =>{ 
+                                var d = new Date(Number(obj.timestamp));
+  
+                                var india = moment.tz(d, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
+                                india.format(); 
+                              var timestamp;
+                                if(india.minute() > 0)
+                                  timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();
+                              else
+                                  timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year();      
+
+                                return d;
+                              });
+
+                var yArr = dataSet.map(obj =>{ 
+                  var rObj = {};
+                  rObj.y = obj.close;
+                  rObj.t= new Date(obj.timestamp);
+                  return obj.close;
+                });
+                              
+                /* Chart.defaults.global.elements.rectangle.borderWidth = 1;
+                Chart.defaults.global.elements.point.radius = 1;
+                Chart.defaults.global.elements.point.pointStyle = 'line';
+                 */
+                const data = {
+                  labels: xArr,
+                  datasets: [{
+                    fill: false,
+                    label: symbolName,
+                    data: yArr,
+                    borderColor: '#107cb1',
+                    backgroundColor: '#107cb1',
+                    lineTension: 0,
+                    pointRadius:0.2,
+                    spanGaps:false,
+                    steppedLine:false
+                    }]
+                }
+               
+
+                $("#chartDiv").empty();
+                var canvas = document.createElement('canvas');
+                canvas.id  = "myChart";
+                $( "#chartDiv" ).append(canvas);
+                ctx = document.getElementById("myChart").getContext('2d');
+
+
+                var myChart1 = new Chart(ctx, {
+                    type: 'line',
+                    data: data,
+                    options: {
+                          cubicInterpolationMode:'monotone',
+                          tooltips:{enabled:false}, 
+                          responsive: true,
+                          animation: {
+                              duration: 0, // general animation time
+                          },
+                          hover: {
+                              animationDuration: 0, // duration of animations when hovering an item
+                          },
+                          responsiveAnimationDuration: 0, // animation duration after a resize
+                          showLines: true, // disable for all datasets
+                          scales: {
+                              xAxes: [{
+                                  type: 'time',
+                                  distribution: 'series',
+                                  time: {
+                                      displayFormats: {
+                                          quarter: 'DD-MM-YYYY HH:mm'
+                                      }
+                                  }
+                              }]
+                          }
+                      }
+                  
+                });
+                /* function getRandomData(date, count) {
+                    var dateFormat = 'MMMM DD YYYY';
+                    var date = moment(date, dateFormat);
+                    var data = [randomBar(date, 30)];
+                    while (data.length < count) {
+                    date = date.clone().add(1, 'd');
+                    if (date.isoWeekday() <= 5) {
+                      data.push(randomBar(date, data[data.length - 1].c));
+                    }
+                }
+                return data;
+                }
+
+                function randomNumber(min, max) {
+                   return Math.random() * (max - min) + min;
+                }
+
+                function getRandomBarNoTime(lastClose) {
+                  var open = randomNumber(lastClose * .95, lastClose * 1.05);
+                  var close = randomNumber(open * .95, open * 1.05);
+                  var high = randomNumber(Math.max(open, close), Math.max(open, close) * 1.1);
+                  var low = randomNumber(Math.min(open, close) * .9, Math.min(open, close));
+                  return {
+                  o: open,
+                  h: high,
+                  l: low,
+                  c: close,
+                  };
+                }
+
+                function randomBar(date, lastClose) {
+                  var bar = getRandomBarNoTime(lastClose);
+                  bar.t = date.valueOf();
+                  return bar;
+                }
+
+                var data1 = getRandomData('April 01 2017', 60);
+                // Candlestick
+                var ctx = document.getElementById("chart1").getContext("2d");
+                ctx.canvas.width = 1000;
+                ctx.canvas.height = 250;
+                new Chart(ctx, {
+                  type: 'candlestick',
+                  data: {
+                    datasets: [{
+                      label: "CHRT - Chart.js Corporation",
+                      data: data1,
+                      fractionalDigitsCount: 2,
+                    }]
+                  },
+                  options: {
+                    tooltips: {
+                      position: 'nearest',
+                      mode: 'index',
+                    },
+                  },
+                });  */
+
+
+/* 
                 $("#date_txt").html(dataSet[0].timestamp);
                   var table = new Tabulator("#example-table", {
                     height:"90%",
@@ -113,7 +268,7 @@ $(document).ready( function () {
                         {title:"SMA", field:"sma"},
                         {title:"Bolinger Band", field:"bb.isCrossed"}
                     ]
-                });
+                }); */
             }
           });  
       }
@@ -141,15 +296,15 @@ $(document).ready( function () {
           <li><a href="/contactus">Contact Us</a></li>  
         </ul>
         <ul class="nav navbar-nav pull-right">
-            <li class="dropdown pull-right"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome, <span id="userTxt"></span> <b class="caret"></b></a>
-              <ul class="dropdown-menu pull-right">
-                  <li><a href="/profile"><i class="icon-cog"></i> Profile</a></li>
+          <li class="dropdown pull-right"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome, <span id="userTxt"></span> <span class="glyphicon glyphicon-user"></span><b class="caret"></b></a>
+            <ul class="dropdown-menu pull-right">
+                <li><a href="/profile"><i class="icon-cog"></i> Profile</a></li>
                 <li><a href="/preferences"><i class="icon-envelope"></i> Preferences</a></li>
                 <li class="divider"></li>
-                <li><a href="/logout"><i class="icon-off"></i> Logout</a></li>
-              </ul>
-          </li>
-        </ul>
+                <li><a href="/logout"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
+            </ul>
+        </li>
+      </ul>
       </div> 
     </div>
   </nav>
@@ -184,11 +339,17 @@ $(document).ready( function () {
           </div> 
     </div> 
     <div class="row">
-      <div class="col-sm">
-          <div id="example-table"></div>
+      <div class="col-sm" id="chartDiv" style="position: relative; height:50vh; width:90vw">
+<!--           <div id="example-table"></div> 
+          <canvas id="myChart"></canvas>-->
       </div>  
     </div>
   </div>
   <div class="loader"></div>
+  <div style="width:1000px">
+    <canvas id="chart1"></canvas>
+  </div>
+
+  
 </body>
 </html>
