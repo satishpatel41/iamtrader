@@ -742,15 +742,15 @@ if (cluster.isMaster) {
     });
 
     app.get('/admin', checkSignIn,function (req, res) {
-        var india = moment.tz(store.get('tokenValidity'), 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
+        var india = moment.tz(store.get('tokenValidity'),"Asia/Kolkata");
         var d =new Date();
         var now1 = moment.tz(d, 'YYYY-DD-MM HH:mm',"Asia/Kolkata");
         now1.format(); 
-        console.log("tokenValidity "  +now1 +":"+india+":"+ now1.isBefore(india));
-        if(now1.isBefore(india))
+        console.log("tokenValidity "  +now1 +":"+india+":"+ india.isBefore(now1));
+        if(india.isBefore(now1))
         {
             accessToken = '';
-            upstox.setToken(accessToken);
+            store.set('accessToken',accessToken)
         }
 
         if(store.get('accessToken') && store.get('accessToken') != ''){
