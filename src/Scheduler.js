@@ -2,21 +2,21 @@ var cron = require('node-cron');
 var chalk = require('chalk');
 var list;// = fnoList;
 
-cron.schedule('*/3 * * * *', () => {
-    load3minData();
+// cron.schedule('*/3 * * * *', () => {
+    /*load3minData();
     console.log(chalk.blue('running a task every 3 minutes'));
 }, {
 scheduled: true,
 timezone: "Asia/Kolkata"
-});
+});*/
 
-cron.schedule('*/5 * * * *', () => {
-    load5minData();
+//cron.schedule('*/5 * * * *', () => {
+ /*   load5minData();
     console.log(chalk.blue('running a task every 5 minutes'));
 }, {
 scheduled: true,
 timezone: "Asia/Kolkata"
-});
+}); */
 
 cron.schedule('*/10 * * * *', () => {
     load10minData();

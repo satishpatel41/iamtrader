@@ -1,0 +1,10 @@
+diff a/src/server.js b/src/server.js	(rejected hunks)
+@@ -532,7 +532,7 @@
+             stdDev : 2 
+         }
+         //console.log("sma");
+-        bb = new technicalindicators.BollingerBands(inputBB);
++        bb = new technicalindicators.BollingerBands(inputBB); */
+         inputBB = inputRSI = inputSMA = null;
+     }
+ 

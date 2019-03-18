@@ -320,7 +320,7 @@ async function loadAllSymbolData(response,interval='1DAY',start_date='11-11-2018
                         values : [],
                         period : 14
                     };
-                    rsi = new technicalindicators.RSI(inputRSI);
+                    /* rsi = new technicalindicators.RSI(inputRSI);
                     var inputSMA = {
                         values : [],
                         period : 20
@@ -331,15 +331,15 @@ async function loadAllSymbolData(response,interval='1DAY',start_date='11-11-2018
                         values : [],
                         stdDev : 2 
                     }
-                    bb = new technicalindicators.BollingerBands(inputBB);
+                    bb = new technicalindicators.BollingerBands(inputBB); */
                     inputBB = inputRSI = inputSMA = null;
                     //console.log('loadSymbol  > ' + stockData);
                     
                     stockData.map(row => {
                         if(row && Number(row.close) > 0){
-                            row.rsi = rsi.nextValue(Number(row.close));
+                            /* row.rsi = rsi.nextValue(Number(row.close));
                             row.sma = sma.nextValue(Number(row.close));
-                            row.bb = bb.nextValue(Number(row.close)); 
+                            row.bb = bb.nextValue(Number(row.close));  */
                         }
                         row.change = getPercentageChange(Number(lastObject.close),Number(row.close)); 
                     

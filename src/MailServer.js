@@ -1,8 +1,6 @@
 'use strict';
 const nodemailer = require('nodemailer');
 
-
-
 var transporter = nodemailer.createTransport({
 service: 'gmail',
 auth: {
@@ -28,14 +26,11 @@ let mailOptions = {
         content: 'Some notes about this e-mail',
         contentType: 'text/plain' // optional, would be detected from the filename
     }
-
-    
     ],
 
     list: {
         // List-Help: <mailto:admin@example.com?subject=help>
         help: 'admin@example.com?subject=help',
-
         // List-Unsubscribe: <http://example.com> (Comment)
         unsubscribe: [
             {
@@ -44,7 +39,6 @@ let mailOptions = {
             },
             'unsubscribe@example.com'
         ],
-
         // List-ID: "comment" <example.com>
         id: {
             url: 'mylist.example.com',
@@ -52,7 +46,6 @@ let mailOptions = {
         }
     }
 };
-
 
 function sendingMail(){
     // send mail with defined transport object

@@ -8,45 +8,21 @@ var exec    = require('child_process').exec;
 const minify = require("gulp-babel-minify");
 var del = require('del');
 var gulpSequence = require('gulp-sequence').use(gulp);
-
-/* gulp.task('connect', function() {
-    connect.server();
-  });
-  */
   
 
  gulp.task("script", () =>
     gulp.src("src/*.js")
     .pipe(minify({
         mangle: {
-        keepClassName: true
+          keepClassName: true
         }
     })) 
     .pipe(concat('app.min.js'))
+    .pipe(uglify())
+    .on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })
     .pipe(gulp.dest("./dist"))
 );
-  /*   
-gulp.task("script", function () {
-    var tsResult = gulp.src("src/*.js")
-    .pipe(ts({
-            noImplicitAny: false,
-            lib: ["es2015","dom"],
-            target: "es5",
-            noImplicitAny:false,
-            sourceMap:false,
-            out: "app.min.js"
-    }))
-    //.pipe(uglify())
-    //.on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })
-    .pipe(gulp.dest("./dist"));
-}); */
-/* gulp.task("script", function () {
-    var script =  gulp.src('src/*.js')
-    .pipe(concat('app.min.js'))
-    .pipe(uglify())
-    .on('error', function (err) { console.log(err.toString()); })
-    .pipe(gulp.dest('dist'));
-});  */
+
 gulp.task("html", function () {
     var tsResult = gulp.src("views/*.html")
     .pipe(gulp.dest('./dist/'));
@@ -66,12 +42,6 @@ gulp.task('server', function () {
     gulp.watch(['app.min.js', 'routes/**/*.js'], [server.run]);
 });
 
-/* gulp.task('server', function() {
-    connect.server({
-      root: 'dist/app.min.js',
-      livereload: true
-    });
-  }); */
 
 gulp.task('clean', function () {
     return del([

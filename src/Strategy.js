@@ -1,6 +1,8 @@
 
 var technicalindicators = require('technicalindicators');
 var fs = require('fs');
+var path = require('path');
+var moment = require('moment-timezone');
 
 var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 var date = new Date();
@@ -22,6 +24,25 @@ var strategyObj = {
                ,{indicator:'sma',settings:'20',value:'close',op:'>='}],
     interval:'15min'
 };
+
+
+
+
+    
+
+//console.log("data  : " + x + " :: "+JSON.stringify(database.data));
+
+/*  var df =  dataForge.fromJSON(JSON.stringify(obj.data)) // Read CSV file (or JSON!)
+//.setIndex("timestamp")
+.dropSeries(["cp"]) // Drop certain columns.
+.where(row => calculateIndicators(row)) // Filter rows.
+.select(row => transform(row)); // Transform the data. 
+
+const chronoOrder = df.reverse();
+var output = df.toJSON();
+
+var valuesDf = df.detectValues(); */ 
+//console.log(valuesDf.toString());
 
 function backTesting(stockData,path){ 
 
@@ -146,71 +167,6 @@ function backTesting(stockData,path){
   console.log(stockData); */
 }
 
-var rsi,sma,bb;
-
-function getList(list){ 
-    for (let x of list) {
-    //list.map(Object(x) => {
-      if(x){
-
-          var inputRSI = {
-              values : [],
-              period : 14
-          };
-          rsi = new technicalindicators.RSI(inputRSI);
-          var inputSMA = {
-              values : [],
-              period : 20
-          };
-          sma= new technicalindicators.SMA(inputSMA);
-
-          var inputBB = {
-              period : 14, 
-              values : [],
-              stdDev : 2 
-          }
-          bb = new technicalindicators.BollingerBands(inputBB);
-
-          var symbol = x.symbol ? x.symbol:x;
-          var path = 'data/stock/1day/'+symbol+'.txt';
-          fs.access(path, fs.constants.F_OK | fs.constants.R_OK, (err) => {
-              if (err) {
-              console.error(
-                  `${path} ${err.code === 'ENOENT' ? 'does not exist' : 'is read-only'}`);
-              } else {
-              console.log(`${path} exists, and it is Readable`);
-
-                  fs.readFile(path, 'utf8', function(err, response) {
-                      if (err) throw err;
-                      
-                      if(response != '' && response != undefined && response != null){
-                          var obj = JSON.parse(response);
-                         
-                          var df =  dataForge.fromJSON(JSON.stringify(obj.data)) // Read CSV file (or JSON!)
-                         .dropSeries(["cp"]) // Drop certain columns.
-                         .where(row => calculateIndicators(row)) // Filter rows.
-                         .select(row => transform(row)); // Transform the data. 
-                         
-                         const chronoOrder = df.reverse();
-                         var output = df.toJSON();
-                         console.log("data >> " + path +" \ n \n "+ output);
-
-                          /* const indexedDf = chronoOrder.setIndex("timestamp"); 
-                          const close = indexedDf.getSeries("close"); 
-                          dataFrame.plot().renderImage("my-chart.png"); */
-                      } 
-                  });
-              }
-
-          });
-
-      
-
-          
-              }
-          }  
-}
-
 
 function mappedFunction()
 {
@@ -219,7 +175,21 @@ function mappedFunction()
 
 function transform(row)
 {
-  row.timestamp = new Date(row.timestamp);
+    var timestamp = '';
+    if(row.timestamp > 0){
+        var d =new Date(Number(row.timestamp));
+        var india = moment.tz(d, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
+        india.format(); 
+        //console.log(india +" : "+ stockData[0].timestamp +" : "+ d);
+        /*  if(india.minute() > 0)
+            timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();
+        else
+            timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year();      */       
+    }  
+
+    row.timestamp = india;
+
+  //row.timestamp = new Date(row.timestamp);
   return row;
 }
 
@@ -284,11 +254,62 @@ function transform(row)
   }
 }
  */
+
+
+
+
+
+
+var index = 0;
+var buyprice = 0;
+var sellprice = 0;
+var profit = 0;
+var totalProfit = 0;
+var isBuySignalGenerated = false;
+var isSellSignalGenerated = false;
+var buyCall = 0;
+var sellCall = 0;
+
 function calculateIndicators(row)
 {
   row.rsi = rsi.nextValue(Number(row.close));
   row.sma = sma.nextValue(Number(row.close));
   row.bb = bb.nextValue(Number(row.close)); 
+
+var d =new Date(Number(row.timestamp));
+var india = moment.tz(d, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
+india.format(); 
+row.date =india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();
+
+    if(india.hour() == 9 && india.minute() == 25 && row.bb && row.close > row.bb.upper)
+    {
+        buyCall++;
+          buyprice = row.close;
+          isBuySignalGenerated = true;
+          console.log("\n\n BUY *>> " + row.date  +" >> "+ buyprice);
+    }
+
+    if(isBuySignalGenerated)
+    {
+        if(row.bb && row.close <= row.bb.middle)
+        {
+            isBuySignalGenerated = false;  
+            profit = row.close - buyprice;
+            totalProfit += profit;
+            console.log("\n\n EXIT CALL *>> " + row.date+" close >> "+row.close+" profit>> "+ profit+" totalProfit >> "+ totalProfit +">>"+ buyCall);
+        }
+    }else if(isSellSignalGenerated)
+    {
+        if(obj.rsi > 40 || row.close > obj.sma)
+        {
+            isSellSignalGenerated = false;  
+            profit = sellprice - row.close;
+            totalProfit += profit;
+            console.log("\n\n EXIT SELL *>> " + row.date+" close >> "+row.close+" profit>> "+ profit+" totalProfit >> "+ totalProfit +">>"+ sellCall);
+        }
+    } 
+    index++;
+  
   return row;
 }
 
@@ -340,7 +361,7 @@ function addIndicators(response,path){
       values : closeData,
       period : 14
   };
-  var rsiData = technicalindicators.RSI.calculate(inputRSI);
+ /*  var rsiData = technicalindicators.RSI.calculate(inputRSI);
   var inputSMA = {
       values : closeData,
       period : 20
@@ -353,7 +374,7 @@ function addIndicators(response,path){
       values : closeData ,
       stdDev : 2 
   }
-  var bbData = BB.calculate(inputBB);
+  var bbData = BB.calculate(inputBB); */
   //console.log("\n \n BB >> " + JSON.stringify(bbData));
 
   var index = 0;
@@ -369,9 +390,9 @@ function addIndicators(response,path){
   for (let x of stockData) {
   //stockData= stockData.map(x =>{
       var obj = x;
-      obj.rsi = index > inputRSI.period?rsiData[index - inputRSI.period]:0;
+     /*  obj.rsi = index > inputRSI.period?rsiData[index - inputRSI.period]:0;
       obj.sma = index >= inputSMA.period?smaData[index - inputSMA.period]:0;
-      obj.bb = index >= inputBB.period?bbData[index - inputBB.period]:null;
+      obj.bb = index >= inputBB.period?bbData[index - inputBB.period]:null; */
 
       index++;
       //console.log("\nobj > " + JSON.stringify(obj));
