@@ -12,13 +12,13 @@ var gulpSequence = require('gulp-sequence').use(gulp);
 
  gulp.task("script", () =>
     gulp.src("src/*.js")
-    .pipe(minify({
-        mangle: {
-          keepClassName: true
-        }
-    })) 
+    // .pipe(minify({
+    //     mangle: {
+    //       keepClassName: true
+    //     }
+    // })) 
     .pipe(concat('app.min.js'))
-    .pipe(uglify())
+    //.pipe(uglify())
     .on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })
     .pipe(gulp.dest("./dist"))
 );

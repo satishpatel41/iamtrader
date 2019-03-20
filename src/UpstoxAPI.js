@@ -1,14 +1,14 @@
 var Upstox = require("upstox");
 var moment = require('moment-timezone');
-var api = "cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw";
+var api = "OknufM07tm1g9EfN4fHKP2Eqi9DSw40I2Y3xliHg";
 var upstox = new Upstox(api);
 var fs = require('fs');
 var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 var code = '';
 var __dirname = "views"
 var exchanges =  [ 'MCX_FO', 'BSE_EQ', 'NSE_EQ', 'NSE_FO', 'NCD_FO'];
-var login_code = "ce728b73424e719680aa66a51ba4eb469f9875f2";
-var api_secret = "xs5ibb0pk0";
+var login_code = "OknufM07tm1g9EfN4fHKP2Eqi9DSw40I2Y3xliHg";
+var api_secret = "69xldylnvf";
 var client_id="";
 var watchList = ['banknifty','hindalco','ICICIBANK','sbin','idea','lt','HAVELLS'];
 var accessToken;
@@ -26,9 +26,7 @@ function getAcceToken(code)
         .then(function (response) {
             params = api_secret = code = null;
             
-            // Set API version as this to use new APIs
-            //upstox.setApiVersion(upstox.Constants.VERSIONS.DEFAULT);
-
+         
             accessToken = response.access_token;
             store.set('accessToken', accessToken); 
             var d  = new Date();
@@ -174,7 +172,7 @@ function start() {
             //console.log("join" + niftyStr);
 
             upstox.subscribeFeed({
-                "exchange": "nse_eq",
+                "exchange": "NSE_EQ",
                 "symbol": niftyStr,//'BANKNIFTY27DECFUT',//NIFTY29NOVFUT NIFTY18NOVFUT,BANKNIFTY18NOVFUT
                 "type": "ltp"
             })
@@ -274,12 +272,13 @@ function getMaster(ex = "nse_fo"){
     }    
 }
 
-function loadSymbol(symbol,exchange,interval='1day',start_date='12-12-2018'){ 
-    console.log("loadSymbol > " + symbol + " > "+ interval +" > "+exchange +" > "+ start_date +" :: "+ store.get('accessToken'));
+function loadSymbol(symbol,exchange,interval='1day',start_date='',end_date=''){ 
+    //console.log("loadSymbol > " + symbol + " > "+ interval +" > "+exchange +" > "+ start_date +" > "+ end_date+" :: "+ store.get('accessToken'));
     if(store.get('accessToken')){
         return upstox.getOHLC({"exchange": exchange,
             "symbol": symbol,
             "start_date": start_date,
+            "end_date": end_date,
             "format" : "json",
             "interval" : interval
         })  
@@ -287,7 +286,12 @@ function loadSymbol(symbol,exchange,interval='1day',start_date='12-12-2018'){
 }
 
 function getAllData(){
-  // syncStockData();
+    var interval = '1DAY';
+    var now = new Date();
+    var end_date = now.getDate()+"/"+(now.getMonth() + 1)+"/"+now.getFullYear();
+    now.setDate(now.getDate() - 21);
+    var start_date = now.getDate()+"/"+(now.getMonth() + 1)+"/"+now.getFullYear();
+    syncLiveAllStockData(store.get('fnoList'),interval,"",""); 
 }
 
 function syncStockData(){ 
@@ -307,12 +311,12 @@ var data = {};
 var promiseArr = [];
  
 async function loadAllSymbolData(response,interval='1DAY',start_date='11-11-2018'){ 
-    //console.log('* Step 1 : loadSymbol ');
+    console.log('* Step 1 : loadSymbol ');
     promiseArr = [];
     return Promise.all(response.map(function(symbol) { 
-      return loadSymbol(symbol,'nse_eq',interval,start_date).then(function (response) {
+      return loadSymbol(symbol,'NSE_EQ',interval,start_date).then(function (response) {
             try {
-                    //console.log('* loadSymbol ' + JSON.stringify(response));
+                    console.log('* loadSymbol ' + JSON.stringify(response));
                     stockData =response.data;
                     //console.log('* loadSymbol symbol  > ' +symbol +" :: "+interval +" :: "+start_date+" :: "+ stockData);// +":: "+stockData);
 
@@ -389,6 +393,25 @@ async function loadAllSymbolData(response,interval='1DAY',start_date='11-11-2018
                 console.log("loadAllSymbolData : err   > " + err);
                 //return err;
               }
+        });
+    }));
+}
+
+
+async function getUpstoxData(response,interval='1DAY',start_date='',end_date=''){ 
+    console.log('* Step 1 : loadSymbol ');
+    promiseArr = [];
+    return Promise.all(response.map(function(symbol) { 
+      return loadSymbol(symbol,'NSE_EQ',interval,start_date,end_date).then(function (response) {
+            try {
+                    console.log('* loadSymbol ' + JSON.stringify(response));
+                    stockData =response.data;
+                    promiseArr.push(data);
+                    return data;
+                } catch (err) {
+                console.log("loadAllSymbolData : err   > " + err);
+                //return err;
+                }
         });
     }));
 }

@@ -6,36 +6,49 @@ const ADL = require('technicalindicators').ADL;
 const ADX = require('technicalindicators').ADX;
 const ATR = require('technicalindicators').ATR
 const MACD = require('technicalindicators').MACD;
+var bullish = require('technicalindicators').bullish;
 
-function getIndicator(symbol,stockData,strategyList,isBackTesting){
+async function getIndicator(symbol,stockData,strategyList,isBackTesting){
     var closes = [];
     var opens = [];
     var highs = [];
     var lows = [];
     var timestamps = [];
-    var values = stockData.map(obj =>  {
-        closes.push(obj.close);       
-        opens.push(obj.open);       
-        highs.push(obj.high);       
-        lows.push(obj.low);       
-        timestamps.push(obj.timestamp);       
+    var values = stockData.map(async (obj) =>  {
+        closes.push(Number(obj.close));       
+        opens.push(Number(obj.open));       
+        highs.push(Number(obj.high));       
+        lows.push(Number(obj.low));       
+        timestamps.push(Number(obj.timestamp));       
     });  
-    
+
     timestamps = timestamps.reverse();//**********  dont't change **********  
-    Promise.all(strategyList.map(strategyObj =>  {     
-       return new Promise(function(resolved, rejected) {
+    Promise.all(strategyList.map(async (strategyObj) => {  
+        return new Promise(function(resolved, rejected) {
         var result = [];
         var output = new Array();
-        Promise.all(strategyObj.indicators.map(indicatorObj =>  {
+        Promise.all(strategyObj.indicators.map(async (indicatorObj) => {
             return new Promise(function(resolve, reject) {
                 try{
-                    indicatorObj.values = eval(indicatorObj.values);
-                    var str = indicatorObj.indicator+".calculate("+JSON.stringify(indicatorObj)+")";
-                    var res = eval(str);  
-                    var op = isBackTesting ? res.reverse():res.reverse().slice(0, 3);  //**********  dont't change **********  
-                    output.push(op);     
-                  // console.log("*indicators " +symbol +" > " +indicatorObj.indicator +">> "+JSON.stringify(output));
-                    return resolve(output);                        
+                    if(indicatorObj.indicator && indicatorObj.indicator != ""){
+                        if(indicatorObj.values == "closes")
+                            indicatorObj.values = eval(indicatorObj.values);
+                        else
+                            indicatorObj.values = closes;
+                        
+                        //console.log("*getIndicator " +symbol +" > " +closes[0] +" ::"+ indicatorObj.values[0]);
+                        var str = indicatorObj.indicator+".calculate("+JSON.stringify(indicatorObj)+")";
+                        var res = eval(str); 
+                        //console.log("*getIndicator " +res); 
+                        var op = isBackTesting ? res.reverse():res.reverse().slice(0, 3);  //**********  dont't change **********  
+                        output.push(op);     
+                     // console.log("*indicators " +symbol +" > " +closes[0] +">> "+JSON.stringify(output));
+                        indicatorObj = null;
+                        resolve(output);   
+                    }     
+                    else{
+                        resolve("");   
+                    }                
                 }
                 catch(e){
                     reject(e);
@@ -62,13 +75,22 @@ function getIndicator(symbol,stockData,strategyList,isBackTesting){
                 return resolved(strategyRes);    
             }
             else{
+                //console.log("***** " +strategyObj.strategy);
                 closes = closes.reverse(); //**********  dont't change **********  
-                result.push(eval(strategyObj.strategy));   
-                //console.log("***** " +result +":: "+strategyObj.strategy);
+                highs = highs.reverse(); //**********  dont't change **********  
+                lows = lows.reverse(); //**********  dont't change **********  
+                opens = opens.reverse(); //**********  dont't change **********  
+
+                var strategy = eval(strategyObj.strategy);
+                result.push(strategy);   
+                //console.log("*" +symbol +" > " + result +":: "+ eval((closes[0] - opens[0])/highs[0] - lows[0]));
                 closes = closes.reverse(); //**********  dont't change **********  
+                highs = highs.reverse(); //**********  dont't change **********  
+                lows = lows.reverse(); //**********  dont't change **********  
+                opens = opens.reverse(); //**********  dont't change **********  
                 var d =new Date(Number(timestamps[0])); 
                 var strategyRes = result.every(x => x == true);  
-               //console.log(symbol +" > " + d +"  > "+  strategyRes +" > "+ result);  
+                //console.log(symbol +" > " + d +"  > "+  strategyRes +" > "+ result);  
                 output = result = null;
                 return resolved(strategyRes);       
             }          
@@ -80,8 +102,10 @@ function getIndicator(symbol,stockData,strategyList,isBackTesting){
     })
     })).then(finalResult => { 
         var finalResultFlag = finalResult.every(x => x == true);
-        console.log("%%% strategy RESULT  > " +symbol +" > " +finalResultFlag +" >> "+JSON.stringify(finalResult));
-        closes =  opens =  highs = lows = timestamps = finalResult=  null;
+        if(finalResultFlag)
+          console.log("Strategy RESULT  > " + strategyObj +" :: "+symbol +" > " +finalResultFlag +" >> "+finalResult);
+
+        closes =  opens =  highs = lows = timestamps = finalResult=  strategyObj = null;
     }).catch(error => 
     {
         console.log("OUTER LOOP ERROR > " + error)

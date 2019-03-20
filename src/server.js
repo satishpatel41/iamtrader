@@ -9,21 +9,21 @@ var cluster = require('cluster');
 const dataForge = require('data-forge');
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
-const Store = require('data-store');
+var Store = require('data-store');
 var async = require('async');
 const querystring = require('querystring');
-const store = new Store({ path: 'config.json' });
+var store = new Store({ path: 'config.json' });
 require('data-forge-fs');
 var Upstox = require("upstox");
-var api = "cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw";
+var api = "OknufM07tm1g9EfN4fHKP2Eqi9DSw40I2Y3xliHg";
 var upstox = new Upstox(api);
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 var redirect_uri = "http://localhost:"+PORT;
 var nifty = "https://www.nseindia.com/content/indices/ind_nifty50list.csv";
 var fno = "https://www.nseindia.com/content/fo/fo_mktlots.csv";
 if(process.env.NODE_ENV=="production")
 {
-    api = "cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw";
+    api = "OknufM07tm1g9EfN4fHKP2Eqi9DSw40I2Y3xliHg";
     redirect_uri = "https://robo-trader.herokuapp.com/";
 }
 
@@ -466,7 +466,7 @@ if (cluster.isMaster) {
         inputBB = inputRSI = inputSMA = null;
 
         stockData = [];
-        loadSymbol(symbol,'nse_eq',interval,start_date).then(function (response) {
+        loadSymbol(symbol,'NSE_EQ',interval,start_date).then(function (response) {
             res.setHeader('Content-Type', 'application/json');
             stockData =response.data;
             //console.log("loadSymbol stockData : " + response);
