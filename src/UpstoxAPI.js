@@ -208,7 +208,14 @@ function getListOfAllSymbol()
    upstox.getMasterContract({ exchange: "nse_eq",format:"json" })
     .then(function (response) {
         var list = response.data;
-        nseSymbolList = list.map(x => x.symbol);
+        nseSymbolList.forEach(function(item) {   
+            if(item.SYMBOL)
+                nseSymbolList.push({ex:"NSE_FO", symbol:item.SYMBOL});
+            else if(item.Symbol)
+                nseSymbolList.push({ex:"NSE_EQ", symbol:item.Symbol});
+            
+        });
+
         store.set('nseSymbolList', nseSymbolList); 
         //getAllData();
      })
@@ -230,11 +237,11 @@ function getBalance()
         if (err) throw err;
             log('balance is created successfully.');
         });   */
-        //getListOfAllSymbol();
+        getListOfAllSymbol();
     })
     .catch(function (err) {
         console.log(err);
-        //getListOfAllSymbol();
+        getListOfAllSymbol();
     });
 }
 
@@ -282,7 +289,9 @@ function loadSymbol(symbol,exchange,interval='1day',start_date='',end_date=''){
             "format" : "json",
             "interval" : interval
         })  
-    }    
+    }   
+    
+    
 }
 
 function getAllData(){
@@ -291,7 +300,10 @@ function getAllData(){
     var end_date = now.getDate()+"/"+(now.getMonth() + 1)+"/"+now.getFullYear();
     now.setDate(now.getDate() - 21);
     var start_date = now.getDate()+"/"+(now.getMonth() + 1)+"/"+now.getFullYear();
+    
     syncLiveAllStockData(store.get('fnoList'),interval,"",""); 
+
+    getPercent_list(store.get('fnoList').sort());   
 }
 
 function syncStockData(){ 
@@ -337,7 +349,6 @@ async function loadAllSymbolData(response,interval='1DAY',start_date='11-11-2018
                     }
                     bb = new technicalindicators.BollingerBands(inputBB); */
                     inputBB = inputRSI = inputSMA = null;
-                    //console.log('loadSymbol  > ' + stockData);
                     
                     stockData.map(row => {
                         if(row && Number(row.close) > 0){

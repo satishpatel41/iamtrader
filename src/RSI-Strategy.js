@@ -23,7 +23,7 @@ async function getIndicator(symbol,stockData,strategyList,isBackTesting){
     });  
 
     timestamps = timestamps.reverse();//**********  dont't change **********  
-    Promise.all(strategyList.map(async (strategyObj) => {  
+    return Promise.all(strategyList.strategy.map(async (strategyObj) => {  
         return new Promise(function(resolved, rejected) {
         var result = [];
         var output = new Array();
@@ -92,6 +92,7 @@ async function getIndicator(symbol,stockData,strategyList,isBackTesting){
                 var strategyRes = result.every(x => x == true);  
                 //console.log(symbol +" > " + d +"  > "+  strategyRes +" > "+ result);  
                 output = result = null;
+                
                 return resolved(strategyRes);       
             }          
         })
@@ -100,16 +101,9 @@ async function getIndicator(symbol,stockData,strategyList,isBackTesting){
             console.log("INNER LOOP : " + err)
         });
     })
-    })).then(finalResult => { 
-        var finalResultFlag = finalResult.every(x => x == true);
-        if(finalResultFlag)
-          console.log("Strategy RESULT  > " + strategyObj +" :: "+symbol +" > " +finalResultFlag +" >> "+finalResult);
+    }));
 
-        closes =  opens =  highs = lows = timestamps = finalResult=  strategyObj = null;
-    }).catch(error => 
-    {
-        console.log("OUTER LOOP ERROR > " + error)
-    });
+
  }
 
  Array.prototype.insert = function(i,...rest){

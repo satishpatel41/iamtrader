@@ -135,7 +135,8 @@ function load5minData()
      var interval = '5MINUTE';
     if(store.get('accessToken')){
         syncLiveAllStockData(store.get('fnoList'),interval,start_date,end_date); 
-    }    
+    } 
+    getPercent_list(store.get('fnoList').sort());   
 }
 
 function load3minData()
@@ -151,5 +152,6 @@ function load15minData()
     var interval = '15MINUTE';
     if(store.get('accessToken')){
         syncLiveAllStockData(store.get('fnoList'),interval,start_date,end_date);     
-    }    
+    }   
+    getPercent_list(store.get('fnoList').sort()); 
 }

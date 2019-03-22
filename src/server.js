@@ -30,7 +30,7 @@ if(process.env.NODE_ENV=="production")
 var numReqs = 0; 
 if (cluster.isMaster) {
   // Fork workers.
-  let cpus = 1;//require('os').cpus().length;
+  let cpus = require('os').cpus().length;
   console.log(chalk.green("cpus "  +cpus));
   for (var i = 0; i < cpus; i++) {
     var worker = cluster.fork();
@@ -86,8 +86,15 @@ if (cluster.isMaster) {
 
         var fnoList = [];
         fnoArr.forEach(function(item) {   
-            if(item.SYMBOL)
-                fnoList.push(item.SYMBOL)
+           
+            if(item.SYMBOL){
+                fnoList.push({ex:"NSE_FO", symbol:item.SYMBOL});
+            }
+            else if(item.Symbol){
+                console.log(" :: "  +item.Symbol)
+                fnoList.push({ex:"NSE_EQ", symbol:item.Symbol});
+            }
+            
         });
         store.set('fnoList',fnoList);
 
@@ -95,7 +102,12 @@ if (cluster.isMaster) {
         .parseCSV()
         .toArray();
 
-        niftyList = niftyList.map(x => x.Symbol);
+        niftyList = niftyList.map(x => {
+            if(x.SYMBOL)
+                return {ex:"NSE_EQ", symbol:x.SYMBOL};
+            else if(x.Symbol)
+                return {ex:"NSE_EQ", symbol:x.Symbol};
+        });
         store.set('niftyList',niftyList);
        
         app.get('/', function (req, res) {
@@ -178,6 +190,14 @@ if (cluster.isMaster) {
 
     app.get('/signup', function (req, res) {
         res.sendFile("signup.html", {"root": __dirname});
+    });
+
+    app.get('/gainerLoser', function (req, res) {
+        res.sendFile("gainerloser.html", {"root": __dirname});
+    });
+
+    app.get('/api/gainerLoser', function (req, res) {
+        res.send(store.get('percentage'));
     });
 
     app.post('/signup', function (req, res) {
@@ -466,7 +486,7 @@ if (cluster.isMaster) {
         inputBB = inputRSI = inputSMA = null;
 
         stockData = [];
-        loadSymbol(symbol,'NSE_EQ',interval,start_date).then(function (response) {
+        loadSymbol(symbol,ex,interval,start_date).then(function (response) {
             res.setHeader('Content-Type', 'application/json');
             stockData =response.data;
             //console.log("loadSymbol stockData : " + response);

@@ -257,9 +257,6 @@ function transform(row)
 
 
 
-
-
-
 var index = 0;
 var buyprice = 0;
 var sellprice = 0;
