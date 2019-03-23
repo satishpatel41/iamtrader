@@ -7,17 +7,13 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<link href="https://unpkg.com/tabulator-tables@4.1.3/dist/css/tabulator.min.css" rel="stylesheet">
-<link href="https://unpkg.com/tabulator-tables@4.1.3/dist/css/semantic-ui/tabulator_semantic-ui.min.css" rel="stylesheet">
-<script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.1.3/dist/js/tabulator.min.js"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
-<!-- <script src="https://raw.githubusercontent.com/chartjs/chartjs-chart-financial/master/docs/Chart.Financial.js"></script>
-<script src="https://raw.githubusercontent.com/chartjs/chartjs-chart-financial/master/docs/utils.js"></script>
-<script src="https://raw.githubusercontent.com/chartjs/chartjs-chart-financial/master/docs/Chart.js"></script> -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.23/moment-timezone-with-data-2012-2022.min.js"></script>
+<script src="https://moment.github.io/luxon/global/luxon.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@0.1.1"></script>
+<script src="https://www.chartjs.org/chartjs-chart-financial/chartjs-chart-financial.js"></script>
 
-
-<script src="https://www.chartjs.org/dist/2.7.3/Chart.bundle.js"></script>
 <style>
     .loader {
       border: 10px solid #f3f3f3;
@@ -32,6 +28,23 @@
       top: 45%;
       transform: translate(-50%, -50%);
     }
+
+    * {
+      font-family: Sans-Serif;
+    }
+
+    h1 {
+      font-size: 1.5em;
+    }
+
+    h2 {
+      font-size: 1.25em;
+    }
+
+    .chartjs-render-monitor {
+      animation: chartjs-render-animation 1ms;
+  }
+
     
     /* Safari */
     @-webkit-keyframes spin {
@@ -44,9 +57,6 @@
       100% { transform: rotate(360deg); }
     }
 </style>
-
-
-
 
 <script type="text/javascript">
 $(document).ready( function () {
@@ -66,10 +76,8 @@ $(document).ready( function () {
           loadSymbolData(symbol,interval);
         });
 
-
-       
-
         $(".loader").show();
+        $("#chartDiv").empty();
         $.ajax({
         type: "get",
         url: server + '/getListOfAllSymbol',success: function(data){
@@ -89,7 +97,7 @@ $(document).ready( function () {
               dropdown.append('<option value="">' + emptyMessage + '</option>');
               if(result != ''){
                   $.each(result, function(k, v) {
-                      dropdown.append('<option value="' + v + '">' + v + '</option>');
+                      dropdown.append('<option value="' + v.symbol + '">' + v.symbol + '</option>');
                   });
               }
           }
@@ -100,178 +108,49 @@ $(document).ready( function () {
         function loadSymbolData(symbolName,interval){
           $(".loader").show();
           $.get({
-            url: server+'/loadSymbol/'+symbolName+"/"+interval,
+            url: server+'/getStockIndicators/'+symbolName+"/"+interval,
             success: function(response){
+              response = response.slice(0, 40);
+
                 var dataSet = response.filter(function (el) {
                   return (el != null && el.close != null && el.close != undefined && el.close != "");
                 });
 
-                $(".loader").hide();
+                $(".loader").hide();       
                 dataSet.filter((obj) => obj );
-
-                var xArr = dataSet.map(obj =>{ 
-                                var d = new Date(Number(obj.timestamp));
-  
-                                var india = moment.tz(d, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
-                                india.format(); 
-                              var timestamp;
-                                if(india.minute() > 0)
-                                  timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();
-                              else
-                                  timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year();      
-
-                                return d;
-                              });
-
-                var yArr = dataSet.map(obj =>{ 
-                  var rObj = {};
-                  rObj.y = obj.close;
-                  rObj.t= new Date(obj.timestamp);
-                  return obj.close;
-                });
-                              
-                /* Chart.defaults.global.elements.rectangle.borderWidth = 1;
-                Chart.defaults.global.elements.point.radius = 1;
-                Chart.defaults.global.elements.point.pointStyle = 'line';
-                 */
-                const data = {
-                  labels: xArr,
-                  datasets: [{
-                    fill: false,
-                    label: symbolName,
-                    data: yArr,
-                    borderColor: '#107cb1',
-                    backgroundColor: '#107cb1',
-                    lineTension: 0,
-                    pointRadius:0.2,
-                    spanGaps:false,
-                    steppedLine:false
-                    }]
-                }
-               
-
                 $("#chartDiv").empty();
                 var canvas = document.createElement('canvas');
                 canvas.id  = "myChart";
                 $( "#chartDiv" ).append(canvas);
                 ctx = document.getElementById("myChart").getContext('2d');
-
-
-                var myChart1 = new Chart(ctx, {
-                    type: 'line',
-                    data: data,
-                    options: {
-                          cubicInterpolationMode:'monotone',
-                          tooltips:{enabled:false}, 
-                          responsive: true,
-                          animation: {
-                              duration: 0, // general animation time
-                          },
-                          hover: {
-                              animationDuration: 0, // duration of animations when hovering an item
-                          },
-                          responsiveAnimationDuration: 0, // animation duration after a resize
-                          showLines: true, // disable for all datasets
-                          scales: {
-                              xAxes: [{
-                                  type: 'time',
-                                  distribution: 'series',
-                                  time: {
-                                      displayFormats: {
-                                          quarter: 'DD-MM-YYYY HH:mm'
-                                      }
-                                  }
-                              }]
-                          }
-                      }
-                  
-                });
-                /* function getRandomData(date, count) {
-                    var dateFormat = 'MMMM DD YYYY';
-                    var date = moment(date, dateFormat);
-                    var data = [randomBar(date, 30)];
-                    while (data.length < count) {
-                    date = date.clone().add(1, 'd');
-                    if (date.isoWeekday() <= 5) {
-                      data.push(randomBar(date, data[data.length - 1].c));
-                    }
-                }
-                return data;
-                }
-
-                function randomNumber(min, max) {
-                   return Math.random() * (max - min) + min;
-                }
-
-                function getRandomBarNoTime(lastClose) {
-                  var open = randomNumber(lastClose * .95, lastClose * 1.05);
-                  var close = randomNumber(open * .95, open * 1.05);
-                  var high = randomNumber(Math.max(open, close), Math.max(open, close) * 1.1);
-                  var low = randomNumber(Math.min(open, close) * .9, Math.min(open, close));
-                  return {
-                  o: open,
-                  h: high,
-                  l: low,
-                  c: close,
-                  };
-                }
-
-                function randomBar(date, lastClose) {
-                  var bar = getRandomBarNoTime(lastClose);
-                  bar.t = date.valueOf();
-                  return bar;
-                }
-
-                var data1 = getRandomData('April 01 2017', 60);
-                // Candlestick
-                var ctx = document.getElementById("chart1").getContext("2d");
                 ctx.canvas.width = 1000;
-                ctx.canvas.height = 250;
-                new Chart(ctx, {
+                ctx.canvas.height = 450;
+
+                var stockData = dataSet.map(obj =>{ 
+                  var rObj = {};
+                  rObj.t= Number(obj.timestamp);
+                  rObj.o= Number(obj.open);
+                  rObj.h= Number(obj.high);
+                  rObj.l= Number(obj.low);
+                  rObj.c= Number(obj.close);
+                  return rObj;
+                });      
+                
+                stockData = stockData.reverse().slice(0, 60);
+
+                var chart = new Chart(ctx, 
+                {
                   type: 'candlestick',
                   data: {
                     datasets: [{
-                      label: "CHRT - Chart.js Corporation",
-                      data: data1,
-                      fractionalDigitsCount: 2,
-                    }]
-                  },
-                  options: {
-                    tooltips: {
-                      position: 'nearest',
-                      mode: 'index',
-                    },
-                  },
-                });  */
-
-
-/* 
-                $("#date_txt").html(dataSet[0].timestamp);
-                  var table = new Tabulator("#example-table", {
-                    height:"90%",
-                    width:"96%",
-                    data:dataSet,
-                    layout:"fitDataFill",      //fit columns to width of table
-                    responsiveLayout:"hide",  //hide columns that dont fit on the table
-                    tooltips:true,            //show tool tips on cells
-                    history:true,             //allow undo and redo actions on the table
-                    pagination:"local",       //paginate the data
-                    paginationSize:20,         //allow 7 rows per page of data
-                    movableColumns:true,      //allow column order to be changed
-                    initialSort:[             //set the initial sort order of the data
-                      {column:"timestamp", dir:"asc"},
-                    ], 
-                    columns:[
-                        {title:"Close", field:"close"},
-                        {title:"Volume", field:"volume"},
-                        {title:"RSI", field:"rsi"},
-                        {title:"SMA", field:"sma"},
-                        {title:"Bolinger Band", field:"bb.isCrossed"}
-                    ]
-                }); */
+                    label: symbolName,
+                    data: stockData
+                  }]
+                  }
+                });  
             }
-          });  
-      }
+      });  
+  }
           
 });
 </script>
@@ -324,7 +203,7 @@ $(document).ready( function () {
             <label>Interval</label>
             <select id="intervalDropDown" class="form-control" >
                 <option value="5MINUTE">5MINUTE</option>
-                <option value="10MINUTE">10MINUTE</option>
+                <option value="15MINUTE">15MINUTE</option>
                 <option value="30MINUTE">30MINUTE</option>
                 <option value="60MINUTE">60MINUTE</option>
                 <option value="1DAY" selected="selected">1DAY</option>
@@ -340,16 +219,12 @@ $(document).ready( function () {
     </div> 
     <div class="row">
       <div class="col-sm" id="chartDiv" style="position: relative; height:50vh; width:90vw">
-<!--           <div id="example-table"></div> 
-          <canvas id="myChart"></canvas>-->
+        
+          <canvas id="myChart"></canvas>
       </div>  
     </div>
   </div>
   <div class="loader"></div>
-  <div style="width:1000px">
-    <canvas id="chart1"></canvas>
-  </div>
 
-  
 </body>
 </html>

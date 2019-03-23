@@ -71,7 +71,7 @@ $(document).ready( function () {
           $.get({
           //  data: JSON.stringify(reqObj),
            // contentType: 'application/json',
-            url: server+'/loadAllSymbolData/'+interval+'/'+exchange,
+            url: server+'/getDefaultIndicators/'+interval+'/'+exchange,
             success: function(response){
                   $(".loader").hide();
                   var dataSet = response.filter(function (el) {

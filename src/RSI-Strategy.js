@@ -8,7 +8,7 @@ const ATR = require('technicalindicators').ATR
 const MACD = require('technicalindicators').MACD;
 var bullish = require('technicalindicators').bullish;
 
-async function getIndicator(symbol,stockData,strategyList,isBackTesting){
+async function executeStrategy(symbol,stockData,strategyList,isBackTesting){
     var closes = [];
     var opens = [];
     var highs = [];

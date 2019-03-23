@@ -132,7 +132,7 @@ async function getAllStockDataByInterval(list,interval,strategy){
             var arr = stockData.map(async (dataObj) =>  {
                 try{
                     var data = JSON.parse(dataObj.data); 
-                    await getIndicator(dataObj.symbol,data,strategy,false).then(finalResult => { 
+                    await executeStrategy(dataObj.symbol,data,strategy,false).then(finalResult => { 
                         var finalResultFlag = finalResult.every(x => x == true);
                         if(finalResultFlag){
                             matchSymbols.push(dataObj.symbol);
@@ -152,8 +152,8 @@ async function getAllStockDataByInterval(list,interval,strategy){
             Promise.all(arr)
             .then(a=>
             {
-                console.log("RESULT  > " + matchSymbols +" >> "+strategy.name);
-                sendingMail("satish.patel41@gmail.com",strategy.name,matchSymbols); 
+                console.log("RESULT  > " +strategy.name +" >> "+ matchSymbols);
+                //sendingMail("satish.patel41@gmail.com",strategy.name,matchSymbols); 
             })
             .catch();
                        
@@ -215,6 +215,28 @@ async function getPercent_list(list){
         .catch(error => { 
             console.log(error)
         }); 
+ }
+ 
+ async function getDefaultIndicatorsValues(list,interval){ 
+    // console.log("* getAllStockDataByInterval   >> "+list.length);
+         var matchSymbols = [];
+         Promise.all(list.map(async (x) =>  {
+         var symbol = x.symbol ? x.symbol:x;    
+         return getStock(symbol,interval);          
+         })).then(stockData => {
+             var arr = stockData.map(async (dataObj) =>  {
+                 try{
+                     var data = JSON.parse(dataObj.data); 
+                     
+                 }
+                 catch(e){
+                     console.log("Error " + e);
+                 }
+             });                           
+         })
+         .catch(error => { 
+             console.log(error)
+         }); 
  }
 
 async function syncLiveStockDataByInterval(list,interval){ 
