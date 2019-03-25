@@ -2,11 +2,11 @@
   "fnoList": [
     {
       "ex": "NSE_EQ",
-      "symbol": "TATACHEM"
+      "symbol": "BANKNIFTY"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "BANKNIFTY"
+      "symbol": "NIFTY"
     },
     {
       "ex": "NSE_EQ",
@@ -402,7 +402,7 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "NIFTY"
+      "symbol": "TATACHEM"
     },
     {
       "ex": "NSE_EQ",

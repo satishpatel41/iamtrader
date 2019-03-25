@@ -110,10 +110,7 @@ getAllStockDataByInterval(store.get('fnoList').sort(),'15MINUTE',strategy_bbLowe
 
 getPercent_list(store.get('fnoList').sort()); */
 
-getAllStockDataByInterval(store.get('fnoList').sort(),'15MINUTE',strategy_bbLower); 
-getAllStockDataByInterval(store.get('fnoList').sort(),'15MINUTE',strategy_rsi60_crossed); 
-getAllStockDataByInterval(store.get('fnoList').sort(),'15MINUTE',strategy_bbUpper_band_crossed); 
-getAllStockDataByInterval(store.get('fnoList').sort(),'15MINUTE',strategy_bbLower); 
+
 /* getAllStockDataByInterval(store.get('fnoList').sort(),'1DAY',strategy_rsi60_crossed); 
  */
 async function syncLiveAllStockData(list,interval,start_date,end_date){ 
