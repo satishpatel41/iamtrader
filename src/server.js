@@ -30,7 +30,7 @@ if(process.env.NODE_ENV=="production")
 var numReqs = 0; 
 if (cluster.isMaster) {
   // Fork workers.
-  let cpus = require('os').cpus().length;
+  let cpus = 1;//require('os').cpus().length;
   console.log(chalk.green("cpus "  +cpus));
   for (var i = 0; i < cpus; i++) {
     var worker = cluster.fork();

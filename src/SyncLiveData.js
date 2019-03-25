@@ -1,11 +1,10 @@
 var fs = require('fs');
 var path = require('path');
 var loki  = require( 'lokijs' );
-var intervalsArr = ['1MONTH','1WEEK','1DAY','60MINUTE','30MINUTE','10MINUTE','5MINUTE'];
+var intervalsArr = ['1MONTH','1WEEK','1DAY','60MINUTE','30MINUTE','15MINUTE','10MINUTE','5MINUTE'];
 var database;
 
 var queue = async.queue(function(task, callback) {
-    //console.log('async.queue    ' +task.interval+"> "+ task.symbol);
     if(task.symbol){
 
         var symbolfile;
@@ -90,7 +89,6 @@ var queue = async.queue(function(task, callback) {
     } 
 }, 4);
 
-
 //syncLiveAllStockData(store.get('nseSymbolList')); 
 //syncLiveStockDataByInterval(store.get('nseSymbolList'),'5MINUTE'); 
 //getStockDataByInterval('BATAINDIA','1DAY',strategy_rsi60);
@@ -100,18 +98,38 @@ var queue = async.queue(function(task, callback) {
 //getAllData();
 /* getAllStockDataByInterval(store.get('fnoList').sort(),'1DAY',strategy_rsi60_crossed);
 getAllStockDataByInterval(store.get('fnoList').sort(),'1DAY',strategy_rsi40_crossed);
-//getAllStockDataByInterval(store.get('fnoList').sort(),'1DAY',strategy_rsi60_crossed);
+
 //getAllStockDataByInterval(['ULTRACEMCO','ENGINERSIN','DRREDDY','HINDALCO','LT','MINDTREE','PCJEWELLER'],'1DAY',strategy_bbUpper_band_crossed);
 getAllStockDataByInterval(store.get('fnoList').sort(),'1DAY',strategy_bbLower); */
 
-getAllStockDataByInterval(store.get('fnoList').sort(),'15MINUTE',strategy_rsi40_crossed);
+//getAllStockDataByInterval(store.get('fnoList').sort(),'15MINUTE',strategy_rsi60_crossed);
+
+/* getAllStockDataByInterval(store.get('fnoList').sort(),'15MINUTE',strategy_rsi40_crossed);
 
 getAllStockDataByInterval(store.get('fnoList').sort(),'15MINUTE',strategy_bbLower);
 
-getPercent_list(store.get('fnoList').sort());
+getPercent_list(store.get('fnoList').sort()); */
 
+getAllStockDataByInterval(store.get('fnoList').sort(),'15MINUTE',strategy_bbLower); 
+getAllStockDataByInterval(store.get('fnoList').sort(),'15MINUTE',strategy_rsi60_crossed); 
+getAllStockDataByInterval(store.get('fnoList').sort(),'15MINUTE',strategy_bbUpper_band_crossed); 
+getAllStockDataByInterval(store.get('fnoList').sort(),'15MINUTE',strategy_bbLower); 
+/* getAllStockDataByInterval(store.get('fnoList').sort(),'1DAY',strategy_rsi60_crossed); 
+ */
 async function syncLiveAllStockData(list,interval,start_date,end_date){ 
-    //intervalsArr.map(async (interval) =>  {
+    list.map(async (x) =>  {
+        var symbol = x.symbol ? x.symbol:x;        
+        var ex = x.ex;        
+        queue.push({symbol: symbol,ex : ex,interval:interval,start_date:start_date,end_date:end_date}, function (err) {
+            //  console.log('SyncLiveAllStockData : Finished Queue  - ' + interval);
+        });
+    });        
+}
+
+//Sync Upstox data on first load
+async function syncAllUpstoxData(list){ 
+    intervalsArr.map(async (interval) =>  {
+        console.log('syncAllUpstoxData : Finished Queue  - ' + interval);
         list.map(async (x) =>  {
             var symbol = x.symbol ? x.symbol:x;        
             var ex = x.ex;        
@@ -119,9 +137,10 @@ async function syncLiveAllStockData(list,interval,start_date,end_date){
               //  console.log('SyncLiveAllStockData : Finished Queue  - ' + interval);
             });
         }); 
-    //});          
+    });          
 }
 
+//Sync Upstox data on by Interval, eg 15 min sync
 async function getAllStockDataByInterval(list,interval,strategy){ 
    // console.log("* getAllStockDataByInterval   >> "+list.length);
         var matchSymbols = [];
@@ -132,7 +151,7 @@ async function getAllStockDataByInterval(list,interval,strategy){
             var arr = stockData.map(async (dataObj) =>  {
                 try{
                     var data = JSON.parse(dataObj.data); 
-                    await executeStrategy(dataObj.symbol,data,strategy,false).then(finalResult => { 
+                    await executeStrategy(dataObj.symbol,data,strategy).then(finalResult => { 
                         var finalResultFlag = finalResult.every(x => x == true);
                         if(finalResultFlag){
                             matchSymbols.push(dataObj.symbol);
@@ -153,6 +172,12 @@ async function getAllStockDataByInterval(list,interval,strategy){
             .then(a=>
             {
                 console.log("RESULT  > " +strategy.name +" >> "+ matchSymbols);
+
+                if(process.env.NODE_ENV=="production")
+                {
+                    sendingMail("satish.patel41@gmail.com",strategy.name,matchSymbols); 
+                }
+
                 //sendingMail("satish.patel41@gmail.com",strategy.name,matchSymbols); 
             })
             .catch();
@@ -163,7 +188,7 @@ async function getAllStockDataByInterval(list,interval,strategy){
         }); 
 }
 
-
+//Get Percentage change 
 async function getPercent_list(list){ 
     console.log("getPercent_list  % " + list.length);
     var intervalsArr = ['1DAY','15MINUTE'];
@@ -215,29 +240,66 @@ async function getPercent_list(list){
         .catch(error => { 
             console.log(error)
         }); 
- }
- 
- async function getDefaultIndicatorsValues(list,interval){ 
-    // console.log("* getAllStockDataByInterval   >> "+list.length);
-         var matchSymbols = [];
-         Promise.all(list.map(async (x) =>  {
-         var symbol = x.symbol ? x.symbol:x;    
-         return getStock(symbol,interval);          
-         })).then(stockData => {
-             var arr = stockData.map(async (dataObj) =>  {
-                 try{
-                     var data = JSON.parse(dataObj.data); 
-                     
-                 }
-                 catch(e){
-                     console.log("Error " + e);
-                 }
-             });                           
-         })
-         .catch(error => { 
-             console.log(error)
-         }); 
- }
+}
+
+//Get Indicators 
+async function getDefaultIndicatorsValues(list,interval){ 
+// console.log("* getAllStockDataByInterval   >> "+list.length);
+        var matchSymbols = [];
+        Promise.all(list.map(async (x) =>  {
+        var symbol = x.symbol ? x.symbol:x;    
+        return getStock(symbol,interval);          
+        })).then(stockData => {
+            var arr = stockData.map(async (dataObj) =>  {
+                try{
+                    var data = JSON.parse(dataObj.data); 
+                    
+                }
+                catch(e){
+                    console.log("Error " + e);
+                }
+            });                           
+        })
+        .catch(error => { 
+            console.log(error)
+        }); 
+}
+
+//backTesting("SBIN","1DAY",strategy_bbUpper_band_crossed,true);
+//backTesting
+async function backTesting(symbol,interval,strategy,isbackTesting){ 
+    var matchDates = [];
+    return new Promise(function(resolved, rejected) {           
+        var arr =  getStock(symbol,interval); 
+        resolved(arr);  
+    }).then(stockData => {
+            try{
+                var data = JSON.parse(stockData.data); 
+                startBackTesting(symbol,data,strategy,isbackTesting).then(finalResult => { 
+                for(var i=0; i < finalResult[1].length;i++){
+                    var finalResultFlag = finalResult[0][i].every(x => x.flag == true);
+                  
+                    if(finalResultFlag){
+                        matchDates.push(finalResult[1][i][0].date);
+                       // console.log("\n > " +JSON.stringify(finalResult[0][i]));
+                       // console.log("\n backTesting RESULT  > " +strategy.name +"::"+ stockData.symbol +" > "+ matchDates);
+                    }
+                }  
+                
+                console.log("\n backTesting RESULT  > " +strategy.name +"::"+ stockData.symbol +" > "+ matchDates);
+            }).catch(error => 
+            {
+                console.log("OUTER LOOP ERROR > " + error)
+            });
+        }
+        catch(e){
+            console.log("Error " + e);
+        }             
+    })
+    .catch(error => { 
+        console.log(error)
+    }); 
+}
 
 async function syncLiveStockDataByInterval(list,interval){ 
     list.map(async (x) =>  {

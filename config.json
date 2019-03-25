@@ -2,11 +2,11 @@
   "fnoList": [
     {
       "ex": "NSE_EQ",
-      "symbol": "BANKNIFTY"
+      "symbol": "TATACHEM"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "NIFTY"
+      "symbol": "BANKNIFTY"
     },
     {
       "ex": "NSE_EQ",
@@ -14,19 +14,15 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "NIFTYMID50"
-    },
-    {
-      "ex": "NSE_EQ",
       "symbol": "Symbol"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "BAJAJFINSV"
+      "symbol": "ACC"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "ADANIENT"
+      "symbol": "ALBK"
     },
     {
       "ex": "NSE_EQ",
@@ -38,15 +34,7 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "AJANTPHARM"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "AMARAJABAT"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "APOLLOHOSP"
+      "symbol": "AMBUJACEM"
     },
     {
       "ex": "NSE_EQ",
@@ -54,27 +42,11 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "ARVIND"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "ACC"
-    },
-    {
-      "ex": "NSE_EQ",
       "symbol": "ASIANPAINT"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "AXISBANK"
-    },
-    {
-      "ex": "NSE_EQ",
       "symbol": "BAJAJ-AUTO"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "BAJFINANCE"
     },
     {
       "ex": "NSE_EQ",
@@ -86,7 +58,7 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "BANKINDIA"
+      "symbol": "BATAINDIA"
     },
     {
       "ex": "NSE_EQ",
@@ -94,27 +66,11 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "AMBUJACEM"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "BHARATFIN"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "BEML"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "BERGEPAINT"
-    },
-    {
-      "ex": "NSE_EQ",
       "symbol": "BHARATFORG"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "BHARTIARTL"
+      "symbol": "AJANTPHARM"
     },
     {
       "ex": "NSE_EQ",
@@ -122,11 +78,7 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "BIOCON"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "BRITANNIA"
+      "symbol": "CADILAHC"
     },
     {
       "ex": "NSE_EQ",
@@ -134,59 +86,11 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "CANFINHOME"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "CIPLA"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "CAPF"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "CASTROLIND"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "CEATLTD"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "EQUITAS"
-    },
-    {
-      "ex": "NSE_EQ",
       "symbol": "CENTURYTEX"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "CESC"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "GRASIM"
-    },
-    {
-      "ex": "NSE_EQ",
       "symbol": "CGPOWER"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "CHENNPETRO"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "HEXAWARE"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "CHOLAFIN"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "IDFCBANK"
     },
     {
       "ex": "NSE_EQ",
@@ -198,7 +102,7 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "INFY"
+      "symbol": "AUROPHARMA"
     },
     {
       "ex": "NSE_EQ",
@@ -206,23 +110,7 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "DABUR"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "DHFL"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "JSWSTEEL"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "DIVISLAB"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "JUBLFOOD"
+      "symbol": "CUMMINSIND"
     },
     {
       "ex": "NSE_EQ",
@@ -230,23 +118,19 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "EICHERMOT"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "KSCL"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "ENGINERSIN"
-    },
-    {
-      "ex": "NSE_EQ",
       "symbol": "ESCORTS"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "MOTHERSUMI"
+      "symbol": "EXIDEIND"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "FEDERALBNK"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "BRITANNIA"
     },
     {
       "ex": "NSE_EQ",
@@ -254,23 +138,7 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "GMRINFRA"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "GODFRYPHLP"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "GODREJCP"
-    },
-    {
-      "ex": "NSE_EQ",
       "symbol": "GODREJIND"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "NTPC"
     },
     {
       "ex": "NSE_EQ",
@@ -278,11 +146,19 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "OFSS"
+      "symbol": "DABUR"
     },
     {
       "ex": "NSE_EQ",
       "symbol": "HAVELLS"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "DHFL"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "HCLTECH"
     },
     {
       "ex": "NSE_EQ",
@@ -294,35 +170,19 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "HEROMOTOCO"
-    },
-    {
-      "ex": "NSE_EQ",
       "symbol": "HINDALCO"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "HINDUNILVR"
+      "symbol": "DRREDDY"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "HINDZINC"
+      "symbol": "IOC"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "RELCAPITAL"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "IBULHSGFIN"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "SUNPHARMA"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "TATAMTRDVR"
+      "symbol": "HINDPETRO"
     },
     {
       "ex": "NSE_EQ",
@@ -330,63 +190,7 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "TCS"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "IGL"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "UBL"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "INDIACEM"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "INDIGO"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "INDUSINDBK"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "UJJIVAN"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "WOCKPHARMA"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "YESBANK"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "INFIBEAM"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "ALBK"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "INFRATEL"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "ITC"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "JINDALSTEL"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "JISLJALEQS"
+      "symbol": "IDEA"
     },
     {
       "ex": "NSE_EQ",
@@ -398,47 +202,27 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "KPIT"
+      "symbol": "INDIACEM"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "KTKBANK"
+      "symbol": "INDIGO"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "L&TFH"
+      "symbol": "HEXAWARE"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "LT"
+      "symbol": "INDUSINDBK"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "M&M"
+      "symbol": "JISLJALEQS"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "MANAPPURAM"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "AUROPHARMA"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "MARUTI"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "MCX"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "MFSL"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "MGL"
+      "symbol": "JSWSTEEL"
     },
     {
       "ex": "NSE_EQ",
@@ -446,19 +230,51 @@
     },
     {
       "ex": "NSE_EQ",
+      "symbol": "KTKBANK"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "IDBI"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "LICHSGFIN"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "LT"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "INFY"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "M&MFIN"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "JUBLFOOD"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "MANAPPURAM"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "MCX"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "MOTHERSUMI"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "NMDC"
+    },
+    {
+      "ex": "NSE_EQ",
       "symbol": "MRF"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "MRPL"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "CUMMINSIND"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "MUTHOOTFIN"
     },
     {
       "ex": "NSE_EQ",
@@ -466,7 +282,19 @@
     },
     {
       "ex": "NSE_EQ",
+      "symbol": "OIL"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "MFSL"
+    },
+    {
+      "ex": "NSE_EQ",
       "symbol": "NBCC"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "PCJEWELLER"
     },
     {
       "ex": "NSE_EQ",
@@ -478,79 +306,23 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "NIITTECH"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "NMDC"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "OIL"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "ONGC"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "PCJEWELLER"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "PEL"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "PFC"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "ICICIBANK"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "PIDILITIND"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "PNB"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "POWERGRID"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "PVR"
-    },
-    {
-      "ex": "NSE_EQ",
       "symbol": "RAMCOCEM"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "RAYMOND"
+      "symbol": "NTPC"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "RBLBANK"
+      "symbol": "PAGEIND"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "SAIL"
+      "symbol": "RPOWER"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "SHREECEM"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "SIEMENS"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "SOUTHBANK"
+      "symbol": "PEL"
     },
     {
       "ex": "NSE_EQ",
@@ -562,23 +334,83 @@
     },
     {
       "ex": "NSE_EQ",
+      "symbol": "PFC"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "PIDILITIND"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "TCS"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "RAYMOND"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "RECLTD"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "VEDL"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "YESBANK"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "ZEEL"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "RELCAPITAL"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "RELINFRA"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "SAIL"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "SBIN"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "SRTRANSFIN"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "SUNPHARMA"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "SUNTV"
+    },
+    {
+      "ex": "NSE_EQ",
       "symbol": "SYNDIBANK"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "TATACHEM"
+      "symbol": "ADANIENT"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "TATAELXSI"
+      "symbol": "NIFTY"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "TATAPOWER"
+      "symbol": "TATAMTRDVR"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "TATASTEEL"
+      "symbol": "TECHM"
     },
     {
       "ex": "NSE_EQ",
@@ -590,10 +422,6 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "TORNTPOWER"
-    },
-    {
-      "ex": "NSE_EQ",
       "symbol": "TV18BRDCST"
     },
     {
@@ -602,11 +430,7 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "ULTRACEMCO"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "UNIONBANK"
+      "symbol": "UBL"
     },
     {
       "ex": "NSE_EQ",
@@ -614,15 +438,7 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "VEDL"
-    },
-    {
-      "ex": "NSE_EQ",
       "symbol": "VGUARD"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "VOLTAS"
     },
     {
       "ex": "NSE_EQ",
@@ -630,31 +446,31 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "ZEEL"
+      "symbol": "WOCKPHARMA"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "ORIENTBANK"
+      "symbol": "APOLLOHOSP"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "BATAINDIA"
+      "symbol": "BANKINDIA"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "RECLTD"
+      "symbol": "BHARATFIN"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "RELINFRA"
+      "symbol": "BHARTIARTL"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "RPOWER"
+      "symbol": "CHENNPETRO"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "CADILAHC"
+      "symbol": "CESC"
     },
     {
       "ex": "NSE_EQ",
@@ -662,27 +478,23 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "DISHTV"
+      "symbol": "DIVISLAB"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "DRREDDY"
+      "symbol": "ENGINERSIN"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "FEDERALBNK"
+      "symbol": "EQUITAS"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "HCLTECH"
+      "symbol": "CHOLAFIN"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "HINDPETRO"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "IDBI"
+      "symbol": "HINDZINC"
     },
     {
       "ex": "NSE_EQ",
@@ -690,11 +502,7 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "INDIANB"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "IOC"
+      "symbol": "INFRATEL"
     },
     {
       "ex": "NSE_EQ",
@@ -702,7 +510,11 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "JETAIRWAYS"
+      "symbol": "JINDALSTEL"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "HINDUNILVR"
     },
     {
       "ex": "NSE_EQ",
@@ -710,43 +522,19 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "M&MFIN"
+      "symbol": "MARICO"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "MCDOWELL-N"
+      "symbol": "MUTHOOTFIN"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "PAGEIND"
+      "symbol": "IDFCFIRSTB"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "PETRONET"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "PTC"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "RELIANCE"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "SBIN"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "SREINFRA"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "SUNTV"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "TATAGLOBAL"
+      "symbol": "SOUTHBANK"
     },
     {
       "ex": "NSE_EQ",
@@ -754,23 +542,55 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "TECHM"
+      "symbol": "TATASTEEL"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "BOSCHLTD"
+      "symbol": "UJJIVAN"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "BPCL"
+      "symbol": "BAJFINANCE"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "EXIDEIND"
+      "symbol": "CASTROLIND"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "IDEA"
+      "symbol": "GODREJCP"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "GRASIM"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "IGL"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "INDIANB"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "ITC"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "M&M"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "MCDOWELL-N"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "MGL"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "ORIENTBANK"
     },
     {
       "ex": "NSE_EQ",
@@ -778,39 +598,35 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "LICHSGFIN"
+      "symbol": "PETRONET"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "MARICO"
+      "symbol": "PNB"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "REPCOHOME"
+      "symbol": "ONGC"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "SRTRANSFIN"
+      "symbol": "POWERGRID"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "TATACOMM"
+      "symbol": "SIEMENS"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "NHPC"
+      "symbol": "UNIONBANK"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "RCOM"
+      "symbol": "VOLTAS"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "GAIL"
-    },
-    {
-      "ex": "NSE_EQ",
-      "symbol": "LUPIN"
+      "symbol": "INFIBEAM"
     },
     {
       "ex": "NSE_EQ",
@@ -818,11 +634,175 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "JPASSOCIAT"
+      "symbol": "BEML"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "CANFINHOME"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "CIPLA"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "EICHERMOT"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "GAIL"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "GODFRYPHLP"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "HEROMOTOCO"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "MRPL"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "JETAIRWAYS"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "KSCL"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "L&TFH"
     },
     {
       "ex": "NSE_EQ",
       "symbol": "SUZLON"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "MARUTI"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "RBLBANK"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "TATACOMM"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "RELIANCE"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "REPCOHOME"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "TATAGLOBAL"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "TATAPOWER"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "TORNTPOWER"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "AMARAJABAT"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "BPCL"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "ARVIND"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "AXISBANK"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "BERGEPAINT"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "IBULHSGFIN"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "BSOFT"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "LUPIN"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "OFSS"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "PVR"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "SHREECEM"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "ULTRACEMCO"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "DISHTV"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "ICICIBANK"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "NIITTECH"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "TATAELXSI"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "CEATLTD"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "BIOCON"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "GMRINFRA"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "BAJAJFINSV"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "BOSCHLTD"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "NHPC"
+    },
+    {
+      "ex": "NSE_EQ",
+      "symbol": "JPASSOCIAT"
     }
   ],
   "niftyList": [
@@ -1027,799 +1007,789 @@
       "symbol": "ZEEL"
     }
   ],
-  "nseSymbolList": [],
   "percentage": [
     {
-      "symbol": "RCOM",
-      "percentage": "9.38"
-    },
-    {
-      "symbol": "NTPC",
-      "percentage": "3.75"
-    },
-    {
-      "symbol": "CASTROLIND",
-      "percentage": "2.88"
-    },
-    {
-      "symbol": "JUBLFOOD",
-      "percentage": "2.62"
-    },
-    {
       "symbol": "JETAIRWAYS",
-      "percentage": "2.49"
+      "percentage": "15.15"
     },
     {
-      "symbol": "JUSTDIAL",
-      "percentage": "2.43"
+      "symbol": "RECLTD",
+      "percentage": "10.82"
     },
     {
-      "symbol": "SRF",
-      "percentage": "2.42"
-    },
-    {
-      "symbol": "GMRINFRA",
-      "percentage": "2.35"
-    },
-    {
-      "symbol": "LT",
-      "percentage": "1.76"
-    },
-    {
-      "symbol": "SREINFRA",
-      "percentage": "1.75"
-    },
-    {
-      "symbol": "ACC",
-      "percentage": "1.46"
-    },
-    {
-      "symbol": "LICHSGFIN",
-      "percentage": "1.41"
-    },
-    {
-      "symbol": "JINDALSTEL",
-      "percentage": "1.25"
-    },
-    {
-      "symbol": "AMBUJACEM",
-      "percentage": "1.06"
-    },
-    {
-      "symbol": "ASIANPAINT",
-      "percentage": "1.03"
-    },
-    {
-      "symbol": "JSWSTEEL",
-      "percentage": "0.96"
-    },
-    {
-      "symbol": "MGL",
-      "percentage": "0.88"
-    },
-    {
-      "symbol": "PIDILITIND",
-      "percentage": "0.87"
-    },
-    {
-      "symbol": "INFY",
-      "percentage": "0.82"
-    },
-    {
-      "symbol": "TATASTEEL",
-      "percentage": "0.72"
-    },
-    {
-      "symbol": "BATAINDIA",
-      "percentage": "0.70"
-    },
-    {
-      "symbol": "NESTLEIND",
-      "percentage": "0.66"
-    },
-    {
-      "symbol": "HINDALCO",
-      "percentage": "0.65"
-    },
-    {
-      "symbol": "NCC",
-      "percentage": "0.64"
-    },
-    {
-      "symbol": "AXISBANK",
-      "percentage": "0.63"
-    },
-    {
-      "symbol": "BERGEPAINT",
-      "percentage": "0.62"
-    },
-    {
-      "symbol": "SHREECEM",
-      "percentage": "0.49"
-    },
-    {
-      "symbol": "PAGEIND",
-      "percentage": "0.46"
-    },
-    {
-      "symbol": "MUTHOOTFIN",
-      "percentage": "0.40"
-    },
-    {
-      "symbol": "BRITANNIA",
-      "percentage": "0.39"
-    },
-    {
-      "symbol": "MARICO",
-      "percentage": "0.34"
-    },
-    {
-      "symbol": "GRASIM",
-      "percentage": "0.29"
-    },
-    {
-      "symbol": "EICHERMOT",
-      "percentage": "0.29"
-    },
-    {
-      "symbol": "TATAPOWER",
-      "percentage": "0.28"
+      "symbol": "PFC",
+      "percentage": "5.13"
     },
     {
       "symbol": "ONGC",
-      "percentage": "0.26"
+      "percentage": "4.53"
     },
     {
-      "symbol": "BHARATFIN",
-      "percentage": "0.25"
+      "symbol": "IOC",
+      "percentage": "4.52"
     },
     {
-      "symbol": "BAJAJFINSV",
-      "percentage": "0.24"
-    },
-    {
-      "symbol": "CUMMINSIND",
-      "percentage": "0.17"
-    },
-    {
-      "symbol": "INDIGO",
-      "percentage": "0.16"
-    },
-    {
-      "symbol": "WOCKPHARMA",
-      "percentage": "0.11"
-    },
-    {
-      "symbol": "TORNTPHARM",
-      "percentage": "0.10"
-    },
-    {
-      "symbol": "POWERGRID",
-      "percentage": "0.10"
-    },
-    {
-      "symbol": "YESBANK",
-      "percentage": "0.08"
-    },
-    {
-      "symbol": "TITAN",
-      "percentage": "0.05"
-    },
-    {
-      "symbol": "ULTRACEMCO",
-      "percentage": "0.04"
-    },
-    {
-      "symbol": "TECHM",
-      "percentage": "0.03"
-    },
-    {
-      "symbol": "HDFC",
-      "percentage": "0.02"
-    },
-    {
-      "symbol": "HAVELLS",
-      "percentage": "0.01"
-    },
-    {
-      "symbol": "STAR",
-      "percentage": "0.00"
-    },
-    {
-      "symbol": "EQUITAS",
-      "percentage": "-0.04"
-    },
-    {
-      "symbol": "ITC",
-      "percentage": "-0.05"
-    },
-    {
-      "symbol": "DRREDDY",
-      "percentage": "-0.09"
-    },
-    {
-      "symbol": "NIITTECH",
-      "percentage": "-0.12"
-    },
-    {
-      "symbol": "DABUR",
-      "percentage": "-0.14"
-    },
-    {
-      "symbol": "L&TFH",
-      "percentage": "-0.17"
-    },
-    {
-      "symbol": "IGL",
-      "percentage": "-0.18"
-    },
-    {
-      "symbol": "PETRONET",
-      "percentage": "-0.19"
-    },
-    {
-      "symbol": "UPL",
-      "percentage": "-0.20"
-    },
-    {
-      "symbol": "VOLTAS",
-      "percentage": "-0.20"
-    },
-    {
-      "symbol": "RAMCOCEM",
-      "percentage": "-0.21"
-    },
-    {
-      "symbol": "ADANIPORTS",
-      "percentage": "-0.21"
-    },
-    {
-      "symbol": "M&M",
-      "percentage": "-0.24"
-    },
-    {
-      "symbol": "TCS",
-      "percentage": "-0.25"
-    },
-    {
-      "symbol": "KAJARIACER",
-      "percentage": "-0.26"
-    },
-    {
-      "symbol": "PEL",
-      "percentage": "-0.30"
-    },
-    {
-      "symbol": "HEROMOTOCO",
-      "percentage": "-0.31"
-    },
-    {
-      "symbol": "CONCOR",
-      "percentage": "-0.32"
-    },
-    {
-      "symbol": "VGUARD",
-      "percentage": "-0.34"
-    },
-    {
-      "symbol": "BAJAJ-AUTO",
-      "percentage": "-0.34"
-    },
-    {
-      "symbol": "BALKRISIND",
-      "percentage": "-0.41"
-    },
-    {
-      "symbol": "ICICIBANK",
-      "percentage": "-0.46"
-    },
-    {
-      "symbol": "CENTURYTEX",
-      "percentage": "-0.49"
-    },
-    {
-      "symbol": "SUNPHARMA",
-      "percentage": "-0.54"
-    },
-    {
-      "symbol": "GODREJCP",
-      "percentage": "-0.54"
+      "symbol": "RELCAPITAL",
+      "percentage": "2.94"
     },
     {
       "symbol": "DIVISLAB",
-      "percentage": "-0.56"
+      "percentage": "2.70"
     },
     {
-      "symbol": "WIPRO",
-      "percentage": "-0.57"
+      "symbol": "OIL",
+      "percentage": "2.53"
     },
     {
-      "symbol": "HINDUNILVR",
-      "percentage": "-0.60"
+      "symbol": "BHEL",
+      "percentage": "2.52"
     },
     {
-      "symbol": "SOUTHBANK",
-      "percentage": "-0.62"
+      "symbol": "HINDPETRO",
+      "percentage": "2.48"
     },
     {
-      "symbol": "TATAELXSI",
-      "percentage": "-0.71"
+      "symbol": "COALINDIA",
+      "percentage": "2.26"
     },
     {
-      "symbol": "HCLTECH",
-      "percentage": "-0.72"
-    },
-    {
-      "symbol": "BHARTIARTL",
-      "percentage": "-0.72"
-    },
-    {
-      "symbol": "SRTRANSFIN",
-      "percentage": "-0.73"
-    },
-    {
-      "symbol": "TATACHEM",
-      "percentage": "-0.73"
-    },
-    {
-      "symbol": "MRPL",
-      "percentage": "-0.75"
-    },
-    {
-      "symbol": "PVR",
-      "percentage": "-0.76"
-    },
-    {
-      "symbol": "VEDL",
-      "percentage": "-0.77"
-    },
-    {
-      "symbol": "BOSCHLTD",
-      "percentage": "-0.78"
-    },
-    {
-      "symbol": "AUROPHARMA",
-      "percentage": "-0.86"
-    },
-    {
-      "symbol": "OFSS",
-      "percentage": "-0.87"
-    },
-    {
-      "symbol": "INDUSINDBK",
-      "percentage": "-0.88"
-    },
-    {
-      "symbol": "M&MFIN",
-      "percentage": "-0.88"
-    },
-    {
-      "symbol": "JISLJALEQS",
-      "percentage": "-0.90"
-    },
-    {
-      "symbol": "GODREJIND",
-      "percentage": "-0.90"
-    },
-    {
-      "symbol": "BAJFINANCE",
-      "percentage": "-0.93"
-    },
-    {
-      "symbol": "REPCOHOME",
-      "percentage": "-0.96"
-    },
-    {
-      "symbol": "IBULHSGFIN",
-      "percentage": "-1.00"
+      "symbol": "MGL",
+      "percentage": "1.90"
     },
     {
       "symbol": "CANFINHOME",
-      "percentage": "-1.03"
+      "percentage": "1.82"
+    },
+    {
+      "symbol": "JUBLFOOD",
+      "percentage": "1.66"
+    },
+    {
+      "symbol": "POWERGRID",
+      "percentage": "1.59"
+    },
+    {
+      "symbol": "BALKRISIND",
+      "percentage": "1.59"
+    },
+    {
+      "symbol": "BPCL",
+      "percentage": "1.32"
+    },
+    {
+      "symbol": "AUROPHARMA",
+      "percentage": "1.19"
+    },
+    {
+      "symbol": "UNIONBANK",
+      "percentage": "1.15"
+    },
+    {
+      "symbol": "NTPC",
+      "percentage": "1.00"
+    },
+    {
+      "symbol": "BEL",
+      "percentage": "0.93"
+    },
+    {
+      "symbol": "GODREJIND",
+      "percentage": "0.74"
+    },
+    {
+      "symbol": "GAIL",
+      "percentage": "0.73"
+    },
+    {
+      "symbol": "PAGEIND",
+      "percentage": "0.69"
+    },
+    {
+      "symbol": "DRREDDY",
+      "percentage": "0.53"
+    },
+    {
+      "symbol": "BAJFINANCE",
+      "percentage": "0.51"
+    },
+    {
+      "symbol": "BAJAJ-AUTO",
+      "percentage": "0.36"
+    },
+    {
+      "symbol": "SRTRANSFIN",
+      "percentage": "0.32"
+    },
+    {
+      "symbol": "MINDTREE",
+      "percentage": "0.32"
+    },
+    {
+      "symbol": "RBLBANK",
+      "percentage": "0.27"
+    },
+    {
+      "symbol": "NATIONALUM",
+      "percentage": "0.19"
+    },
+    {
+      "symbol": "TATAGLOBAL",
+      "percentage": "0.13"
+    },
+    {
+      "symbol": "SYNDIBANK",
+      "percentage": "0.13"
+    },
+    {
+      "symbol": "ADANIPORTS",
+      "percentage": "0.12"
+    },
+    {
+      "symbol": "IGL",
+      "percentage": "0.11"
+    },
+    {
+      "symbol": "BEML",
+      "percentage": "0.10"
     },
     {
       "symbol": "HDFCBANK",
+      "percentage": "0.08"
+    },
+    {
+      "symbol": "CADILAHC",
+      "percentage": "0.05"
+    },
+    {
+      "symbol": "RAMCOCEM",
+      "percentage": "0.04"
+    },
+    {
+      "symbol": "ACC",
+      "percentage": "0.03"
+    },
+    {
+      "symbol": "DCBBANK",
+      "percentage": "0.03"
+    },
+    {
+      "symbol": "TECHM",
+      "percentage": "0.01"
+    },
+    {
+      "symbol": "ENGINERSIN",
+      "percentage": "-0.04"
+    },
+    {
+      "symbol": "ORIENTBANK",
+      "percentage": "-0.05"
+    },
+    {
+      "symbol": "MRPL",
+      "percentage": "-0.07"
+    },
+    {
+      "symbol": "CASTROLIND",
+      "percentage": "-0.09"
+    },
+    {
+      "symbol": "HINDUNILVR",
+      "percentage": "-0.12"
+    },
+    {
+      "symbol": "CIPLA",
+      "percentage": "-0.15"
+    },
+    {
+      "symbol": "BRITANNIA",
+      "percentage": "-0.15"
+    },
+    {
+      "symbol": "BANKINDIA",
+      "percentage": "-0.20"
+    },
+    {
+      "symbol": "TITAN",
+      "percentage": "-0.22"
+    },
+    {
+      "symbol": "TORNTPHARM",
+      "percentage": "-0.24"
+    },
+    {
+      "symbol": "BERGEPAINT",
+      "percentage": "-0.25"
+    },
+    {
+      "symbol": "BHARATFIN",
+      "percentage": "-0.31"
+    },
+    {
+      "symbol": "BAJAJFINSV",
+      "percentage": "-0.31"
+    },
+    {
+      "symbol": "PIDILITIND",
+      "percentage": "-0.33"
+    },
+    {
+      "symbol": "AMBUJACEM",
+      "percentage": "-0.37"
+    },
+    {
+      "symbol": "GRASIM",
+      "percentage": "-0.39"
+    },
+    {
+      "symbol": "APOLLOHOSP",
+      "percentage": "-0.40"
+    },
+    {
+      "symbol": "MUTHOOTFIN",
+      "percentage": "-0.43"
+    },
+    {
+      "symbol": "TV18BRDCST",
+      "percentage": "-0.43"
+    },
+    {
+      "symbol": "MCX",
+      "percentage": "-0.44"
+    },
+    {
+      "symbol": "TATACOMM",
+      "percentage": "-0.45"
+    },
+    {
+      "symbol": "CANBK",
+      "percentage": "-0.46"
+    },
+    {
+      "symbol": "BOSCHLTD",
+      "percentage": "-0.48"
+    },
+    {
+      "symbol": "TATASTEEL",
+      "percentage": "-0.48"
+    },
+    {
+      "symbol": "NIITTECH",
+      "percentage": "-0.52"
+    },
+    {
+      "symbol": "SIEMENS",
+      "percentage": "-0.55"
+    },
+    {
+      "symbol": "TVSMOTOR",
+      "percentage": "-0.55"
+    },
+    {
+      "symbol": "CGPOWER",
+      "percentage": "-0.56"
+    },
+    {
+      "symbol": "MARUTI",
+      "percentage": "-0.58"
+    },
+    {
+      "symbol": "TATAPOWER",
+      "percentage": "-0.62"
+    },
+    {
+      "symbol": "OFSS",
+      "percentage": "-0.62"
+    },
+    {
+      "symbol": "CENTURYTEX",
+      "percentage": "-0.69"
+    },
+    {
+      "symbol": "HCLTECH",
+      "percentage": "-0.70"
+    },
+    {
+      "symbol": "NCC",
+      "percentage": "-0.73"
+    },
+    {
+      "symbol": "TORNTPOWER",
+      "percentage": "-0.76"
+    },
+    {
+      "symbol": "ASIANPAINT",
+      "percentage": "-0.76"
+    },
+    {
+      "symbol": "NHPC",
+      "percentage": "-0.81"
+    },
+    {
+      "symbol": "MRF",
+      "percentage": "-0.88"
+    },
+    {
+      "symbol": "GODFRYPHLP",
+      "percentage": "-0.91"
+    },
+    {
+      "symbol": "INDUSINDBK",
+      "percentage": "-0.92"
+    },
+    {
+      "symbol": "RELIANCE",
+      "percentage": "-0.96"
+    },
+    {
+      "symbol": "NESTLEIND",
+      "percentage": "-0.96"
+    },
+    {
+      "symbol": "M&MFIN",
+      "percentage": "-0.97"
+    },
+    {
+      "symbol": "BIOCON",
+      "percentage": "-1.00"
+    },
+    {
+      "symbol": "TATACHEM",
+      "percentage": "-1.01"
+    },
+    {
+      "symbol": "AJANTPHARM",
+      "percentage": "-1.03"
+    },
+    {
+      "symbol": "ADANIPOWER",
       "percentage": "-1.04"
-    },
-    {
-      "symbol": "MFSL",
-      "percentage": "-1.06"
-    },
-    {
-      "symbol": "UBL",
-      "percentage": "-1.06"
     },
     {
       "symbol": "NBCC",
       "percentage": "-1.08"
     },
     {
-      "symbol": "ASHOKLEY",
-      "percentage": "-1.10"
-    },
-    {
-      "symbol": "KSCL",
-      "percentage": "-1.10"
-    },
-    {
-      "symbol": "PTC",
-      "percentage": "-1.11"
-    },
-    {
-      "symbol": "TATAGLOBAL",
-      "percentage": "-1.11"
-    },
-    {
-      "symbol": "GLENMARK",
-      "percentage": "-1.12"
-    },
-    {
-      "symbol": "KOTAKBANK",
-      "percentage": "-1.12"
-    },
-    {
-      "symbol": "IDBI",
-      "percentage": "-1.16"
-    },
-    {
-      "symbol": "CIPLA",
-      "percentage": "-1.17"
-    },
-    {
-      "symbol": "INDIACEM",
-      "percentage": "-1.19"
-    },
-    {
-      "symbol": "MINDTREE",
-      "percentage": "-1.22"
-    },
-    {
-      "symbol": "ADANIPOWER",
-      "percentage": "-1.23"
-    },
-    {
-      "symbol": "LUPIN",
-      "percentage": "-1.27"
-    },
-    {
-      "symbol": "PFC",
-      "percentage": "-1.31"
-    },
-    {
-      "symbol": "AMARAJABAT",
-      "percentage": "-1.32"
-    },
-    {
-      "symbol": "HINDZINC",
-      "percentage": "-1.32"
-    },
-    {
-      "symbol": "MANAPPURAM",
-      "percentage": "-1.33"
-    },
-    {
-      "symbol": "DCBBANK",
-      "percentage": "-1.36"
-    },
-    {
-      "symbol": "UJJIVAN",
-      "percentage": "-1.36"
-    },
-    {
-      "symbol": "MRF",
-      "percentage": "-1.36"
-    },
-    {
-      "symbol": "MCDOWELL-N",
-      "percentage": "-1.37"
-    },
-    {
-      "symbol": "IRB",
-      "percentage": "-1.39"
-    },
-    {
-      "symbol": "RAYMOND",
-      "percentage": "-1.39"
-    },
-    {
-      "symbol": "SIEMENS",
-      "percentage": "-1.42"
-    },
-    {
-      "symbol": "DLF",
-      "percentage": "-1.43"
-    },
-    {
-      "symbol": "CHOLAFIN",
-      "percentage": "-1.45"
-    },
-    {
-      "symbol": "AJANTPHARM",
-      "percentage": "-1.46"
-    },
-    {
-      "symbol": "INFIBEAM",
-      "percentage": "-1.48"
-    },
-    {
-      "symbol": "RBLBANK",
-      "percentage": "-1.51"
-    },
-    {
-      "symbol": "ADANIENT",
-      "percentage": "-1.54"
-    },
-    {
-      "symbol": "TV18BRDCST",
-      "percentage": "-1.56"
-    },
-    {
-      "symbol": "GODFRYPHLP",
-      "percentage": "-1.57"
-    },
-    {
-      "symbol": "HEXAWARE",
-      "percentage": "-1.58"
-    },
-    {
-      "symbol": "NHPC",
-      "percentage": "-1.60"
-    },
-    {
-      "symbol": "CADILAHC",
-      "percentage": "-1.60"
-    },
-    {
-      "symbol": "GAIL",
-      "percentage": "-1.66"
-    },
-    {
-      "symbol": "APOLLOHOSP",
-      "percentage": "-1.67"
-    },
-    {
-      "symbol": "BHEL",
-      "percentage": "-1.68"
-    },
-    {
-      "symbol": "TVSMOTOR",
-      "percentage": "-1.69"
-    },
-    {
-      "symbol": "COALINDIA",
-      "percentage": "-1.69"
-    },
-    {
-      "symbol": "CHENNPETRO",
-      "percentage": "-1.71"
-    },
-    {
-      "symbol": "OIL",
-      "percentage": "-1.74"
-    },
-    {
-      "symbol": "DISHTV",
-      "percentage": "-1.74"
-    },
-    {
-      "symbol": "BIOCON",
-      "percentage": "-1.78"
-    },
-    {
-      "symbol": "MARUTI",
-      "percentage": "-1.82"
-    },
-    {
-      "symbol": "ORIENTBANK",
-      "percentage": "-1.85"
-    },
-    {
-      "symbol": "CANBK",
-      "percentage": "-1.88"
-    },
-    {
-      "symbol": "CESC",
-      "percentage": "-1.88"
-    },
-    {
-      "symbol": "IDFC",
-      "percentage": "-1.91"
-    },
-    {
-      "symbol": "ZEEL",
-      "percentage": "-1.92"
-    },
-    {
-      "symbol": "FEDERALBNK",
-      "percentage": "-1.95"
-    },
-    {
-      "symbol": "SBIN",
-      "percentage": "-1.99"
-    },
-    {
-      "symbol": "COLPAL",
-      "percentage": "-2.01"
-    },
-    {
-      "symbol": "TORNTPOWER",
-      "percentage": "-2.02"
-    },
-    {
-      "symbol": "ESCORTS",
-      "percentage": "-2.05"
-    },
-    {
-      "symbol": "SUZLON",
-      "percentage": "-2.17"
-    },
-    {
-      "symbol": "UNIONBANK",
-      "percentage": "-2.20"
-    },
-    {
-      "symbol": "RELIANCE",
-      "percentage": "-2.21"
-    },
-    {
-      "symbol": "ALBK",
-      "percentage": "-2.25"
-    },
-    {
-      "symbol": "RPOWER",
-      "percentage": "-2.29"
-    },
-    {
-      "symbol": "BHARATFORG",
-      "percentage": "-2.30"
-    },
-    {
-      "symbol": "BANKINDIA",
-      "percentage": "-2.34"
-    },
-    {
-      "symbol": "IOC",
-      "percentage": "-2.36"
-    },
-    {
-      "symbol": "PCJEWELLER",
-      "percentage": "-2.37"
-    },
-    {
-      "symbol": "KTKBANK",
-      "percentage": "-2.40"
-    },
-    {
-      "symbol": "BEL",
-      "percentage": "-2.41"
-    },
-    {
-      "symbol": "APOLLOTYRE",
-      "percentage": "-2.43"
-    },
-    {
-      "symbol": "TATACOMM",
-      "percentage": "-2.50"
-    },
-    {
-      "symbol": "HINDPETRO",
-      "percentage": "-2.51"
-    },
-    {
-      "symbol": "SAIL",
-      "percentage": "-2.54"
-    },
-    {
-      "symbol": "INDIANB",
-      "percentage": "-2.54"
+      "symbol": "SRF",
+      "percentage": "-1.08"
     },
     {
       "symbol": "IFCI",
-      "percentage": "-2.55"
+      "percentage": "-1.12"
     },
     {
-      "symbol": "CEATLTD",
-      "percentage": "-2.57"
+      "symbol": "GLENMARK",
+      "percentage": "-1.18"
     },
     {
-      "symbol": "ENGINERSIN",
-      "percentage": "-2.64"
+      "symbol": "PEL",
+      "percentage": "-1.18"
+    },
+    {
+      "symbol": "DABUR",
+      "percentage": "-1.19"
+    },
+    {
+      "symbol": "HEROMOTOCO",
+      "percentage": "-1.20"
+    },
+    {
+      "symbol": "L&TFH",
+      "percentage": "-1.20"
+    },
+    {
+      "symbol": "BHARATFORG",
+      "percentage": "-1.22"
+    },
+    {
+      "symbol": "INFY",
+      "percentage": "-1.23"
+    },
+    {
+      "symbol": "TCS",
+      "percentage": "-1.24"
+    },
+    {
+      "symbol": "LICHSGFIN",
+      "percentage": "-1.26"
     },
     {
       "symbol": "PNB",
-      "percentage": "-2.67"
+      "percentage": "-1.26"
+    },
+    {
+      "symbol": "HINDZINC",
+      "percentage": "-1.28"
+    },
+    {
+      "symbol": "EICHERMOT",
+      "percentage": "-1.29"
+    },
+    {
+      "symbol": "KSCL",
+      "percentage": "-1.32"
+    },
+    {
+      "symbol": "ITC",
+      "percentage": "-1.32"
+    },
+    {
+      "symbol": "BHARTIARTL",
+      "percentage": "-1.33"
+    },
+    {
+      "symbol": "LT",
+      "percentage": "-1.34"
+    },
+    {
+      "symbol": "WIPRO",
+      "percentage": "-1.36"
+    },
+    {
+      "symbol": "SBIN",
+      "percentage": "-1.38"
+    },
+    {
+      "symbol": "AMARAJABAT",
+      "percentage": "-1.41"
+    },
+    {
+      "symbol": "CHENNPETRO",
+      "percentage": "-1.46"
+    },
+    {
+      "symbol": "CESC",
+      "percentage": "-1.46"
+    },
+    {
+      "symbol": "STAR",
+      "percentage": "-1.50"
+    },
+    {
+      "symbol": "BANKBARODA",
+      "percentage": "-1.50"
+    },
+    {
+      "symbol": "CONCOR",
+      "percentage": "-1.50"
+    },
+    {
+      "symbol": "MARICO",
+      "percentage": "-1.52"
+    },
+    {
+      "symbol": "EXIDEIND",
+      "percentage": "-1.52"
+    },
+    {
+      "symbol": "PETRONET",
+      "percentage": "-1.55"
+    },
+    {
+      "symbol": "AXISBANK",
+      "percentage": "-1.55"
+    },
+    {
+      "symbol": "SOUTHBANK",
+      "percentage": "-1.57"
+    },
+    {
+      "symbol": "IDFC",
+      "percentage": "-1.60"
+    },
+    {
+      "symbol": "PVR",
+      "percentage": "-1.63"
+    },
+    {
+      "symbol": "LUPIN",
+      "percentage": "-1.64"
+    },
+    {
+      "symbol": "ULTRACEMCO",
+      "percentage": "-1.65"
+    },
+    {
+      "symbol": "APOLLOTYRE",
+      "percentage": "-1.67"
+    },
+    {
+      "symbol": "CHOLAFIN",
+      "percentage": "-1.69"
+    },
+    {
+      "symbol": "FEDERALBNK",
+      "percentage": "-1.71"
+    },
+    {
+      "symbol": "GMRINFRA",
+      "percentage": "-1.72"
+    },
+    {
+      "symbol": "SUNPHARMA",
+      "percentage": "-1.74"
+    },
+    {
+      "symbol": "IBULHSGFIN",
+      "percentage": "-1.76"
+    },
+    {
+      "symbol": "SHREECEM",
+      "percentage": "-1.76"
+    },
+    {
+      "symbol": "IDBI",
+      "percentage": "-1.76"
+    },
+    {
+      "symbol": "GODREJCP",
+      "percentage": "-1.79"
+    },
+    {
+      "symbol": "ESCORTS",
+      "percentage": "-1.80"
+    },
+    {
+      "symbol": "RELINFRA",
+      "percentage": "-1.80"
     },
     {
       "symbol": "TATAMTRDVR",
-      "percentage": "-2.69"
+      "percentage": "-1.84"
     },
     {
-      "symbol": "TATAMOTORS",
-      "percentage": "-2.75"
+      "symbol": "HDFC",
+      "percentage": "-1.86"
     },
     {
-      "symbol": "CGPOWER",
-      "percentage": "-2.75"
+      "symbol": "ICICIPRULI",
+      "percentage": "-1.88"
     },
     {
-      "symbol": "RECLTD",
-      "percentage": "-2.76"
+      "symbol": "RPOWER",
+      "percentage": "-1.88"
     },
     {
-      "symbol": "BEML",
-      "percentage": "-2.80"
+      "symbol": "MFSL",
+      "percentage": "-1.93"
     },
     {
-      "symbol": "MCX",
-      "percentage": "-2.81"
+      "symbol": "NMDC",
+      "percentage": "-1.96"
+    },
+    {
+      "symbol": "MOTHERSUMI",
+      "percentage": "-1.97"
+    },
+    {
+      "symbol": "VGUARD",
+      "percentage": "-1.99"
+    },
+    {
+      "symbol": "YESBANK",
+      "percentage": "-2.00"
+    },
+    {
+      "symbol": "REPCOHOME",
+      "percentage": "-2.06"
+    },
+    {
+      "symbol": "HINDALCO",
+      "percentage": "-2.08"
+    },
+    {
+      "symbol": "KOTAKBANK",
+      "percentage": "-2.11"
+    },
+    {
+      "symbol": "ICICIBANK",
+      "percentage": "-2.14"
+    },
+    {
+      "symbol": "ASHOKLEY",
+      "percentage": "-2.18"
+    },
+    {
+      "symbol": "VOLTAS",
+      "percentage": "-2.18"
+    },
+    {
+      "symbol": "HEXAWARE",
+      "percentage": "-2.18"
+    },
+    {
+      "symbol": "WOCKPHARMA",
+      "percentage": "-2.21"
+    },
+    {
+      "symbol": "M&M",
+      "percentage": "-2.21"
+    },
+    {
+      "symbol": "BATAINDIA",
+      "percentage": "-2.25"
+    },
+    {
+      "symbol": "UPL",
+      "percentage": "-2.26"
+    },
+    {
+      "symbol": "COLPAL",
+      "percentage": "-2.27"
     },
     {
       "symbol": "DHFL",
-      "percentage": "-2.94"
+      "percentage": "-2.39"
     },
     {
-      "symbol": "INFRATEL",
-      "percentage": "-3.00"
+      "symbol": "INDIGO",
+      "percentage": "-2.40"
     },
     {
-      "symbol": "BPCL",
-      "percentage": "-3.12"
+      "symbol": "SUNTV",
+      "percentage": "-2.42"
     },
     {
-      "symbol": "IDEA",
-      "percentage": "-3.17"
+      "symbol": "PCJEWELLER",
+      "percentage": "-2.42"
+    },
+    {
+      "symbol": "ARVIND",
+      "percentage": "-2.47"
+    },
+    {
+      "symbol": "MCDOWELL-N",
+      "percentage": "-2.50"
+    },
+    {
+      "symbol": "TATAMOTORS",
+      "percentage": "-2.51"
+    },
+    {
+      "symbol": "HAVELLS",
+      "percentage": "-2.62"
+    },
+    {
+      "symbol": "RAYMOND",
+      "percentage": "-2.64"
+    },
+    {
+      "symbol": "KTKBANK",
+      "percentage": "-2.68"
+    },
+    {
+      "symbol": "TATAELXSI",
+      "percentage": "-2.68"
+    },
+    {
+      "symbol": "CEATLTD",
+      "percentage": "-2.70"
+    },
+    {
+      "symbol": "KAJARIACER",
+      "percentage": "-2.73"
+    },
+    {
+      "symbol": "SUZLON",
+      "percentage": "-2.99"
+    },
+    {
+      "symbol": "JSWSTEEL",
+      "percentage": "-3.08"
     },
     {
       "symbol": "GSFC",
       "percentage": "-3.18"
     },
     {
-      "symbol": "JPASSOCIAT",
+      "symbol": "UJJIVAN",
+      "percentage": "-3.19"
+    },
+    {
+      "symbol": "JINDALSTEL",
+      "percentage": "-3.21"
+    },
+    {
+      "symbol": "ADANIENT",
+      "percentage": "-3.22"
+    },
+    {
+      "symbol": "VEDL",
       "percentage": "-3.28"
     },
     {
-      "symbol": "NATIONALUM",
-      "percentage": "-3.31"
+      "symbol": "SAIL",
+      "percentage": "-3.47"
     },
     {
-      "symbol": "ARVIND",
-      "percentage": "-3.39"
+      "symbol": "ALBK",
+      "percentage": "-3.49"
     },
     {
-      "symbol": "SUNTV",
-      "percentage": "-3.88"
+      "symbol": "MANAPPURAM",
+      "percentage": "-3.50"
     },
     {
-      "symbol": "EXIDEIND",
-      "percentage": "-4.03"
+      "symbol": "UBL",
+      "percentage": "-3.51"
     },
     {
-      "symbol": "SYNDIBANK",
-      "percentage": "-4.12"
+      "symbol": "INFRATEL",
+      "percentage": "-3.53"
     },
     {
-      "symbol": "BANKBARODA",
-      "percentage": "-4.19"
+      "symbol": "DLF",
+      "percentage": "-3.54"
     },
     {
-      "symbol": "ICICIPRULI",
-      "percentage": "-4.37"
+      "symbol": "INDIACEM",
+      "percentage": "-3.56"
     },
     {
-      "symbol": "RELCAPITAL",
-      "percentage": "-5.09"
+      "symbol": "INFIBEAM",
+      "percentage": "-3.60"
     },
     {
-      "symbol": "RELINFRA",
-      "percentage": "-5.29"
+      "symbol": "IRB",
+      "percentage": "-3.91"
     },
     {
-      "symbol": "NMDC",
-      "percentage": "-5.68"
+      "symbol": "JUSTDIAL",
+      "percentage": "-3.99"
     },
     {
-      "symbol": "MOTHERSUMI",
-      "percentage": "-6.56"
+      "symbol": "EQUITAS",
+      "percentage": "-4.01"
+    },
+    {
+      "symbol": "JPASSOCIAT",
+      "percentage": "-4.27"
+    },
+    {
+      "symbol": "ZEEL",
+      "percentage": "-4.28"
+    },
+    {
+      "symbol": "JISLJALEQS",
+      "percentage": "-4.46"
+    },
+    {
+      "symbol": "INDIANB",
+      "percentage": "-4.61"
+    },
+    {
+      "symbol": "CUMMINSIND",
+      "percentage": "-4.81"
+    },
+    {
+      "symbol": "DISHTV",
+      "percentage": "-5.83"
+    },
+    {
+      "symbol": "IDEA",
+      "percentage": "-6.37"
     }
-  ]
+  ],
+  "accessToken": "cc62fda0933f462c738c967503f70024ad68246f",
+  "tokenValidity": "2019-03-26T03:35:05.737Z",
+  "nseSymbolList": []
 }

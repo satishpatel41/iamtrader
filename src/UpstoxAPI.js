@@ -301,7 +301,7 @@ function getAllData(){
     now.setDate(now.getDate() - 21);
     var start_date = now.getDate()+"/"+(now.getMonth() + 1)+"/"+now.getFullYear();
     
-    syncLiveAllStockData(store.get('fnoList'),interval,"",""); 
+    syncAllUpstoxData(store.get('fnoList'),interval); 
 
     getPercent_list(store.get('fnoList').sort());   
 }
