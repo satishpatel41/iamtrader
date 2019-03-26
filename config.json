@@ -2,11 +2,11 @@
   "fnoList": [
     {
       "ex": "NSE_EQ",
-      "symbol": "NIFTY"
+      "symbol": "BANKNIFTY"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "TATACHEM"
+      "symbol": "NIFTY"
     },
     {
       "ex": "NSE_EQ",
@@ -402,7 +402,7 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "BANKNIFTY"
+      "symbol": "TATACHEM"
     },
     {
       "ex": "NSE_EQ",
@@ -808,11 +808,11 @@
   "niftyList": [
     {
       "ex": "NSE_EQ",
-      "symbol": "ADANIPORTS"
+      "symbol": "IOC"
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "ASIANPAINT"
+      "symbol": "ADANIPORTS"
     },
     {
       "ex": "NSE_EQ",
@@ -908,7 +908,7 @@
     },
     {
       "ex": "NSE_EQ",
-      "symbol": "IOC"
+      "symbol": "ASIANPAINT"
     },
     {
       "ex": "NSE_EQ",

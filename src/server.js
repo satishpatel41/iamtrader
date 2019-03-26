@@ -93,8 +93,8 @@ if (cluster.isMaster) {
         });
         store.set('fnoList',fnoList);
 
-        if(store.get('fnoList'))
-           watchList =  store.get('fnoList').sort();
+       /*  if(store.get('fnoList'))
+           watchList =  store.get('fnoList').sort(); */
 
 
         var niftyList =  dataForge.readFileSync("data/list/ind_nifty50list.csv")
@@ -108,6 +108,7 @@ if (cluster.isMaster) {
                 return {ex:"NSE_EQ", symbol:x.Symbol};
         });
         store.set('niftyList',niftyList);
+        watchList =  niftyList.sort();
        
         app.get('/', function (req, res) {
             var q = url.parse(req.url, true).query;
