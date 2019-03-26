@@ -1,5 +1,6 @@
 var Upstox = require("upstox");
 var moment = require('moment-timezone');
+var async = require("async");
 var api = "OknufM07tm1g9EfN4fHKP2Eqi9DSw40I2Y3xliHg";
 var upstox = new Upstox(api);
 var fs = require('fs');
