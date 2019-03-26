@@ -4,9 +4,6 @@ var async = require("async");
 var loki  = require( 'lokijs' );
 var intervalsArr = ['1WEEK','1DAY','60MINUTE','30MINUTE','15MINUTE','10MINUTE','5MINUTE'];//'1MONTH',
 var database;
-var watchList = [];
-/* if(store && store.get('fnoList'))
-    watchList = store.get('fnoList').sort(); */
 
 var queue = async.queue(function(task, callback) {
     if(task.symbol){
@@ -97,6 +94,8 @@ var queue = async.queue(function(task, callback) {
     } 
 },5);
 
+//sendingMail("satish.patel41@gmail.com","RSI",["a","b"]).catch(console.error);
+
 //syncLiveAllStockData(watchList); 
 //syncLiveStockDataByInterval(store.get('nseSymbolList'),'5MINUTE'); 
 //getStockDataByInterval('BATAINDIA','1DAY',strategy_rsi60);
@@ -186,7 +185,7 @@ async function getAllStockDataByInterval(list,interval,strategy){
                     sendingMail("satish.patel41@gmail.com",strategy.name,matchSymbols).catch(console.error);
                 }
 
-                sendingMail("satish.patel41@gmail.com",strategy.name,matchSymbols).catch(console.error);
+               
                 a = strategy = matchSymbols =null;
             })
             .catch();

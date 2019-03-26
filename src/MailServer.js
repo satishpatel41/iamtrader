@@ -96,7 +96,7 @@ async  function sendingMail(toEmail, strategy, symbolsList){
       pass: account.pass // generated ethereal password
     }
   });
-  console.log('nodemailer user  : ' +  account.user +" \n "+ account.pass);
+  //console.log('nodemailer user  : ' +  account.user +" \n "+ account.pass);
 
   // setup email data with unicode symbols
   let mailOptions = {
@@ -127,7 +127,7 @@ async  function sendingMail(toEmail, strategy, symbolsList){
   // send mail with defined transport object
   let info = await transporter.sendMail(mailOptions)
 
-  console.log("Message sent: %s", info.messageId);
+  //console.log("Message sent: %s", info.messageId);
   // Preview only available when sending through an Ethereal account
   console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
 

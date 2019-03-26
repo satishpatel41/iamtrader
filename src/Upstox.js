@@ -9,6 +9,7 @@ var __dirname = "views"
 var exchanges =  [ 'MCX_FO', 'BSE_EQ', 'NSE_EQ', 'NSE_FO', 'NCD_FO'];
 var api_secret = "69xldylnvf";
 var client_id="";
+var watchList = [];
 var accessToken;
 
 function getAcceToken(code)
@@ -306,7 +307,7 @@ function getAllData(){
     
     syncAllUpstoxData(watchList,interval); 
 
-    getPercent_list(watchList.sort());   
+    getPercent_list(watchList);   
 }
 
 function syncStockData(){ 

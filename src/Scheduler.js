@@ -136,7 +136,7 @@ function load5minData()
     if(store.get('accessToken')){
         syncLiveAllStockData(watchList,interval,start_date,end_date); 
     } 
-    getPercent_list(watchList.sort());   
+    getPercent_list(watchList);   
 }
 
 function load3minData()
@@ -153,10 +153,10 @@ function load15minData()
     if(store.get('accessToken')){
         syncLiveAllStockData(watchList,interval,start_date,end_date);     
     }   
-    getPercent_list(watchList.sort()); 
+    getPercent_list(watchList); 
 
-    getAllStockDataByInterval(watchList.sort(),'15MINUTE',strategy_bbLower); 
-    getAllStockDataByInterval(watchList.sort(),'15MINUTE',strategy_rsi60_crossed); 
-    getAllStockDataByInterval(watchList.sort(),'15MINUTE',strategy_bbUpper_band_crossed); 
-    getAllStockDataByInterval(watchList.sort(),'15MINUTE',strategy_bbLower); 
+    getAllStockDataByInterval(watchList,'15MINUTE',strategy_bbLower); 
+    getAllStockDataByInterval(watchList,'15MINUTE',strategy_rsi60_crossed); 
+    getAllStockDataByInterval(watchList,'15MINUTE',strategy_bbUpper_band_crossed); 
+    getAllStockDataByInterval(watchList,'15MINUTE',strategy_bbLower); 
 }
