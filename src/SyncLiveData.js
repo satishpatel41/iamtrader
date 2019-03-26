@@ -1,5 +1,6 @@
 var fs = require('fs');
 var path = require('path');
+var async = require("async";
 var loki  = require( 'lokijs' );
 var intervalsArr = ['1MONTH','1WEEK','1DAY','60MINUTE','30MINUTE','15MINUTE','10MINUTE','5MINUTE'];
 var database;
