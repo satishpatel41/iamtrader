@@ -93,6 +93,10 @@ if (cluster.isMaster) {
         });
         store.set('fnoList',fnoList);
 
+        if(store.get('fnoList'))
+           watchList =  store.get('fnoList').sort();
+
+
         var niftyList =  dataForge.readFileSync("data/list/ind_nifty50list.csv")
         .parseCSV()
         .toArray();

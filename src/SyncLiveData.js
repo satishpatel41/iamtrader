@@ -2,8 +2,11 @@ var fs = require('fs');
 var path = require('path');
 var async = require("async");
 var loki  = require( 'lokijs' );
-var intervalsArr = ['1MONTH','1WEEK','1DAY','60MINUTE','30MINUTE','15MINUTE','10MINUTE','5MINUTE'];
+var intervalsArr = ['1WEEK','1DAY','60MINUTE','30MINUTE','15MINUTE','10MINUTE','5MINUTE'];//'1MONTH',
 var database;
+var watchList = [];
+if(store.get('fnoList'))
+watchList = store.get('fnoList').sort();
 
 var queue = async.queue(function(task, callback) {
     if(task.symbol){
@@ -30,8 +33,12 @@ var queue = async.queue(function(task, callback) {
                 database = lokiJson.addCollection(task.symbol);
             }  
          
-           var stockData = [];
-            return loadSymbol(task.symbol,task.ex,task.interval,task.start_date,task.end_date).then(function (response) {
+            var stockData = [];
+
+            if(task.ex == null || task.ex == undefined || task.ex == '')
+                task.ex = "NSE_EQ";
+            
+            loadSymbol(task.symbol,task.ex,task.interval,task.start_date,task.end_date).then(function (response) {
                 try {
                         if(response != '' && response != undefined && response != null){
                             stockData = response;
@@ -88,37 +95,39 @@ var queue = async.queue(function(task, callback) {
             }); */     
         }  
     } 
-}, 4);
+},5);
 
-//syncLiveAllStockData(store.get('nseSymbolList')); 
+//syncLiveAllStockData(watchList); 
 //syncLiveStockDataByInterval(store.get('nseSymbolList'),'5MINUTE'); 
 //getStockDataByInterval('BATAINDIA','1DAY',strategy_rsi60);
 //getAllStockDataByInterval(store.get('niftyList'),'1DAY',strategy_rsi60);
 //getAllStockDataByInterval(['ULTRACEMCO','ENGINERSIN','DRREDDY','HINDALCO','LT','MINDTREE','PCJEWELLER'],'1DAY',strategy_rsi60);
 //getAllStockDataByInterval(['ULTRACEMCO','VEDL','SBIN'],'1DAY');
 //getAllData();
-/* getAllStockDataByInterval(store.get('fnoList').sort(),'1DAY',strategy_rsi60_crossed);
-getAllStockDataByInterval(store.get('fnoList').sort(),'1DAY',strategy_rsi40_crossed);
+/* getAllStockDataByInterval(watchList.sort(),'1DAY',strategy_rsi60_crossed);
+getAllStockDataByInterval(watchList.sort(),'1DAY',strategy_rsi40_crossed);
 
 //getAllStockDataByInterval(['ULTRACEMCO','ENGINERSIN','DRREDDY','HINDALCO','LT','MINDTREE','PCJEWELLER'],'1DAY',strategy_bbUpper_band_crossed);
-getAllStockDataByInterval(store.get('fnoList').sort(),'1DAY',strategy_bbLower); */
+getAllStockDataByInterval(watchList.sort(),'1DAY',strategy_bbLower); */
 
-//getAllStockDataByInterval(store.get('fnoList').sort(),'15MINUTE',strategy_rsi60_crossed);
+//getAllStockDataByInterval(watchList.sort(),'15MINUTE',strategy_rsi60_crossed);
 
-/* getAllStockDataByInterval(store.get('fnoList').sort(),'15MINUTE',strategy_rsi40_crossed);
+/* getAllStockDataByInterval(watchList.sort(),'15MINUTE',strategy_rsi40_crossed);
 
-getAllStockDataByInterval(store.get('fnoList').sort(),'15MINUTE',strategy_bbLower);
+getAllStockDataByInterval(watchList.sort(),'15MINUTE',strategy_bbLower);
 
-getPercent_list(store.get('fnoList').sort()); */
+getPercent_list(watchList.sort()); */
 
 
-/* getAllStockDataByInterval(store.get('fnoList').sort(),'1DAY',strategy_rsi60_crossed); 
+/* getAllStockDataByInterval(watchList.sort(),'1DAY',strategy_rsi60_crossed); 
  */
 async function syncLiveAllStockData(list,interval,start_date,end_date){ 
     list.map(async (x) =>  {
         var symbol = x.symbol ? x.symbol:x;        
-        var ex = x.ex;        
-        queue.push({symbol: symbol,ex : ex,interval:interval,start_date:start_date,end_date:end_date}, function (err) {
+        var ex = x.ex;      
+        //console.log('syncLiveAllStockData : Finished Queue  - ' + symbol +" :: "+ ex);
+
+        queue.push({symbol: symbol,ex:ex,interval:interval,start_date:start_date,end_date:end_date}, function (err) {
             //  console.log('SyncLiveAllStockData : Finished Queue  - ' + interval);
         });
     });        
@@ -131,7 +140,7 @@ async function syncAllUpstoxData(list){
         list.map(async (x) =>  {
             var symbol = x.symbol ? x.symbol:x;        
             var ex = x.ex;        
-            queue.push({symbol: symbol,ex : ex,interval:interval,start_date:start_date,end_date:end_date}, function (err) {
+            queue.push({symbol:symbol,ex:ex,interval:interval,start_date:start_date,end_date:end_date}, function (err) {
               //  console.log('SyncLiveAllStockData : Finished Queue  - ' + interval);
             });
         }); 
@@ -173,10 +182,10 @@ async function getAllStockDataByInterval(list,interval,strategy){
 
                 if(process.env.NODE_ENV=="production")
                 {
-                    sendingMail("satish.patel41@gmail.com",strategy.name,matchSymbols); 
+                    sendingMail("satish.patel41@gmail.com",strategy.name,matchSymbols).catch(console.error);
                 }
 
-                //sendingMail("satish.patel41@gmail.com",strategy.name,matchSymbols); 
+                sendingMail("satish.patel41@gmail.com",strategy.name,matchSymbols).catch(console.error);
             })
             .catch();
                        
@@ -193,8 +202,7 @@ async function getPercent_list(list){
     Promise.all(intervalsArr.map(async (interval) => {  
         return new Promise(function(resolved, rejected) {           
             Promise.all(list.map(async (x) =>  {
-                var symbol = x.symbol ? x.symbol:x;    
-                return getStock(symbol,interval);          
+                return getStock(x.symbol ? x.symbol:x,interval);          
             })).then(stockData => {
                 resolved(stockData);
             })
@@ -233,7 +241,7 @@ async function getPercent_list(list){
                 percentageChangeArray.reverse();
                 store.set("percentage",percentageChangeArray);
                 
-            dataArr =  null;
+                percentageChangeArray = dataArr =  intervalsArr = null;
         })
         .catch(error => { 
             console.log(error)
@@ -301,8 +309,9 @@ async function backTesting(symbol,interval,strategy,isbackTesting){
 
 async function syncLiveStockDataByInterval(list,interval){ 
     list.map(async (x) =>  {
-        var symbol = x.symbol ? x.symbol:x;        
-        queue.push({symbol: symbol,interval:interval}, function (err) {
+        var symbol = x.symbol ? x.symbol:x;    
+        var ex = x.ex;        
+        queue.push({symbol:symbol,ex:ex,interval:interval}, function (err) {
             //console.log('syncLiveStockDataByInterval : Finished Queue' + interval);
         });       
     }); 

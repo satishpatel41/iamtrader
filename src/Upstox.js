@@ -1,6 +1,5 @@
 var Upstox = require("upstox");
 var moment = require('moment-timezone');
-var async = require("async");
 var api = "OknufM07tm1g9EfN4fHKP2Eqi9DSw40I2Y3xliHg";
 var upstox = new Upstox(api);
 var fs = require('fs');
@@ -8,10 +7,8 @@ var months = ['January','February','March','April','May','June','July','August',
 var code = '';
 var __dirname = "views"
 var exchanges =  [ 'MCX_FO', 'BSE_EQ', 'NSE_EQ', 'NSE_FO', 'NCD_FO'];
-var login_code = "OknufM07tm1g9EfN4fHKP2Eqi9DSw40I2Y3xliHg";
 var api_secret = "69xldylnvf";
 var client_id="";
-var watchList = ['banknifty','hindalco','ICICIBANK','sbin','idea','lt','HAVELLS'];
 var accessToken;
 
 function getAcceToken(code)
@@ -26,8 +23,7 @@ function getAcceToken(code)
     upstox.getAccessToken(params)
         .then(function (response) {
             params = api_secret = code = null;
-            
-         
+                
             accessToken = response.access_token;
             store.set('accessToken', accessToken); 
             var d  = new Date();
@@ -123,7 +119,7 @@ function start() {
     });
 
     // Get Master Contract
-    upstox.getMasterContract({ exchange: "NSE_INDEX",format:"json"})
+   /*  upstox.getMasterContract({ exchange: "NSE_INDEX",format:"json"})
     .then(function (response) {
         fs.writeFile("data/index/index.txt", JSON.stringify(response), function (err) {
             if (err) throw err;
@@ -132,7 +128,7 @@ function start() {
     })
     .catch(function (err) {
         console.log(err);
-    });
+    }); */
 
     // PlaceOrder Note : default product = I i.e intra day order will be placed.
     /*var orderObject = {
@@ -206,7 +202,7 @@ function start() {
 var nseSymbolList = [];
 function getListOfAllSymbol()
 {
-   upstox.getMasterContract({ exchange: "nse_eq",format:"json" })
+  /*  upstox.getMasterContract({ exchange: "nse_eq",format:"json" })
     .then(function (response) {
         var list = response.data;
         nseSymbolList.forEach(function(item) {   
@@ -223,7 +219,7 @@ function getListOfAllSymbol()
      .catch(function (err) {
         console.log( "Error getListOfAllSymbol > " +  JSON.stringify(err));
          //getAllData();
-    }); 
+    });  */
 }
 
 // Get Balance
@@ -273,25 +269,31 @@ function getProfile()
         console.log("Error"+ error);
     });
 }
-
+/* 
 function getMaster(ex = "nse_fo"){ 
     if(store.get('accessToken')){
         return upstox.getMasterContract({exchange: ex});
     }    
-}
+} */
 
-function loadSymbol(symbol,exchange,interval='1day',start_date='',end_date=''){ 
+async function loadSymbol(symbol,exchange,interval='1day',start_date='',end_date=''){ 
     //console.log("loadSymbol > " + symbol + " > "+ interval +" > "+exchange +" > "+ start_date +" > "+ end_date+" :: "+ store.get('accessToken'));
     if(store.get('accessToken')){
-        return upstox.getOHLC({"exchange": exchange,
-            "symbol": symbol,
-            "start_date": start_date,
-            "end_date": end_date,
-            "format" : "json",
-            "interval" : interval
-        })  
-    }   
-    
+        return new Promise(function(resolved, rejected) {   
+            upstox.getOHLC({"exchange": exchange,
+                "symbol": symbol,
+                "start_date": start_date,
+                "end_date": end_date,
+                "format" : "json",
+                "interval" : interval
+            }).then(result =>{
+                resolved(result);
+             })
+            .catch(error =>{
+                rejected(error);
+            }); 
+        });
+    }
     
 }
 
@@ -302,9 +304,9 @@ function getAllData(){
     now.setDate(now.getDate() - 21);
     var start_date = now.getDate()+"/"+(now.getMonth() + 1)+"/"+now.getFullYear();
     
-    syncAllUpstoxData(store.get('fnoList'),interval); 
+    syncAllUpstoxData(watchList,interval); 
 
-    getPercent_list(store.get('fnoList').sort());   
+    getPercent_list(watchList.sort());   
 }
 
 function syncStockData(){ 
