@@ -5,8 +5,8 @@ var loki  = require( 'lokijs' );
 var intervalsArr = ['1WEEK','1DAY','60MINUTE','30MINUTE','15MINUTE','10MINUTE','5MINUTE'];//'1MONTH',
 var database;
 var watchList = [];
-if(store.get('fnoList'))
-watchList = store.get('fnoList').sort();
+if(store && store.get('fnoList'))
+    watchList = store.get('fnoList').sort();
 
 var queue = async.queue(function(task, callback) {
     if(task.symbol){
