@@ -1,6 +1,7 @@
 var Upstox = require("upstox");
 var api = "cIs71szuLZ7WFKInU8O0o7GTHm5QIJke8ahnzLVw";
 var upstox = new Upstox(api);
+var async = require("async");
 var fs = require('fs');
 var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 var code = '';
