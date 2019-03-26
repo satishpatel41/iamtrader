@@ -164,6 +164,8 @@ async function getAllStockDataByInterval(list,interval,strategy){
                             matchSymbols.push(dataObj.symbol);
                             //console.log("Strategy RESULT  > " + finalResult +"::"+   strategy.name +"::"+ dataObj.symbol +" > "+ matchSymbols.length);
                          }
+                         finalResultFlag= dataObj =null;
+
                         //closes =  opens =  highs = lows = timestamps = finalResult=  strategyObj = null;
                     }).catch(error => 
                     {
@@ -175,8 +177,7 @@ async function getAllStockDataByInterval(list,interval,strategy){
                 }
             });       
             
-            Promise.all(arr)
-            .then(a=>
+            Promise.all(arr).then(a=>
             {
                 console.log("RESULT  > " +strategy.name +" >> "+ matchSymbols);
 
@@ -186,6 +187,7 @@ async function getAllStockDataByInterval(list,interval,strategy){
                 }
 
                 sendingMail("satish.patel41@gmail.com",strategy.name,matchSymbols).catch(console.error);
+                a = strategy = matchSymbols =null;
             })
             .catch();
                        

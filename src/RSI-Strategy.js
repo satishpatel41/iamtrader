@@ -43,7 +43,7 @@ async function executeStrategy(symbol,stockData,strategyList){
                         var op = res.reverse().slice(0, 3);  //**********  dont't change **********  
                         output.push(op);     
                      //console.log("*indicators " +symbol +" > " +closes[0] +">> "+JSON.stringify(output));
-                        indicatorObj = null;
+                        op = str = res = indicatorObj = null;
                         resolve(output);   
                     }     
                     else{
@@ -74,7 +74,7 @@ async function executeStrategy(symbol,stockData,strategyList){
             
            // console.log(symbol +" > " + d +"  > "+  strategyRes +" > "+ result);  
             
-            output = result = null;
+            output = result = i = d = null;
             //closes =  opens =  highs = lows = timestamps = finalResult=  strategyObj = null;
             return resolved(strategyRes);       
                      

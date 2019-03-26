@@ -79,7 +79,7 @@ function load1WeekData()
     var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
     var interval = '1WEEK';
     if(store.get('accessToken')){    
-        syncLiveAllStockData(store.get('fnoList'),interval,start_date,end_date); 
+        syncLiveAllStockData(watchList,interval,start_date,end_date); 
     }   
 }
 
@@ -92,7 +92,7 @@ function load1dayData()
     var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
     var interval = '1DAY';
     if(store.get('accessToken')){    
-        syncLiveAllStockData(store.get('fnoList'),interval,start_date,end_date); 
+        syncLiveAllStockData(watchList,interval,start_date,end_date); 
     }   
 }
 
@@ -110,7 +110,7 @@ function load60minData()
 {
     var interval = '60MINUTE';
     if(store.get('accessToken')){   
-        syncLiveAllStockData(store.get('fnoList'),interval,start_date,end_date); 
+        syncLiveAllStockData(watchList,interval,start_date,end_date); 
     }   
 }
 
@@ -118,7 +118,7 @@ function load30minData()
 { 
     var interval = '30MINUTE';
     if(store.get('accessToken')){    
-        syncLiveAllStockData(store.get('fnoList'),interval,start_date,end_date); 
+        syncLiveAllStockData(watchList,interval,start_date,end_date); 
    }    
 }
 
@@ -126,7 +126,7 @@ function load10minData()
 {
      var interval = '10MINUTE';   
     if(store.get('accessToken')){    
-      syncLiveAllStockData(store.get('fnoList'),interval,start_date,end_date); 
+      syncLiveAllStockData(watchList,interval,start_date,end_date); 
     }    
 }
 
@@ -134,16 +134,16 @@ function load5minData()
 {
      var interval = '5MINUTE';
     if(store.get('accessToken')){
-        syncLiveAllStockData(store.get('fnoList'),interval,start_date,end_date); 
+        syncLiveAllStockData(watchList,interval,start_date,end_date); 
     } 
-    getPercent_list(store.get('fnoList').sort());   
+    getPercent_list(watchList.sort());   
 }
 
 function load3minData()
 {  
     var interval = '3MINUTE';
     if(store.get('accessToken')){
-       syncLiveAllStockData(store.get('fnoList'),interval,start_date,end_date);       
+       syncLiveAllStockData(watchList,interval,start_date,end_date);       
     }    
 }
 
@@ -151,12 +151,12 @@ function load15minData()
 {   
     var interval = '15MINUTE';
     if(store.get('accessToken')){
-        syncLiveAllStockData(store.get('fnoList'),interval,start_date,end_date);     
+        syncLiveAllStockData(watchList,interval,start_date,end_date);     
     }   
-    getPercent_list(store.get('fnoList').sort()); 
+    getPercent_list(watchList.sort()); 
 
-    getAllStockDataByInterval(store.get('fnoList').sort(),'15MINUTE',strategy_bbLower); 
-    getAllStockDataByInterval(store.get('fnoList').sort(),'15MINUTE',strategy_rsi60_crossed); 
-    getAllStockDataByInterval(store.get('fnoList').sort(),'15MINUTE',strategy_bbUpper_band_crossed); 
-    getAllStockDataByInterval(store.get('fnoList').sort(),'15MINUTE',strategy_bbLower); 
+    getAllStockDataByInterval(watchList.sort(),'15MINUTE',strategy_bbLower); 
+    getAllStockDataByInterval(watchList.sort(),'15MINUTE',strategy_rsi60_crossed); 
+    getAllStockDataByInterval(watchList.sort(),'15MINUTE',strategy_bbUpper_band_crossed); 
+    getAllStockDataByInterval(watchList.sort(),'15MINUTE',strategy_bbLower); 
 }
