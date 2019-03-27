@@ -134,20 +134,20 @@ function load5minData()
 {
      var interval = '5MINUTE';
     if(store.get('accessToken')){
-        syncLiveAllStockData(watchList,interval,start_date,end_date); 
+       // syncLiveAllStockData(watchList,interval,start_date,end_date); 
     } 
     getPercent_list(watchList);   
 
-    strategyList.map(strategy =>{
+    /* strategyList.map(strategy =>{
         applyStrategy(watchList,'5MINUTE',strategy); 
-    });
+    }); */
 }
 
 function load3minData()
 {  
     var interval = '3MINUTE';
     if(store.get('accessToken')){
-       syncLiveAllStockData(watchList,interval,start_date,end_date);       
+       //syncLiveAllStockData(watchList,interval,start_date,end_date);       
     }    
 }
 
@@ -157,14 +157,9 @@ function load15minData()
     if(store.get('accessToken')){
         syncLiveAllStockData(watchList,interval,start_date,end_date);     
     }   
-    //getPercent_list(watchList); 
-
-
+    
     strategyList.map(strategy =>{
         applyStrategy(watchList,'15MINUTE',strategy); 
     });
-    /* applyStrategy(watchList,'15MINUTE',strategy_bbLower); 
-    applyStrategy(watchList,'15MINUTE',strategy_rsi60_crossed); 
-    applyStrategy(watchList,'15MINUTE',strategy_bbUpper_band_crossed); 
-    applyStrategy(watchList,'15MINUTE',strategy_bbLower); */ 
+    getPercent_list(watchList); 
 }

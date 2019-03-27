@@ -1,4 +1,5 @@
 var express = require('express');
+
 var compression = require('compression')
 var moment = require('moment-timezone');
 var bodyParser = require('body-parser');
@@ -6,59 +7,23 @@ var chalk = require('chalk');
 var fs = require('fs');
 var url = require('url');
 var cluster = require('cluster');
-var watchList = [];
-//const heapdump = require('heapdump');
-const dataForge = require('data-forge');
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
 var Store = require('data-store');
 var async = require('async');
 const querystring = require('querystring');
 var store = new Store({ path: 'config.json' });
-require('data-forge-fs');
 var Upstox = require("upstox");
 var api = "OknufM07tm1g9EfN4fHKP2Eqi9DSw40I2Y3xliHg";
 var upstox = new Upstox(api);
 const PORT = process.env.PORT || 3000;
 var redirect_uri = "http://localhost:"+PORT;
-var nifty = "https://www.nseindia.com/content/indices/ind_nifty50list.csv";
-var fno = "https://www.nseindia.com/content/fo/fo_mktlots.csv";
+
 if(process.env.NODE_ENV=="production")
 {
     api = "OknufM07tm1g9EfN4fHKP2Eqi9DSw40I2Y3xliHg";
     redirect_uri = "https://robo-trader.herokuapp.com/";
 }
-
-
-var fnoArr=  dataForge.readFileSync("data/list/fo_mktlots.csv")
-.parseCSV()
-.toArray();
-
-var fnoList = [];
-fnoArr.forEach(function(item) {   
-    if(item.SYMBOL){
-       // console.log(" NSE_FO :: "  +item.SYMBOL)
-        fnoList.push({ex:"NSE_EQ", symbol:item.SYMBOL});
-    }
-});
-store.set('fnoList',fnoList);
-
-
-watchList =  fnoList.sort(); 
-
-
-var niftyList =  dataForge.readFileSync("data/list/ind_nifty50list.csv")
-.parseCSV()
-.toArray();
-
-niftyList = niftyList.map(x => {
-    if(x.SYMBOL)
-        return {ex:"NSE_EQ", symbol:x.SYMBOL};
-    else if(x.Symbol)
-        return {ex:"NSE_EQ", symbol:x.Symbol};
-});
-store.set('niftyList',niftyList);
-//watchList =  niftyList.sort();
 
 
 
@@ -889,12 +854,7 @@ if (cluster.isMaster) {
         res.end();
     });
 
-    app.get('/sync',checkSignIn, function (req, res) {   
-        syncStockData();
-        res.setHeader('Content-Type', 'application/json');
-        res.send("Successfully sync data !");
-        res.end();
-    });
+    
 
     app.get('/getBalance', function (req, res) {   
         res.setHeader('Content-Type', 'application/json');

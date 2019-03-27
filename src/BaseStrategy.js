@@ -93,13 +93,10 @@ class BaseStrategy {
     }
 
 }
-  
-
-
 
 //Sync Upstox data on by Interval, eg 15 min sync
 async function applyStrategy(list,interval,strategy){ 
-// console.log("* getAllStockDataByInterval   >> "+list.length);
+    var base;
     var matchSymbols = [];
     Promise.all(list.map(async (x) =>  {
     var symbol = x.symbol ? x.symbol:x;    
@@ -108,23 +105,24 @@ async function applyStrategy(list,interval,strategy){
         var arr = stockData.map(async (dataObj) =>  {
             try{
                 var data = JSON.parse(dataObj.data); 
-                var base = new BaseStrategy();
+                base = new BaseStrategy();
                 await base.executeStrategy(dataObj.symbol,data,strategy).then(finalResult => { 
                     var finalResultFlag = finalResult.every(x => x == true);
                     if(finalResultFlag){
                         matchSymbols.push(dataObj.symbol);
                         //console.log("Strategy RESULT  > " + finalResult +"::"+   strategy.name +"::"+ dataObj.symbol +" > "+ matchSymbols.length);
                         }
-                        finalResultFlag= dataObj =null;
-
-                    //closes =  opens =  highs = lows = timestamps = finalResult=  strategyObj = null;
+                   finalResult= finalResultFlag= dataObj =base = null;
+                    
                 }).catch(error => 
                 {
-                    console.log("OUTER LOOP ERROR > " + error)
+                    console.log("OUTER LOOP ERROR > " + error);
+                    error = base = null;
                 });
             }
             catch(e){
                 console.log("Error " + e);
+                e = base = null;
             }
         });       
         
@@ -137,7 +135,7 @@ async function applyStrategy(list,interval,strategy){
                 sendingMail("satish.patel41@gmail.com",strategy.name,matchSymbols).catch(console.error);
             }
             
-            a = strategy = matchSymbols =null;
+            closes =  opens =  highs = lows = timestamps =  a = strategy = matchSymbols =null;
         })
         .catch();
                     

@@ -1,5 +1,7 @@
 var Upstox = require("upstox");
 var moment = require('moment-timezone');
+
+
 var api = "OknufM07tm1g9EfN4fHKP2Eqi9DSw40I2Y3xliHg";
 var upstox = new Upstox(api);
 var fs = require('fs');
@@ -63,10 +65,10 @@ function start() {
         getListOfAllSymbol,
         getAllData
     }, function(err, results) {
-        // results is now equals to: {one: 1, two: 2}
+        
     });
 
-    //getProfile();
+   
        
     var bankNiftyCall;
           
@@ -230,11 +232,7 @@ function getBalance()
     upstox.getBalance({ type: "security" })  // type can be security or commodity
     .then(function (response) {
         balance = JSON.stringify(response);
-        /* log("****************** Balance ******************\n");
-        fs.writeFile("data/balance/"+client_id+'-balance.txt', JSON.stringify(response), function (err) {
-        if (err) throw err;
-            log('balance is created successfully.');
-        });   */
+        
         getListOfAllSymbol();
     })
     .catch(function (err) {
@@ -251,20 +249,6 @@ function getProfile()
     .then(function (response) {
         client_id = response.data.client_id;
         profile = JSON.stringify(response.data);
-        //getBalance();
-        
-            
-        /* fs.writeFile("data/profile/"+client_id+'.txt', JSON.stringify(response), function (err) {
-        if (err) throw err;
-            log('client_id is created successfully.');
-        });  
-
-        /*  var watchList = ['dlf','hindalco','ICICIBANK','sbin','yesbank','reliance','idea','WIPRO','lt','HAVELLS']
-        watchList.map(async (obj) => {
-            loadAllSymbolData(obj,'1DAY','1-1-2005');
-        }); 
-         */
-    
     })
     .catch(function (error) {
         console.log("Error"+ error);
@@ -307,18 +291,6 @@ function getAllData(){
     syncAllUpstoxData(watchList,interval); 
     getPercent_list(watchList);   
 }
-
-function syncStockData(){ 
-    delay(10).then(() => load5minData());
-    delay(1000).then(() => load3minData());
-    delay(10000).then(() => load10minData());
-    delay(15000).then(() => load15minData());
-    delay(20000).then(() => load30minData());
-    delay(30000).then(() => load60minData());
-    delay(60000).then(() => load1dayData());
-}
-
-const delay = t => new Promise(resolve => setTimeout(resolve, t));
 
 var stockData = []; 
 var data = {};

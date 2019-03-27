@@ -8,18 +8,17 @@ var exec    = require('child_process').exec;
 const minify = require("gulp-babel-minify");
 var del = require('del');
 var gulpSequence = require('gulp-sequence').use(gulp);
-  
 
  gulp.task("script", () =>
     gulp.src("src/*.js")
-    // .pipe(minify({
-    //     mangle: {
-    //       keepClassName: true
-    //     }
-    // })) 
+    .pipe(minify({
+        mangle: {
+          keepClassName: true
+        }
+    })) 
     .pipe(concat('app.min.js'))
-    //.pipe(uglify())
-    .on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })
+    .pipe(uglify())
+    .on('error', function (err) { console.log(err.toString()); })
     .pipe(gulp.dest("./dist"))
 );
 

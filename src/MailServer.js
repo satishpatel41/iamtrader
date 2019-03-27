@@ -1,4 +1,4 @@
-/* 'use strict';
+'use strict';
 const nodemailer = require('nodemailer');
 
 var transporter1 = nodemailer.createTransport({
@@ -73,8 +73,8 @@ function sendingMail(toEmail, strategy, symbolsList){
         console.log('Message sent: %s', info.messageId);
         //console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
     });
-} */
-
+}
+/* 
 "use strict";
 const nodemailer = require("nodemailer");
 
@@ -135,3 +135,4 @@ async  function sendingMail(toEmail, strategy, symbolsList){
   // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
 }
 
+ */

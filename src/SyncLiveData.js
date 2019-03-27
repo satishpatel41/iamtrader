@@ -6,8 +6,7 @@ var intervalsArr = ['1WEEK','1DAY','60MINUTE','30MINUTE','15MINUTE','10MINUTE','
 var database;
 
 var queue = async.queue(function(task, callback) {
-    //console.log('TASK - ' + task.symbol);
-
+   
     if(task.symbol){
         var symbolfile;
         try{      
@@ -59,12 +58,12 @@ var queue = async.queue(function(task, callback) {
                             callback();     
                         }
                       
-                   stockData = response = null;
+                        symbolfile = task = stockData = response = null;
                     
                   } catch (err) {
                     lokiJson.close();    
                     console.log("loadHandler queue : err   > " + err);
-                    err = null;
+                    symbolfile = task = err = null;
                     callback();    
                     //return err;
                   }
