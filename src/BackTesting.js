@@ -77,6 +77,7 @@ async function startBackTesting(symbol,stockData,strategyList,isBackTesting){
             .catch(err => {
                 rejected(err);
                 console.log("INNER LOOP : " + err)
+                err = null;
             });
         })
     }));

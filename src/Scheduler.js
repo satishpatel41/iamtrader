@@ -4,7 +4,7 @@ var list;
 var moment = require('moment-timezone');
 
 cron.schedule('*/5 * * * *', () => {
-   //load5minData();
+   load5minData();
     console.log(chalk.blue('running a task every 5 minutes'));
 }, {
 scheduled: true,
@@ -137,6 +137,10 @@ function load5minData()
         syncLiveAllStockData(watchList,interval,start_date,end_date); 
     } 
     getPercent_list(watchList);   
+
+    strategyList.map(strategy =>{
+        applyStrategy(watchList,'5MINUTE',strategy); 
+    });
 }
 
 function load3minData()
@@ -153,10 +157,14 @@ function load15minData()
     if(store.get('accessToken')){
         syncLiveAllStockData(watchList,interval,start_date,end_date);     
     }   
-    getPercent_list(watchList); 
+    //getPercent_list(watchList); 
 
-    getAllStockDataByInterval(watchList,'15MINUTE',strategy_bbLower); 
-    getAllStockDataByInterval(watchList,'15MINUTE',strategy_rsi60_crossed); 
-    getAllStockDataByInterval(watchList,'15MINUTE',strategy_bbUpper_band_crossed); 
-    getAllStockDataByInterval(watchList,'15MINUTE',strategy_bbLower); 
+
+    strategyList.map(strategy =>{
+        applyStrategy(watchList,'15MINUTE',strategy); 
+    });
+    /* applyStrategy(watchList,'15MINUTE',strategy_bbLower); 
+    applyStrategy(watchList,'15MINUTE',strategy_rsi60_crossed); 
+    applyStrategy(watchList,'15MINUTE',strategy_bbUpper_band_crossed); 
+    applyStrategy(watchList,'15MINUTE',strategy_bbLower); */ 
 }

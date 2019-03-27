@@ -1,5 +1,7 @@
 // Start from https://gist.github.com/iwek/7154578#file-csv-to-json-js
 // and fix the issue with double quoted values
+//var memwatch = require('memwatch');
+
 
 function csvTojs(csv) {
   var lines=csv;//.split(",");
@@ -56,3 +58,16 @@ function getPercentageChange(oldNumber, newNumber){
 
   return ((decreaseValue / oldNumber) * 100).toFixed(2);
 }
+
+Array.prototype.insert = function(i,...rest){
+  return this.slice(0,i).concat(rest,this.slice(i));
+}
+
+/* 
+memwatch.on('leak', function(info) {
+  console.log("leak:",info);
+});
+
+memwatch.on('stats', function(stats) {
+  console.log("stats:",stats);
+}); */

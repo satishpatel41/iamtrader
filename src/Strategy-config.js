@@ -35,8 +35,8 @@ var strategy_sma200 = {
         {
             indicators:
             [
-                {indicator:'SMA',period : 200,values:"closes"}
-            ],output:[],strategy:"closes[i+1] <= output[0][i+1]"
+                {indicator:'SMA',period : 200,values:"opens"}
+            ],output:[],strategy:"opens[i+1] <= output[0][i]"
         },
         {
             indicators:
@@ -126,7 +126,7 @@ var strategy_bbLower ={
         indicators:
         [
             {indicator:'BB',period : 14,values:"closes",stdDev : 2}
-        ],output:[],strategy:"closes[i+1] >= output[0][i+1]['lower']"
+        ],output:[],strategy:"opens[i] >= output[0][i]['lower']"
     },
     {
         indicators:
@@ -158,7 +158,7 @@ var strategy_bbUpper_band_crossed ={
         indicators:
         [
             {indicator:'BB',period : 14,values:"closes",stdDev : 2}
-        ],output:[],strategy:"closes[i+1] <= output[0][i+1]['upper']"
+        ],output:[],strategy:"opens[i] <= output[0][i]['upper']"
     },
     {
         indicators:
@@ -174,3 +174,4 @@ var strategy_bbUpper_band_crossed ={
     } 
 ]}; 
     
+var strategyList = [strategy_rsi60_crossed,strategy_bbUpper_band_crossed,strategy_bbLower];

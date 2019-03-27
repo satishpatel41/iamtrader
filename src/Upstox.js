@@ -9,7 +9,7 @@ var __dirname = "views"
 var exchanges =  [ 'MCX_FO', 'BSE_EQ', 'NSE_EQ', 'NSE_FO', 'NCD_FO'];
 var api_secret = "69xldylnvf";
 var client_id="";
-var watchList = [];
+
 var accessToken;
 
 function getAcceToken(code)
@@ -304,9 +304,7 @@ function getAllData(){
     var end_date = now.getDate()+"/"+(now.getMonth() + 1)+"/"+now.getFullYear();
     now.setDate(now.getDate() - 21);
     var start_date = now.getDate()+"/"+(now.getMonth() + 1)+"/"+now.getFullYear();
-    
     syncAllUpstoxData(watchList,interval); 
-
     getPercent_list(watchList);   
 }
 

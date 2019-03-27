@@ -6,8 +6,9 @@ var intervalsArr = ['1WEEK','1DAY','60MINUTE','30MINUTE','15MINUTE','10MINUTE','
 var database;
 
 var queue = async.queue(function(task, callback) {
-    if(task.symbol){
+    //console.log('TASK - ' + task.symbol);
 
+    if(task.symbol){
         var symbolfile;
         try{      
             symbolfile = path.resolve(path.join(__dirname, '..', 'db/stock/'+task.interval+'/'+task.symbol+'.db'));
@@ -29,7 +30,6 @@ var queue = async.queue(function(task, callback) {
             if(!database){
                 database = lokiJson.addCollection(task.symbol);
             }  
-         
             var stockData = [];
 
             if(task.ex == null || task.ex == undefined || task.ex == '')
@@ -50,85 +50,39 @@ var queue = async.queue(function(task, callback) {
                                 database.clear();
                                 database.insert(stockData);      
                             }
-                            lokiJson.saveDatabase();    
+                            lokiJson.saveDatabase();   
+                            lokiJson.close(); 
                             callback();         
                         } 
                         else{
+                            lokiJson.close();    
                             callback();     
                         }
                       
-                   // stockData = null;
+                   stockData = response = null;
                     
                   } catch (err) {
+                    lokiJson.close();    
                     console.log("loadHandler queue : err   > " + err);
+                    err = null;
                     callback();    
                     //return err;
                   }
             });
-           /*  var filePath = 'data/stock/'+task.interval+'/'+task.symbol+'.txt';                 
-            fs.exists(filePath, function(exists) {
-                if (exists){
-                    fs.readFile(filePath, 'utf8', function(err, response) {
-                        if (err) console.log('readFile  ' +err);
-                        if(response != '' && response != undefined && response != null){
-                            var obj = JSON.parse(response);
-                            //console.log("read file  > " +  database +"::"+database.get(1).timestamp +" : "+ obj.timestamp);
-                            if(database.get(1) && database.get(1).timestamp && database.get(1).timestamp === obj.timestamp){
-                                //console.log('update   ' +task.interval+"> "+ task.symbol);
-                            }
-                            else{
-                                console.log('****************UPDATE   ' +task.interval+"> "+ task.symbol);
-                                database.clear();
-                                database.insert(obj);      
-                            }
-                            lokiJson.saveDatabase();    
-                            callback();         
-                        } 
-                    });
-                }
-                else{
-                    callback();
-                }
-            }); */     
         }  
     } 
-},5);
+},15);
 
-//sendingMail("satish.patel41@gmail.com","RSI",["a","b"]).catch(console.error);
-
-//syncLiveAllStockData(watchList); 
-//syncLiveStockDataByInterval(store.get('nseSymbolList'),'5MINUTE'); 
-//getStockDataByInterval('BATAINDIA','1DAY',strategy_rsi60);
-//getAllStockDataByInterval(store.get('niftyList'),'1DAY',strategy_rsi60);
-//getAllStockDataByInterval(['ULTRACEMCO','ENGINERSIN','DRREDDY','HINDALCO','LT','MINDTREE','PCJEWELLER'],'1DAY',strategy_rsi60);
-//getAllStockDataByInterval(['ULTRACEMCO','VEDL','SBIN'],'1DAY');
-//getAllData();
-/* getAllStockDataByInterval(watchList.sort(),'1DAY',strategy_rsi60_crossed);
-getAllStockDataByInterval(watchList.sort(),'1DAY',strategy_rsi40_crossed);
-
-//getAllStockDataByInterval(['ULTRACEMCO','ENGINERSIN','DRREDDY','HINDALCO','LT','MINDTREE','PCJEWELLER'],'1DAY',strategy_bbUpper_band_crossed);
-getAllStockDataByInterval(watchList.sort(),'1DAY',strategy_bbLower); */
-
-//getAllStockDataByInterval(watchList.sort(),'15MINUTE',strategy_rsi60_crossed);
-
-/* getAllStockDataByInterval(watchList.sort(),'15MINUTE',strategy_rsi40_crossed);
-
-getAllStockDataByInterval(watchList.sort(),'15MINUTE',strategy_bbLower);
-
-getPercent_list(watchList.sort()); */
-
-
-/* getAllStockDataByInterval(watchList.sort(),'1DAY',strategy_rsi60_crossed); 
- */
 async function syncLiveAllStockData(list,interval,start_date,end_date){ 
+    //console.log('syncLiveAllStockData  - ' + list.length);
     list.map(async (x) =>  {
         var symbol = x.symbol ? x.symbol:x;        
         var ex = x.ex;      
         //console.log('syncLiveAllStockData : Finished Queue  - ' + symbol +" :: "+ ex);
-
         queue.push({symbol: symbol,ex:ex,interval:interval,start_date:start_date,end_date:end_date}, function (err) {
             //  console.log('SyncLiveAllStockData : Finished Queue  - ' + interval);
         });
+        x = symbol = ex= null;
     });        
 }
 
@@ -146,55 +100,7 @@ async function syncAllUpstoxData(list){
     });          
 }
 
-//Sync Upstox data on by Interval, eg 15 min sync
-async function getAllStockDataByInterval(list,interval,strategy){ 
-   // console.log("* getAllStockDataByInterval   >> "+list.length);
-        var matchSymbols = [];
-        Promise.all(list.map(async (x) =>  {
-        var symbol = x.symbol ? x.symbol:x;    
-        return getStock(symbol,interval);          
-        })).then(stockData => {
-            var arr = stockData.map(async (dataObj) =>  {
-                try{
-                    var data = JSON.parse(dataObj.data); 
-                    await executeStrategy(dataObj.symbol,data,strategy).then(finalResult => { 
-                        var finalResultFlag = finalResult.every(x => x == true);
-                        if(finalResultFlag){
-                            matchSymbols.push(dataObj.symbol);
-                            //console.log("Strategy RESULT  > " + finalResult +"::"+   strategy.name +"::"+ dataObj.symbol +" > "+ matchSymbols.length);
-                         }
-                         finalResultFlag= dataObj =null;
 
-                        //closes =  opens =  highs = lows = timestamps = finalResult=  strategyObj = null;
-                    }).catch(error => 
-                    {
-                        console.log("OUTER LOOP ERROR > " + error)
-                    });
-                }
-                catch(e){
-                    console.log("Error " + e);
-                }
-            });       
-            
-            Promise.all(arr).then(a=>
-            {
-                console.log("RESULT  > " +strategy.name +" >> "+ matchSymbols);
-
-                if(process.env.NODE_ENV=="production")
-                {
-                    sendingMail("satish.patel41@gmail.com",strategy.name,matchSymbols).catch(console.error);
-                }
-
-               
-                a = strategy = matchSymbols =null;
-            })
-            .catch();
-                       
-        })
-        .catch(error => { 
-            console.log(error)
-        }); 
-}
 
 //Get Percentage change 
 async function getPercent_list(list){ 
@@ -211,65 +117,65 @@ async function getPercent_list(list){
                 console.log(error)
             }); 
         })
-        })).then(dataArr => {
-                var percentageChangeArray = [];
-                for(var i = 0; i < dataArr[0].length;i++){
-                    try{
-                        var dataObj1 = dataArr[0][i];
-                        var dataObj2 = dataArr[1][i];
-                        if(dataObj1.symbol == dataObj2.symbol)
-                        {
-                            var stock1 = [];
-                            stock1 = JSON.parse(dataObj1.data);
-                            stock1.reverse();
-                            var stock2 = [];
-                            stock2 = JSON.parse(dataObj2.data);
-                            stock2.reverse();
-                            var perc = getPercentageChange(stock1[0].close,stock2[0].close);
-                            var percObj = {};
-                            percObj.symbol = dataObj1.symbol;
-                            percObj.percentage = perc;
-                            percentageChangeArray.push(percObj);
-                            //console.log(dataObj1.symbol +" : "+ perc);
-                            stock1 =  stock2 =  null;
-                        }
-                    }
-                    catch(error){ 
-                        console.log("Parsing error " +dataObj1.symbol +" : "+ error);
+    })).then(dataArr => {
+            var percentageChangeArray = [];
+            for(var i = 0; i < dataArr[0].length;i++){
+                try{
+                    var dataObj1 = dataArr[0][i];
+                    var dataObj2 = dataArr[1][i];
+                    if(dataObj1.symbol == dataObj2.symbol)
+                    {
+                        var stock1 = [];
+                        stock1 = JSON.parse(dataObj1.data);
+                        stock1.reverse();
+                        var stock2 = [];
+                        stock2 = JSON.parse(dataObj2.data);
+                        stock2.reverse();
+                        var perc = getPercentageChange(stock1[0].close,stock2[0].close);
+                        var percObj = {};
+                        percObj.symbol = dataObj1.symbol;
+                        percObj.percentage = perc;
+                        percentageChangeArray.push(percObj);
+                        //console.log(dataObj1.symbol +" : "+ perc);
+                        stock1 =  stock2 =  null;
                     }
                 }
-                percentageChangeArray.sort(function(a, b){return a.percentage - b.percentage});
-                percentageChangeArray.reverse();
-                store.set("percentage",percentageChangeArray);
-                
-                percentageChangeArray = dataArr =  intervalsArr = null;
-        })
-        .catch(error => { 
-            console.log(error)
-        }); 
+                catch(error){ 
+                    console.log("Parsing error " +dataObj1.symbol +" : "+ error);
+                }
+            }
+            percentageChangeArray.sort(function(a, b){return a.percentage - b.percentage});
+            percentageChangeArray.reverse();
+            store.set("percentage",percentageChangeArray);
+            
+            percentageChangeArray = dataArr =  intervalsArr = null;
+    })
+    .catch(error => { 
+        console.log(error)
+    }); 
 }
 
 //Get Indicators 
 async function getDefaultIndicatorsValues(list,interval){ 
 // console.log("* getAllStockDataByInterval   >> "+list.length);
-        var matchSymbols = [];
-        Promise.all(list.map(async (x) =>  {
-        var symbol = x.symbol ? x.symbol:x;    
-        return getStock(symbol,interval);          
-        })).then(stockData => {
-            var arr = stockData.map(async (dataObj) =>  {
-                try{
-                    var data = JSON.parse(dataObj.data); 
-                    
-                }
-                catch(e){
-                    console.log("Error " + e);
-                }
-            });                           
-        })
-        .catch(error => { 
-            console.log(error)
-        }); 
+    var matchSymbols = [];
+    Promise.all(list.map(async (x) =>  {
+    var symbol = x.symbol ? x.symbol:x;    
+    return getStock(symbol,interval);          
+    })).then(stockData => {
+        var arr = stockData.map(async (dataObj) =>  {
+            try{
+                var data = JSON.parse(dataObj.data); 
+                
+            }
+            catch(e){
+                console.log("Error " + e);
+            }
+        });                           
+    })
+    .catch(error => { 
+        console.log(error)
+    }); 
 }
 
 //backTesting("SBIN","1DAY",strategy_bbUpper_band_crossed,true);
@@ -338,6 +244,7 @@ function getStock(symbol,interval)
         catch(e){
             console.log("getStock > Error > " + e);
             reject(e);
+            e = null;
         }
         var lokiJson = new loki(symbolfile, 
         {
@@ -359,9 +266,14 @@ function getStock(symbol,interval)
                     resolve({"symbol":symbol,data:JSON.stringify(database.get(1).data)});
                 else
                     resolve({"symbol":symbol,data:[]}); 
+
+
+                lokiJson.close();    
             }
             catch(e){
+                lokiJson.close();
                 reject(e);
+                e = null;
             }   
         } 
     }); 

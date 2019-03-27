@@ -6,6 +6,8 @@ var chalk = require('chalk');
 var fs = require('fs');
 var url = require('url');
 var cluster = require('cluster');
+var watchList = [];
+//const heapdump = require('heapdump');
 const dataForge = require('data-forge');
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
@@ -26,6 +28,39 @@ if(process.env.NODE_ENV=="production")
     api = "OknufM07tm1g9EfN4fHKP2Eqi9DSw40I2Y3xliHg";
     redirect_uri = "https://robo-trader.herokuapp.com/";
 }
+
+
+var fnoArr=  dataForge.readFileSync("data/list/fo_mktlots.csv")
+.parseCSV()
+.toArray();
+
+var fnoList = [];
+fnoArr.forEach(function(item) {   
+    if(item.SYMBOL){
+       // console.log(" NSE_FO :: "  +item.SYMBOL)
+        fnoList.push({ex:"NSE_EQ", symbol:item.SYMBOL});
+    }
+});
+store.set('fnoList',fnoList);
+
+
+watchList =  fnoList.sort(); 
+
+
+var niftyList =  dataForge.readFileSync("data/list/ind_nifty50list.csv")
+.parseCSV()
+.toArray();
+
+niftyList = niftyList.map(x => {
+    if(x.SYMBOL)
+        return {ex:"NSE_EQ", symbol:x.SYMBOL};
+    else if(x.Symbol)
+        return {ex:"NSE_EQ", symbol:x.Symbol};
+});
+store.set('niftyList',niftyList);
+//watchList =  niftyList.sort();
+
+
 
 var numReqs = 0; 
 if (cluster.isMaster) {
@@ -80,35 +115,7 @@ if (cluster.isMaster) {
         var today = date.getDate() +"-"+(date.getMonth() + 1) +"-"+date.getFullYear();
         var time = date +":"+date.getHours() +":"+date.getMinutes();   
         
-        var fnoArr=  dataForge.readFileSync("data/list/fo_mktlots.csv")
-        .parseCSV()
-        .toArray();
-
-        var fnoList = [];
-        fnoArr.forEach(function(item) {   
-            if(item.SYMBOL){
-               // console.log(" NSE_FO :: "  +item.SYMBOL)
-                fnoList.push({ex:"NSE_EQ", symbol:item.SYMBOL});
-            }
-        });
-        store.set('fnoList',fnoList);
-
-       /*  if(store.get('fnoList'))
-           watchList =  store.get('fnoList').sort(); */
-
-
-        var niftyList =  dataForge.readFileSync("data/list/ind_nifty50list.csv")
-        .parseCSV()
-        .toArray();
-
-        niftyList = niftyList.map(x => {
-            if(x.SYMBOL)
-                return {ex:"NSE_EQ", symbol:x.SYMBOL};
-            else if(x.Symbol)
-                return {ex:"NSE_EQ", symbol:x.Symbol};
-        });
-        store.set('niftyList',niftyList);
-        watchList =  niftyList.sort();
+      
        
         app.get('/', function (req, res) {
             var q = url.parse(req.url, true).query;
@@ -419,6 +426,7 @@ if (cluster.isMaster) {
                     .catch(function(err) {
                         // Something went wrong.
                         console.log(chalk.red(err));
+                        err = null;
                     });
             } 
 
@@ -429,6 +437,7 @@ if (cluster.isMaster) {
         })
         .catch(function(error){
             console.log("createStrategy error > " +  JSON.stringify(error));
+            error = null;
         });
 
     });
@@ -525,6 +534,7 @@ if (cluster.isMaster) {
                 code = req.params.code;
                 res.status(302).setHeader('Location', loginUrl);
                 res.end();
+                error = loginUrl = null;
             }
             console.log("/loadSymbol/:symbol/:interval error > " +  JSON.stringify(error));
         });
@@ -902,6 +912,15 @@ if (cluster.isMaster) {
 
     });
 
+ /*    const requestLogs = [];
+    app.get('/heapdump', checkSignIn,function (req, res) {
+        heapdump.writeSnapshot((err, filename) => {
+            console.log('Heap dump written to', filename)
+        });
+        requestLogs.push({ url: req.url, date: new Date() });
+    res.end(JSON.stringify(requestLogs));
+    }); */
+
     app.get('/admin', checkSignIn,function (req, res) {
         var india = moment.tz(store.get('tokenValidity'),"Asia/Kolkata");
         var d =new Date();
@@ -938,6 +957,7 @@ if (cluster.isMaster) {
     // start the server in the port 3000 !
     app.listen(PORT, function () {
     console.log('App listening on port '+PORT);
+   // console.log(`Heapdump enabled. Run "kill -USR2 ${process.pid}" or send a request to "/heapdump" to generate a heapdump.`);
     });
 }
 
