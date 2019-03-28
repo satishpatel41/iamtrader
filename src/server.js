@@ -87,17 +87,18 @@ if (cluster.isMaster) {
             code = q.code;
 
             console.log(chalk.green("session > " + JSON.stringify(req.session.cookie)));
-
+            getAcceToken(code);        
+            res.sendFile("index.html", {"root": __dirname});
             //checkBankNiftyExpiry();
 
-            if(code)
+            /* if(code)
             {
                 getAcceToken(code);        
                 res.sendFile("index.html", {"root": __dirname});
             }
             else{
                 res.sendFile("index.html", {"root": __dirname});
-            }
+            } */
             q = null;
     });
 
@@ -893,20 +894,20 @@ if (cluster.isMaster) {
             store.set('accessToken',accessToken)
         }
 
-        if(store.get('accessToken') && store.get('accessToken') != ''){
+        /* if(store.get('accessToken') && store.get('accessToken') != ''){
              accessToken = store.get('accessToken');
              upstox.setToken(accessToken);
              getListOfAllSymbol();
              res.sendFile("index.html", {"root": __dirname});
         }
-        else{
+        else{ */
             var loginUrl = upstox.getLoginUri(redirect_uri);
             console.log("*loginUri " + loginUrl);
             res.status(200).header('Content-type', 'text/html');
             code = req.params.code;
             res.status(302).setHeader('Location', loginUrl);
             res.end();
-        }
+        //}
     });
 
     // Change the 404 message modifing the middlewar

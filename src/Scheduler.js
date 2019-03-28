@@ -3,13 +3,6 @@ var chalk = require('chalk');
 var list;
 var moment = require('moment-timezone');
 
-cron.schedule('*/5 * * * *', () => {
-   load5minData();
-    console.log(chalk.blue('running a task every 5 minutes'));
-}, {
-scheduled: true,
-timezone: "Asia/Kolkata"
-});
 
 cron.schedule('*/10 * * * *', () => {
     //load10minData();
@@ -37,7 +30,7 @@ timezone: "Asia/Kolkata"
 });
 
 cron.schedule('0 */1 * * *', () => {
-    load60minData();
+    //load60minData();
     console.log(chalk.blue('running a task every 1 hour'));
 }, {
 scheduled: true,
@@ -46,6 +39,7 @@ timezone: "Asia/Kolkata"
 
 cron.schedule('59 23 * * *', () => {
     store.unlink();
+    store.set('accessToken', ''); 
     console.log(chalk.yellow('Clean cache data'));
 }, {
 scheduled: true,
@@ -67,7 +61,6 @@ cron.schedule('0 17 * * *', () => {
 scheduled: true,
 timezone: "Asia/Kolkata"
 });
-
 
 
 function load1WeekData()
@@ -110,7 +103,7 @@ function load60minData()
 {
     var interval = '60MINUTE';
     if(store.get('accessToken')){   
-        syncLiveAllStockData(watchList,interval,start_date,end_date); 
+        //syncLiveAllStockData(watchList,interval,start_date,end_date); 
     }   
 }
 
@@ -118,7 +111,7 @@ function load30minData()
 { 
     var interval = '30MINUTE';
     if(store.get('accessToken')){    
-        syncLiveAllStockData(watchList,interval,start_date,end_date); 
+        //syncLiveAllStockData(watchList,interval,start_date,end_date); 
    }    
 }
 
@@ -126,7 +119,7 @@ function load10minData()
 {
      var interval = '10MINUTE';   
     if(store.get('accessToken')){    
-      syncLiveAllStockData(watchList,interval,start_date,end_date); 
+      //syncLiveAllStockData(watchList,interval,start_date,end_date); 
     }    
 }
 
@@ -143,13 +136,6 @@ function load5minData()
     }); */
 }
 
-function load3minData()
-{  
-    var interval = '3MINUTE';
-    if(store.get('accessToken')){
-       //syncLiveAllStockData(watchList,interval,start_date,end_date);       
-    }    
-}
 
 function load15minData()
 {   

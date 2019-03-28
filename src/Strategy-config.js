@@ -18,7 +18,8 @@ var strategy_smaCross1 = {
             {indicator:'SMA',period : 50,values:"closes"}
         ],output:[],strategy:"output[0][1] < output[1][1]"
     }
-]}; 
+]
+}; 
 
 var strategy_sma200 = {
     name:"SMA 200 Cross Over",
@@ -44,7 +45,8 @@ var strategy_sma200 = {
                 {indicator:''}
             ],output:[],strategy:"closes[i] > opens[i]"
         }
-]}; 
+]
+}; 
 
 var strategy_rsi60_crossed = {
 name:"RSI : 60 Cross Over",
@@ -76,7 +78,8 @@ strategy : [
             {indicator:''}
         ],output:[],strategy:"closes[i] > opens[i]"
     }  
-]}; 
+]
+}; 
 
 var strategy_rsi40_crossed ={
     name:"RSI : 40 Cross Over",
@@ -108,7 +111,8 @@ var strategy_rsi40_crossed ={
             {indicator:''}
         ],output:[],strategy:"closes[i] < opens[i]"
     }  
-]}; 
+]
+}; 
 
 var strategy_bbLower ={
     name:"Bollinger band : lower band Cross Over",
@@ -140,7 +144,8 @@ var strategy_bbLower ={
             {indicator:''}
         ],output:[],strategy:"((closes[i] - opens[i]) / (highs[i] - lows[i])) <= -0.5"
     }
-]}; 
+]
+}; 
 
 var strategy_bbUpper_band_crossed ={
     name:"Bollinger band : Upper band Cross Over",
@@ -172,6 +177,66 @@ var strategy_bbUpper_band_crossed ={
             {indicator:''}
         ],output:[],strategy:"((closes[i] - opens[i]) / (highs[i] - lows[i])) >= 0.5"
     } 
-]}; 
+]
+}; 
     
 var strategyList = [strategy_rsi60_crossed,strategy_bbUpper_band_crossed,strategy_bbLower];
+
+/******Strong / week *****/
+
+var strategy_rsi_above_60 = {
+name:"RSI > 60 - Strong chart",
+description : "RSI > 60 - Strong chart",
+isLive:false,
+isBuyOrSell:"b",
+strategy : [
+    {
+        indicators:
+        [
+            {indicator:'RSI',period : 14,values:"closes"}
+        ],output:[],strategy:"output[0][i] > 60"
+    },
+    {
+        indicators:
+        [
+            {indicator:''}
+        ],output:[],strategy:"((closes[0] - opens[0]) / (highs[0] - lows[0])) >= 0.5"
+    },
+    {
+        indicators:
+        [
+            {indicator:''}
+        ],output:[],strategy:"closes[i] > opens[i]"
+    }  
+]
+}; 
+
+var strategy_rsi_below_40 = {
+name:"RSI < 40 - Weak chart",
+description : "RSI < 4 - weak charts",
+isLive:false,
+isBuyOrSell:"s",
+strategy : [
+    {
+        indicators:
+        [
+            {indicator:'RSI',period : 14,values:"closes"}
+        ],output:[],strategy:"output[0][i] < 40"
+    },
+    {
+        indicators:
+        [
+            {indicator:''}
+        ],output:[],strategy:"((closes[0] - opens[0]) / (highs[0] - lows[0])) <= -0.5"
+    },
+    {
+        indicators:
+        [
+            {indicator:''}
+        ],output:[],strategy:"closes[i] < opens[i]"
+    }  
+]
+}; 
+
+var strategyStrongList = [strategy_rsi_above_60];
+var strategyWeakList = [strategy_rsi_below_40];

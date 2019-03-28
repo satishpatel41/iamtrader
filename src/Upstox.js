@@ -283,13 +283,23 @@ async function loadSymbol(symbol,exchange,interval='1day',start_date='',end_date
 }
 
 function getAllData(){
-    var interval = '1DAY';
     var now = new Date();
     var end_date = now.getDate()+"/"+(now.getMonth() + 1)+"/"+now.getFullYear();
     now.setDate(now.getDate() - 21);
     var start_date = now.getDate()+"/"+(now.getMonth() + 1)+"/"+now.getFullYear();
-    syncAllUpstoxData(watchList,interval); 
-    getPercent_list(watchList);   
+    syncAllUpstoxData(watchList); 
+
+    strategyStrongList.map(strategy =>{
+        applyStrategy(watchList,'1DAY',strategy); 
+    });
+
+
+    strategyWeakList.map(strategy =>{
+        applyStrategy(watchList,'1DAY',strategy); 
+    });
+
+
+    //getPercent_list(watchList);   
 }
 
 var stockData = []; 

@@ -2,7 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var async = require("async");
 var loki  = require( 'lokijs' );
-var intervalsArr = ['1WEEK','1DAY','60MINUTE','30MINUTE','15MINUTE','10MINUTE','5MINUTE'];//'1MONTH',
+var intervalsArr =['1DAY','15MINUTE'];// ['1WEEK','1DAY','60MINUTE','30MINUTE','15MINUTE','10MINUTE','5MINUTE'];//'1MONTH',
 var database;
 
 var queue = async.queue(function(task, callback) {
@@ -88,7 +88,7 @@ async function syncLiveAllStockData(list,interval,start_date,end_date){
 //Sync Upstox data on first load
 async function syncAllUpstoxData(list){ 
     intervalsArr.map(async (interval) =>  {
-        console.log('syncAllUpstoxData : Finished Queue  - ' + interval);
+        console.log('syncAllUpstoxData :  interval  - ' + interval);
         list.map(async (x) =>  {
             var symbol = x.symbol ? x.symbol:x;        
             var ex = x.ex;        
@@ -98,8 +98,6 @@ async function syncAllUpstoxData(list){
         }); 
     });          
 }
-
-
 
 //Get Percentage change 
 async function getPercent_list(list){ 
@@ -177,7 +175,6 @@ async function getDefaultIndicatorsValues(list,interval){
     }); 
 }
 
-//backTesting("SBIN","1DAY",strategy_bbUpper_band_crossed,true);
 //backTesting
 async function backTesting(symbol,interval,strategy,isbackTesting){ 
     var matchDates = [];

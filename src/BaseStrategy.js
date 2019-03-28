@@ -128,7 +128,7 @@ async function applyStrategy(list,interval,strategy){
         
         Promise.all(arr).then(a=>
         {
-            console.log("RESULT  > " +strategy.name +" >> "+ matchSymbols);
+            console.log("Strategy result  > " +strategy.name+" : "+ interval +" : "+ matchSymbols);
 
             if(process.env.NODE_ENV=="production")
             {
