@@ -73,7 +73,7 @@ var queue = async.queue(function(task, callback) {
             });
         }  
     } 
-},15);
+},5);
 
 async function syncLiveAllStockData(list,interval,start_date,end_date){ 
     //console.log('syncLiveAllStockData  - ' + list.length);
