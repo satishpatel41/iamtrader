@@ -262,7 +262,7 @@ function getMaster(ex = "nse_fo"){
 } */
 
 async function loadSymbol(symbol,exchange,interval='1day',start_date='',end_date=''){ 
-    console.log("loadSymbol > " + symbol + " > "+ interval +" > "+exchange +" > "+ start_date +" > "+ end_date+" :: "+ store.get('accessToken'));
+    //console.log("loadSymbol > " + symbol + " > "+ interval +" > "+exchange +" > "+ start_date +" > "+ end_date+" :: "+ store.get('accessToken'));
     if(store.get('accessToken')){
         return new Promise(function(resolved, rejected) {   
             upstox.getOHLC({"exchange": exchange,
@@ -299,7 +299,7 @@ function getAllData(){
     });
 
 
-    //getPercent_list(watchList);   
+    getPercent_list(watchList);   
 }
 
 var stockData = []; 
