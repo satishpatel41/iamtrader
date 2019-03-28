@@ -41,7 +41,7 @@ var queue = async.queue(function(task, callback) {
                             if(response.error){
                                 database.clear();
                                 lokiJson.close(); 
-                                callback();         
+                                //callback();         
                                 console.log('Queue error ' + task.symbol +" :: "+task.ex +" :: "+JSON.stringify(response.error));
                             }
                             else if(database.get(1) && database.get(1).data && database.get(1).data.timestamp && database.get(1).data.timestamp === response.timestamp){
