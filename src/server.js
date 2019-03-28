@@ -492,8 +492,8 @@ if (cluster.isMaster) {
         })
         .catch(function(error){
             if(error.code == 401){
-                accessToken = '';
-                store.set('accessToken', accessToken); 
+               // accessToken = '';
+               // store.set('accessToken', accessToken); 
 
                 var loginUrl = upstox.getLoginUri(redirect_uri);
                 res.status(200).header('Content-type', 'text/html');
@@ -890,8 +890,8 @@ if (cluster.isMaster) {
         console.log("tokenValidity "  +now1 +":"+india+":"+ india.isBefore(now1));
         if(india.isBefore(now1))
         {
-            accessToken = '';
-            store.set('accessToken',accessToken)
+            //accessToken = '';
+           // store.set('accessToken',accessToken)
         }
 
         /* if(store.get('accessToken') && store.get('accessToken') != ''){
