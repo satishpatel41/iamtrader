@@ -58,3 +58,13 @@ function getPercentageChange(oldNumber, newNumber){
 Array.prototype.insert = function(i,...rest){
   return this.slice(0,i).concat(rest,this.slice(i));
 }
+
+
+function formatDate(str)
+{
+    if(String(str).length == 1)
+    {
+        str ="0"+str;
+    }
+    return str;
+}

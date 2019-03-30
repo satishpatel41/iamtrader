@@ -96,6 +96,14 @@ class BaseStrategy {
 
 //Sync Upstox data on by Interval, eg 15 min sync
 async function applyStrategy(list,interval,strategy){ 
+
+    var now = new Date();
+    var india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
+    india.format(); 
+            
+    var today = formatDate(india.date())+"-"+formatDate(india.month() + 1)+"-"+india.year();
+
+
     var base;
     var matchSymbols = [];
     Promise.all(list.map(async (x) =>  {
@@ -120,14 +128,14 @@ async function applyStrategy(list,interval,strategy){
                 });
             }
             catch(e){
-                console.log("Error " + e);
+                console.log("applyStrategy Error: " + JSON.stringify(e));
                 e = base = null;
             }
         });       
         
         Promise.all(arr).then(a=>
         {
-            console.log("Strategy result  > " +strategy.name+" : "+ interval +" : "+ matchSymbols);
+            console.log("Strategy result  > " +today +" : "+strategy.name+" : "+ interval +" : "+ matchSymbols);
 
             if(process.env.NODE_ENV=="production")
             {
@@ -135,13 +143,14 @@ async function applyStrategy(list,interval,strategy){
             }
             
             closes =  opens =  highs = lows = timestamps =  a = strategy = matchSymbols =null;
+            return 1;
         })
         .catch(err => {
-            console.log("applyStrategy error " + err);
+            console.log("applyStrategy error 1  " + err);
         });
                     
     })
     .catch(error => { 
-        console.log(error)
+        console.log("applyStrategy error  2  " + err);
     }); 
 }

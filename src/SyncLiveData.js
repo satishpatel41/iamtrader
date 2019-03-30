@@ -13,7 +13,7 @@ var queue = async.queue(function(task, callback) {
             symbolfile = path.resolve(path.join(__dirname, '..', 'db/stock/'+task.interval+'/'+task.symbol+'.db'));
         }
         catch(e){
-            console.log("Error > " + e);
+            console.log("symbolfile Error > " + e);
         }
 
         var lokiJson = new loki(symbolfile, 
@@ -38,13 +38,14 @@ var queue = async.queue(function(task, callback) {
                 try {
                         if(response != '' && response != undefined && response != null){
                             stockData = response;
-                            if(response.error){
+                           /*  if(response.error){
                                 database.clear();
                                 lokiJson.close(); 
                                 //callback();         
                                 console.log('Queue error ' + task.symbol +" :: "+task.ex +" :: "+JSON.stringify(response.error));
                             }
-                            else if(database.get(1) && database.get(1).data && database.get(1).data.timestamp && database.get(1).data.timestamp === response.timestamp){
+                            else  */
+                            if(database.get(1) && database.get(1).data && database.get(1).data.timestamp && database.get(1).data.timestamp === response.timestamp){
                                 console.log('Do nothing   ' +task.interval+"> "+ task.symbol);
                             }
                             else{
@@ -73,7 +74,7 @@ var queue = async.queue(function(task, callback) {
             });
         }  
     } 
-},5);
+},10);
 
 async function syncLiveAllStockData(list,interval,start_date,end_date){ 
     //console.log('syncLiveAllStockData  - ' + list.length);
@@ -90,13 +91,24 @@ async function syncLiveAllStockData(list,interval,start_date,end_date){
 
 //Sync Upstox data on first load
 async function syncAllUpstoxData(list){ 
-    intervalsArr.map(async (interval) =>  {
-        console.log('syncAllUpstoxData :  interval  - ' + interval);
-        list.map(async (x) =>  {
+    await intervalsArr.map(async (interval) =>  {
+        //console.log('syncAllUpstoxData :  interval  - ' + interval);
+        await list.map(async (x) =>  {
             var symbol = x.symbol ? x.symbol:x;        
-            var ex = x.ex;        
-            queue.push({symbol:symbol,ex:ex,interval:interval,start_date:start_date,end_date:end_date}, function (err) {
-              //  console.log('SyncLiveAllStockData : Finished Queue  - ' + interval);
+            var ex = x.ex;      
+            
+            var now = new Date();
+            var india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata"); 
+            var end_date = formatDate(india.date())+"-"+formatDate(india.month() + 1)+"-"+india.year();
+            now.setDate(now.getDate() - 6);
+            india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
+            india.format(); 
+            var start_date = formatDate(india.date())+"-"+formatDate(india.month() + 1)+"-"+india.year();
+        
+    
+
+            await queue.push({symbol:symbol,ex:ex,interval:interval,start_date:start_date,end_date:end_date}, function (err) {
+                //console.log('SyncLiveAllStockData : Finished Queue  - ' + interval);
             });
         }); 
     });          
@@ -141,7 +153,7 @@ async function getPercent_list(list){
                     }
                 }
                 catch(error){ 
-                    console.log("Parsing error " +dataObj1.symbol +" : "+ error);
+                    console.log("getPercent_list Parsing error " +dataObj1.symbol +" : "+ error);
                 }
             }
             percentageChangeArray.sort(function(a, b){return a.percentage - b.percentage});
@@ -149,6 +161,7 @@ async function getPercent_list(list){
             store.set("percentage",percentageChangeArray);
             
             percentageChangeArray = dataArr =  intervalsArr = null;
+            return 1;
     })
     .catch(error => { 
         console.log(error)

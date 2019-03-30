@@ -141,7 +141,7 @@ if (cluster.isMaster) {
                     res.send("error")
                 }
                 else{
-                    console.log(chalk.green("Login token > " + store.get('accessToken')));
+                   // console.log(chalk.green("Login token > " + store.get('accessToken')));
                     /* if(store.get('accessToken') && store.get('accessToken') != '')
                     { */
                         req.session.user = user;
@@ -698,7 +698,7 @@ if (cluster.isMaster) {
                       
                     }
                     catch(e){
-                        console.log("Error " + e);
+                        console.log("stockData.map Error " + e);
                     }
                 });    
                 
@@ -847,7 +847,7 @@ if (cluster.isMaster) {
         res.setHeader('Content-Type', 'application/json');
         
         fnoList =  store.get('fnoList');
-        if(fnoList.length > 0)
+        if(fnoList && fnoList.length > 0)
             res.send(JSON.stringify(fnoList));
         else
             res.send(JSON.stringify(getListOfAllSymbol()));

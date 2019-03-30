@@ -28,7 +28,7 @@ function getAcceToken(code)
             params = api_secret = code = null;
                 
             accessToken = response.access_token;
-            store.set('accessToken', accessToken); 
+            //store.set('accessToken', accessToken); 
             var d  = new Date();
             
             var india = moment.tz(d, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
@@ -53,19 +53,20 @@ function getAcceToken(code)
         })
         .catch(function (err) {
             console.log( "getAccessToken > " + err);
-    });
+        });
 }
 
 
 function start() {
+    console.log( 'start');
     // an example using an object instead of an array
     async.parallel({
         getProfile,
         getBalance,
-        getListOfAllSymbol,
+        //getListOfAllSymbol,
         getAllData
     }, function(err, results) {
-        
+        console.log( 'start finish');
     });
 
    
@@ -194,7 +195,7 @@ function start() {
             });
             upstox.on("error", function(error) {
                 //error listener
-                console.log("error"+ error);
+                console.log("upstox.on error"+ error);
             });
         }).catch(function(error) {
             console.log( "connectSocket #" + error);
@@ -229,6 +230,7 @@ function getListOfAllSymbol()
 var balance;
 function getBalance()
 {
+    console.log( 'getBalance');
     upstox.getBalance({ type: "security" })  // type can be security or commodity
     .then(function (response) {
         balance = JSON.stringify(response);
@@ -245,13 +247,15 @@ function getBalance()
 var profile;
 function getProfile()
 {
+    console.log( 'getProfile');
     upstox.getProfile()
     .then(function (response) {
+        console.log("getProfile "+ JSON.stringify(response));
         client_id = response.data.client_id;
         profile = JSON.stringify(response.data);
     })
     .catch(function (error) {
-        console.log("Error"+ error);
+        console.log("getProfile Error"+ JSON.stringify(error));
     });
 }
 /* 
@@ -262,8 +266,8 @@ function getMaster(ex = "nse_fo"){
 } */
 
 async function loadSymbol(symbol,exchange,interval='1day',start_date='',end_date=''){ 
-    //console.log("loadSymbol > " + symbol + " > "+ interval +" > "+exchange +" > "+ start_date +" > "+ end_date+" :: "+ store.get('accessToken'));
-    if(store.get('accessToken')){
+   //console.log("loadSymbol > " + symbol + " > "+ interval +" > "+exchange +" > "+ start_date +" > "+ end_date+" :: "+ store.get('accessToken'));
+    //if(store.get('accessToken')){
         return new Promise(function(resolved, rejected) {   
             upstox.getOHLC({"exchange": exchange,
                 "symbol": symbol,
@@ -278,28 +282,24 @@ async function loadSymbol(symbol,exchange,interval='1day',start_date='',end_date
                 rejected(error);
             }); 
         });
-    }
+    //}
     
 }
 
 function getAllData(){
-    var now = new Date();
-    var end_date = now.getDate()+"/"+(now.getMonth() + 1)+"/"+now.getFullYear();
-    now.setDate(now.getDate() - 21);
-    var start_date = now.getDate()+"/"+(now.getMonth() + 1)+"/"+now.getFullYear();
-    syncAllUpstoxData(watchList); 
-
-    strategyStrongList.map(strategy =>{
-        applyStrategy(watchList,'1DAY',strategy); 
+    var p1= new Promise(function(resolve, reject) {
+        resolve(syncAllUpstoxData(watchList))
+    }).then(function(result) {
+        return strategyStrongList.map(strategy =>{
+                applyStrategy(watchList,'1DAY',strategy); 
+       })
+    }).then(function(result) {
+        return strategyWeakList.map(strategy =>{
+                applyStrategy(watchList,'1DAY',strategy); 
+       })
+    }).then(function(result) {
+        return getPercent_list(watchList);    
     });
-
-
-    strategyWeakList.map(strategy =>{
-        applyStrategy(watchList,'1DAY',strategy); 
-    });
-
-
-    getPercent_list(watchList);   
 }
 
 var stockData = []; 
