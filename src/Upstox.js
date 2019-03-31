@@ -58,7 +58,7 @@ function getAcceToken(code)
 
 
 function start() {
-    console.log( 'start');
+    //console.log( 'start');
     // an example using an object instead of an array
     async.parallel({
         getProfile,
@@ -230,7 +230,7 @@ function getListOfAllSymbol()
 var balance;
 function getBalance()
 {
-    console.log( 'getBalance');
+    //console.log( 'getBalance');
     upstox.getBalance({ type: "security" })  // type can be security or commodity
     .then(function (response) {
         balance = JSON.stringify(response);
@@ -247,10 +247,10 @@ function getBalance()
 var profile;
 function getProfile()
 {
-    console.log( 'getProfile');
+   // console.log( 'getProfile');
     upstox.getProfile()
     .then(function (response) {
-        console.log("getProfile "+ JSON.stringify(response));
+        //console.log("getProfile "+ JSON.stringify(response));
         client_id = response.data.client_id;
         profile = JSON.stringify(response.data);
     })

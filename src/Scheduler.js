@@ -45,6 +45,21 @@ cron.schedule('59 23 * * *', () => {
 scheduled: true,
 timezone: "Asia/Kolkata"
 });
+//9:30
+//cron.schedule('30 9 * * *', () => {
+cron.schedule('59 14 * * *', () => {
+    console.log('Good morning : 9:30 call');
+    var interval = '15MINUTE';
+
+    Promise.all(open_band_List.map(async(strategy) =>{
+            applyStrategy(watchList,'15MINUTE',strategy); 
+    })).then(function(result) {
+        console.log('9:30 call result : ' + result);        
+    })
+}, {
+scheduled: true,
+timezone: "Asia/Kolkata"
+});
 
 cron.schedule('0 17 * * *', () => {
     load1dayData();

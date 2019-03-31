@@ -66,13 +66,16 @@ function sendingMail(toEmail, strategy, symbolsList){
     mailOptions.html =  "<h1>Alert triggered on " +now+"</h1><br><p>Below is the list of new stocks filtered through scan <u>" +strategy+"</u></p><br><p><b>" + list+"</b></p>";
     
     // send mail with defined transport object
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            return console.log(error);
-        }
-        console.log('Message sent: %s', info.messageId);
-        //console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-    });
+
+    if(symbolsList.length > 1){
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                return console.log(error);
+            }
+            console.log('Message sent: %s', info.messageId);
+            //console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+        });
+    }
 }
 /* 
 "use strict";

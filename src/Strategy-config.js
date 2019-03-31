@@ -182,6 +182,8 @@ var strategy_bbUpper_band_crossed ={
     
 var strategyList = [strategy_rsi60_crossed,strategy_bbUpper_band_crossed,strategy_bbLower];
 
+var open_band_List = [strategy_bbUpper_band_crossed,strategy_bbLower];
+
 /******Strong / week *****/
 
 var strategy_rsi_above_60 = {

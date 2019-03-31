@@ -96,17 +96,10 @@ class BaseStrategy {
 
 //Sync Upstox data on by Interval, eg 15 min sync
 async function applyStrategy(list,interval,strategy){ 
-
-    var now = new Date();
-    var india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
-    india.format(); 
-            
-    var today = formatDate(india.date())+"-"+formatDate(india.month() + 1)+"-"+india.year();
-
-
+    //console.log("ApplyStrategy > " + list.length +"::"+   strategy.name +"::"+ interval);
     var base;
     var matchSymbols = [];
-    Promise.all(list.map(async (x) =>  {
+    return Promise.all(list.map(async (x) =>  {
     var symbol = x.symbol ? x.symbol:x;    
     return getStock(symbol,interval);          
     })).then(stockData => {
@@ -132,7 +125,7 @@ async function applyStrategy(list,interval,strategy){
                 e = base = null;
             }
         });       
-        
+       // return arr;
         Promise.all(arr).then(a=>
         {
             console.log("Strategy result  > " +today +" : "+strategy.name+" : "+ interval +" : "+ matchSymbols);
@@ -142,15 +135,17 @@ async function applyStrategy(list,interval,strategy){
                 sendingMail("satish.patel41@gmail.com",strategy.name,matchSymbols).catch(console.error);
             }
             
-            closes =  opens =  highs = lows = timestamps =  a = strategy = matchSymbols =null;
-            return 1;
+            closes =  opens =  highs = lows = timestamps =   matchSymbols =null;
+            return {strategy:strategy.name,matchSymbols:matchSymbols};
         })
         .catch(err => {
             console.log("applyStrategy error 1  " + err);
+            err =null;
         });
                     
     })
     .catch(error => { 
         console.log("applyStrategy error  2  " + err);
+        error =null;
     }); 
 }

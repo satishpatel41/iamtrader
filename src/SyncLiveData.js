@@ -74,10 +74,10 @@ var queue = async.queue(function(task, callback) {
             });
         }  
     } 
-},10);
+},7);
 
 async function syncLiveAllStockData(list,interval,start_date,end_date){ 
-    //console.log('syncLiveAllStockData  - ' + list.length);
+    console.log('syncLiveAllStockData  - ' + list.length);
     list.map(async (x) =>  {
         var symbol = x.symbol ? x.symbol:x;        
         var ex = x.ex;      
@@ -92,7 +92,7 @@ async function syncLiveAllStockData(list,interval,start_date,end_date){
 //Sync Upstox data on first load
 async function syncAllUpstoxData(list){ 
     await intervalsArr.map(async (interval) =>  {
-        //console.log('syncAllUpstoxData :  interval  - ' + interval);
+        console.log('syncAllUpstoxData :  interval  - ' + interval);
         await list.map(async (x) =>  {
             var symbol = x.symbol ? x.symbol:x;        
             var ex = x.ex;      
@@ -100,12 +100,15 @@ async function syncAllUpstoxData(list){
             var now = new Date();
             var india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata"); 
             var end_date = formatDate(india.date())+"-"+formatDate(india.month() + 1)+"-"+india.year();
-            now.setDate(now.getDate() - 6);
+            if(interval == '1DAY')
+                now.setDate(now.getDate() - 22);
+            else
+                now.setDate(now.getDate() - 6);
+
             india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
             india.format(); 
             var start_date = formatDate(india.date())+"-"+formatDate(india.month() + 1)+"-"+india.year();
         
-    
 
             await queue.push({symbol:symbol,ex:ex,interval:interval,start_date:start_date,end_date:end_date}, function (err) {
                 //console.log('SyncLiveAllStockData : Finished Queue  - ' + interval);
@@ -116,7 +119,12 @@ async function syncAllUpstoxData(list){
 
 //Get Percentage change 
 async function getPercent_list(list){ 
-    console.log("getPercent_list  % " + list.length);
+    var now = new Date();
+    var india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata"); 
+    var time = india.hour() +"-"+india.minute();
+
+
+    console.log("getPercent_list  % " + time +" :: "+list.length);
     var intervalsArr = ['1DAY','15MINUTE'];
     Promise.all(intervalsArr.map(async (interval) => {  
         return new Promise(function(resolved, rejected) {           
@@ -138,6 +146,7 @@ async function getPercent_list(list){
                     if(dataObj1.symbol == dataObj2.symbol)
                     {
                         var stock1 = [];
+                        //console.log(dataObj1.symbol +" : "+ dataObj1.data);
                         stock1 = JSON.parse(dataObj1.data);
                         stock1.reverse();
                         var stock2 = [];
@@ -147,6 +156,13 @@ async function getPercent_list(list){
                         var percObj = {};
                         percObj.symbol = dataObj1.symbol;
                         percObj.percentage = perc;
+                        if(time == "9-30")
+                            percObj.open = stock2[0].open;
+                        
+                        percObj.low = Math.max((percentageChangeArray[i] && percentageChangeArray[i].low) ? percentageChangeArray[i].low : 0,stock2[0].low);
+                        percObj.close = Number(stock2[0].close);
+                        percObj.high = Math.max((percentageChangeArray[i] && percentageChangeArray[i].high) ? percentageChangeArray[i].high : 0,stock2[0].high);
+
                         percentageChangeArray.push(percObj);
                         //console.log(dataObj1.symbol +" : "+ perc);
                         stock1 =  stock2 =  null;
@@ -154,6 +170,7 @@ async function getPercent_list(list){
                 }
                 catch(error){ 
                     console.log("getPercent_list Parsing error " +dataObj1.symbol +" : "+ error);
+                    //syncLiveStockDataByInterval([dataObj1.symbol],)
                 }
             }
             percentageChangeArray.sort(function(a, b){return a.percentage - b.percentage});

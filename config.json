@@ -204,204 +204,354 @@
   "percentage": [
     {
       "symbol": "GAIL",
-      "percentage": "0.68"
+      "percentage": "0.68",
+      "low": 346.85,
+      "close": 350,
+      "high": 350.1
     },
     {
       "symbol": "NTPC",
-      "percentage": "0.45"
+      "percentage": "0.45",
+      "low": 132.85,
+      "close": 135.3,
+      "high": 135.4
     },
     {
       "symbol": "ADANIPORTS",
-      "percentage": "0.44"
+      "percentage": "0.44",
+      "low": 377.25,
+      "close": 379.8,
+      "high": 379.8
     },
     {
       "symbol": "IBULHSGFIN",
-      "percentage": "0.29"
+      "percentage": "0.29",
+      "low": 848.5,
+      "close": 860.7,
+      "high": 862.9
     },
     {
       "symbol": "TITAN",
-      "percentage": "0.28"
+      "percentage": "0.28",
+      "low": 1136,
+      "close": 1145.1,
+      "high": 1151.5
     },
     {
       "symbol": "GRASIM",
-      "percentage": "0.24"
+      "percentage": "0.24",
+      "low": 855.5,
+      "close": 860,
+      "high": 861
     },
     {
       "symbol": "VEDL",
-      "percentage": "0.19"
+      "percentage": "0.19",
+      "low": 184.15,
+      "close": 184.8,
+      "high": 185
     },
     {
       "symbol": "ONGC",
-      "percentage": "0.19"
+      "percentage": "0.19",
+      "low": 159.3,
+      "close": 160.05,
+      "high": 162.3
     },
     {
       "symbol": "DRREDDY",
-      "percentage": "0.17"
+      "percentage": "0.17",
+      "low": 2777.5,
+      "close": 2785,
+      "high": 2785.95
     },
     {
       "symbol": "M&M",
-      "percentage": "0.16"
+      "percentage": "0.16",
+      "low": 673.05,
+      "close": 675,
+      "high": 675.75
     },
     {
       "symbol": "TECHM",
-      "percentage": "0.06"
+      "percentage": "0.06",
+      "low": 774.65,
+      "close": 776.4,
+      "high": 777
     },
     {
       "symbol": "BPCL",
-      "percentage": "0.06"
+      "percentage": "0.06",
+      "low": 397.3,
+      "close": 397.8,
+      "high": 398.9
     },
     {
       "symbol": "INDUSINDBK",
-      "percentage": "0.06"
+      "percentage": "0.06",
+      "low": 1771.05,
+      "close": 1781,
+      "high": 1787
     },
     {
       "symbol": "ULTRACEMCO",
-      "percentage": "0.01"
+      "percentage": "0.01",
+      "low": 3990.1,
+      "close": 3998.7,
+      "high": 4009
     },
     {
       "symbol": "KOTAKBANK",
-      "percentage": "0.00"
+      "percentage": "0.00",
+      "low": 1330,
+      "close": 1334.5,
+      "high": 1338
     },
     {
       "symbol": "WIPRO",
-      "percentage": "0.00"
+      "percentage": "0.00",
+      "low": 254.55,
+      "close": 254.8,
+      "high": 255
     },
     {
       "symbol": "IOC",
-      "percentage": "0.00"
+      "percentage": "0.00",
+      "low": 162.5,
+      "close": 162.85,
+      "high": 163.1
     },
     {
       "symbol": "JSWSTEEL",
-      "percentage": "0.00"
+      "percentage": "0.00",
+      "low": 292,
+      "close": 293.05,
+      "high": 294.8
     },
     {
       "symbol": "RELIANCE",
-      "percentage": "-0.01"
+      "percentage": "-0.01",
+      "low": 1362.6,
+      "close": 1363.05,
+      "high": 1366.9
     },
     {
       "symbol": "MARUTI",
-      "percentage": "-0.01"
+      "percentage": "-0.01",
+      "low": 6648.15,
+      "close": 6672,
+      "high": 6687.7
     },
     {
       "symbol": "HINDUNILVR",
-      "percentage": "-0.02"
+      "percentage": "-0.02",
+      "low": 1705.1,
+      "close": 1706.5,
+      "high": 1711
     },
     {
       "symbol": "BAJAJFINSV",
-      "percentage": "-0.03"
+      "percentage": "-0.03",
+      "low": 7028.65,
+      "close": 7035,
+      "high": 7060
     },
     {
       "symbol": "HEROMOTOCO",
-      "percentage": "-0.04"
+      "percentage": "-0.04",
+      "low": 2547.25,
+      "close": 2552.1,
+      "high": 2560
     },
     {
       "symbol": "HCLTECH",
-      "percentage": "-0.04"
+      "percentage": "-0.04",
+      "low": 1084.8,
+      "close": 1087,
+      "high": 1091.9
     },
     {
       "symbol": "HINDPETRO",
-      "percentage": "-0.05"
+      "percentage": "-0.05",
+      "low": 282.9,
+      "close": 283.7,
+      "high": 284.5
     },
     {
       "symbol": "SBIN",
-      "percentage": "-0.06"
+      "percentage": "-0.06",
+      "low": 320.45,
+      "close": 320.55,
+      "high": 321.9
     },
     {
       "symbol": "TCS",
-      "percentage": "-0.08"
+      "percentage": "-0.08",
+      "low": 1994.6,
+      "close": 2000,
+      "high": 2005
     },
     {
       "symbol": "UPL",
-      "percentage": "-0.09"
+      "percentage": "-0.09",
+      "low": 956,
+      "close": 958,
+      "high": 962.6
     },
     {
       "symbol": "POWERGRID",
-      "percentage": "-0.10"
+      "percentage": "-0.10",
+      "low": 196.9,
+      "close": 197.7,
+      "high": 198.2
     },
     {
       "symbol": "TATASTEEL",
-      "percentage": "-0.10"
+      "percentage": "-0.10",
+      "low": 518.5,
+      "close": 520.5,
+      "high": 522.05
     },
     {
       "symbol": "HDFCBANK",
-      "percentage": "-0.13"
+      "percentage": "-0.13",
+      "low": 2310.7,
+      "close": 2316,
+      "high": 2324.95
     },
     {
       "symbol": "TATAMOTORS",
-      "percentage": "-0.14"
+      "percentage": "-0.14",
+      "low": 173.65,
+      "close": 174,
+      "high": 175
     },
     {
       "symbol": "BAJFINANCE",
-      "percentage": "-0.15"
+      "percentage": "-0.15",
+      "low": 3018.15,
+      "close": 3020.5,
+      "high": 3032
     },
     {
       "symbol": "EICHERMOT",
-      "percentage": "-0.15"
+      "percentage": "-0.15",
+      "low": 20500,
+      "close": 20516,
+      "high": 20560
     },
     {
       "symbol": "YESBANK",
-      "percentage": "-0.22"
+      "percentage": "-0.22",
+      "low": 273.6,
+      "close": 274.5,
+      "high": 275
     },
     {
       "symbol": "HDFC",
-      "percentage": "-0.22"
+      "percentage": "-0.22",
+      "low": 1963.4,
+      "close": 1964,
+      "high": 1972
     },
     {
       "symbol": "SUNPHARMA",
-      "percentage": "-0.22"
+      "percentage": "-0.22",
+      "low": 477.4,
+      "close": 477.8,
+      "high": 479
     },
     {
       "symbol": "INFY",
-      "percentage": "-0.23"
+      "percentage": "-0.23",
+      "low": 742,
+      "close": 742.15,
+      "high": 744.6
     },
     {
       "symbol": "ITC",
-      "percentage": "-0.24"
+      "percentage": "-0.24",
+      "low": 296.15,
+      "close": 296.55,
+      "high": 297.4
     },
     {
       "symbol": "LT",
-      "percentage": "-0.25"
+      "percentage": "-0.25",
+      "low": 1380.5,
+      "close": 1381.85,
+      "high": 1386.5
     },
     {
       "symbol": "INFRATEL",
-      "percentage": "-0.26"
+      "percentage": "-0.26",
+      "low": 312.6,
+      "close": 312.6,
+      "high": 314.25
     },
     {
       "symbol": "CIPLA",
-      "percentage": "-0.27"
+      "percentage": "-0.27",
+      "low": 527.25,
+      "close": 527.45,
+      "high": 529.9
     },
     {
       "symbol": "ASIANPAINT",
-      "percentage": "-0.28"
+      "percentage": "-0.28",
+      "low": 1488.1,
+      "close": 1488.5,
+      "high": 1493.85
     },
     {
       "symbol": "AXISBANK",
-      "percentage": "-0.28"
+      "percentage": "-0.28",
+      "low": 774.55,
+      "close": 775.1,
+      "high": 778.75
     },
     {
       "symbol": "HINDALCO",
-      "percentage": "-0.29"
+      "percentage": "-0.29",
+      "low": 204.9,
+      "close": 204.9,
+      "high": 206.25
     },
     {
       "symbol": "ICICIBANK",
-      "percentage": "-0.30"
+      "percentage": "-0.30",
+      "low": 399.1,
+      "close": 399.3,
+      "high": 400.95
     },
     {
       "symbol": "COALINDIA",
-      "percentage": "-0.32"
+      "percentage": "-0.32",
+      "low": 236.05,
+      "close": 236.45,
+      "high": 239.25
     },
     {
       "symbol": "BHARTIARTL",
-      "percentage": "-0.41"
+      "percentage": "-0.41",
+      "low": 331.5,
+      "close": 331.75,
+      "high": 334.25
     },
     {
       "symbol": "BAJAJ-AUTO",
-      "percentage": "-0.48"
+      "percentage": "-0.48",
+      "low": 2895,
+      "close": 2897,
+      "high": 2921.4
     },
     {
       "symbol": "ZEEL",
-      "percentage": "-0.49"
+      "percentage": "-0.49",
+      "low": 442.55,
+      "close": 443.3,
+      "high": 446.9
     }
   ],
-  "tokenValidity": "2019-03-31T03:35:05.122Z"
+  "tokenValidity": "2019-04-01T03:35:05.974Z"
 }
