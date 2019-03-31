@@ -125,7 +125,7 @@ async function applyStrategy(list,interval,strategy){
                 e = base = null;
             }
         });       
-       // return arr;
+      
         Promise.all(arr).then(a=>
         {
             console.log("Strategy result  > " +today +" : "+strategy.name+" : "+ interval +" : "+ matchSymbols);
