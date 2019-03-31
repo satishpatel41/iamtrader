@@ -585,7 +585,7 @@ if (cluster.isMaster) {
         var interval = req.params.interval;  
         
         new Promise(function(resolved, rejected) {
-            var data = getStock(symbol,interval);    
+            var data = getStockDataFromDb(symbol,interval);    
             resolved(data); 
         }).then(stockData => {
             var inputRSI = {
@@ -647,7 +647,7 @@ if (cluster.isMaster) {
 
         Promise.all(list.map(async (x) =>  {
             var symbol = x.symbol ? x.symbol:x;    
-            return getStock(symbol,interval);          
+            return getStockDataFromDb(symbol,interval);          
             })).then(stockData => {
                 var inputRSI = {
                     values : [],

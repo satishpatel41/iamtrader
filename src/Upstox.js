@@ -25,7 +25,7 @@ function getAcceToken(code)
     
     upstox.getAccessToken(params)
         .then(function (response) {
-            params = api_secret = code = null;
+            params = code = null;
                 
             accessToken = response.access_token;
             //store.set('accessToken', accessToken); 
@@ -42,10 +42,9 @@ function getAcceToken(code)
                 'second' : 05
              });
      
-
             store.set('tokenValidity', india); 
 
-            console.log("****accessToken*\n" +accessToken);
+            console.log("accessToken : " +accessToken);
             upstox.setToken(accessToken);
             
             start();

@@ -101,7 +101,7 @@ async function applyStrategy(list,interval,strategy){
     var matchSymbols = [];
     return Promise.all(list.map(async (x) =>  {
     var symbol = x.symbol ? x.symbol:x;    
-    return getStock(symbol,interval);          
+    return getStockDataFromDb(symbol,interval);          
     })).then(stockData => {
         var arr = stockData.map(async (dataObj) =>  {
             try{
@@ -139,13 +139,13 @@ async function applyStrategy(list,interval,strategy){
             return {strategy:strategy.name,matchSymbols:matchSymbols};
         })
         .catch(err => {
-            console.log("applyStrategy error 1  " + err);
+            //console.log("applyStrategy error 1  " + err);
             err =null;
         });
                     
     })
     .catch(error => { 
-        console.log("applyStrategy error  2  " + err);
+        //console.log("applyStrategy error  2  " + err);
         error =null;
     }); 
 }

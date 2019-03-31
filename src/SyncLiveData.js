@@ -1,80 +1,12 @@
 var fs = require('fs');
 var path = require('path');
-var async = require("async");
+
 var loki  = require( 'lokijs' );
-var intervalsArr =['1DAY','15MINUTE'];// ['1WEEK','1DAY','60MINUTE','30MINUTE','15MINUTE','10MINUTE','5MINUTE'];//'1MONTH',
+var intervalsArr =['1DAY','15MINUTE'];//
+var allIntervalsArr = ['1MONTH','1WEEK','1DAY','60MINUTE','30MINUTE','15MINUTE','10MINUTE','5MINUTE'];//
 var database;
 
-var queue = async.queue(function(task, callback) {
-   
-    if(task.symbol){
-        var symbolfile;
-        try{      
-            symbolfile = path.resolve(path.join(__dirname, '..', 'db/stock/'+task.interval+'/'+task.symbol+'.db'));
-        }
-        catch(e){
-            console.log("symbolfile Error > " + e);
-        }
 
-        var lokiJson = new loki(symbolfile, 
-        {
-            autoload: true,
-            autoloadCallback : loadHandler,
-            autosave: true, 
-            autosaveInterval: 10000
-        }); 
-        
-        function loadHandler() {
-            var database = lokiJson.getCollection(task.symbol);
-            if(!database){
-                database = lokiJson.addCollection(task.symbol);
-            }  
-            var stockData = [];
-
-            if(task.ex == null || task.ex == undefined || task.ex == '')
-                task.ex = "NSE_EQ";
-            
-            loadSymbol(task.symbol,task.ex,task.interval,task.start_date,task.end_date).then(function (response) {
-                try {
-                        if(response != '' && response != undefined && response != null){
-                            stockData = response;
-                           /*  if(response.error){
-                                database.clear();
-                                lokiJson.close(); 
-                                //callback();         
-                                console.log('Queue error ' + task.symbol +" :: "+task.ex +" :: "+JSON.stringify(response.error));
-                            }
-                            else  */
-                            if(database.get(1) && database.get(1).data && database.get(1).data.timestamp && database.get(1).data.timestamp === response.timestamp){
-                                console.log('Do nothing   ' +task.interval+"> "+ task.symbol);
-                            }
-                            else{
-                               // console.log('UPDATE   ' +task.interval+"> "+ task.symbol);
-                                database.clear();
-                                database.insert(stockData);      
-                            }
-                            lokiJson.saveDatabase();   
-                            lokiJson.close(); 
-                            callback();         
-                        } 
-                        else{
-                            lokiJson.close();    
-                            callback();     
-                        }
-                      
-                        symbolfile = task = stockData = response = null;
-                    
-                  } catch (err) {
-                    lokiJson.close();    
-                    console.log("loadHandler queue : err   > " + err);
-                    symbolfile = task = err = null;
-                    callback();    
-                    //return err;
-                  }
-            });
-        }  
-    } 
-},7);
 
 async function syncLiveAllStockData(list,interval,start_date,end_date){ 
     console.log('syncLiveAllStockData  - ' + list.length);
@@ -91,7 +23,14 @@ async function syncLiveAllStockData(list,interval,start_date,end_date){
 
 //Sync Upstox data on first load
 async function syncAllUpstoxData(list){ 
-    await intervalsArr.map(async (interval) =>  {
+    var today= new Date();
+    var intervals = intervalsArr;
+    if(today.getDay() == 0 || today.getDay() == 6)
+    {
+        intervals = allIntervalsArr;
+    }
+
+    await intervals.map(async (interval) =>  {
         console.log('syncAllUpstoxData :  interval  - ' + interval);
         await list.map(async (x) =>  {
             var symbol = x.symbol ? x.symbol:x;        
@@ -128,7 +67,7 @@ async function getPercent_list(list){
     Promise.all(intervalsArr.map(async (interval) => {  
         return new Promise(function(resolved, rejected) {           
             Promise.all(list.map(async (x) =>  {
-                return getStock(x.symbol ? x.symbol:x,interval);          
+                return getStockDataFromDb(x.symbol ? x.symbol:x,interval);          
             })).then(stockData => {
                 resolved(stockData);
             })
@@ -190,7 +129,7 @@ async function getDefaultIndicatorsValues(list,interval){
     var matchSymbols = [];
     Promise.all(list.map(async (x) =>  {
     var symbol = x.symbol ? x.symbol:x;    
-    return getStock(symbol,interval);          
+    return getStockDataFromDb(symbol,interval);          
     })).then(stockData => {
         var arr = stockData.map(async (dataObj) =>  {
             try{
@@ -211,7 +150,7 @@ async function getDefaultIndicatorsValues(list,interval){
 async function backTesting(symbol,interval,strategy,isbackTesting){ 
     var matchDates = [];
     return new Promise(function(resolved, rejected) {           
-        var arr =  getStock(symbol,interval); 
+        var arr =  getStockDataFromDb(symbol,interval); 
         resolved(arr);  
     }).then(stockData => {
             try{
@@ -253,7 +192,7 @@ async function syncLiveStockDataByInterval(list,interval){
 }
 
 function getStockDataByInterval(symbol,interval,strategy){ 
-    getStock(symbol,interval)
+    getStockDataFromDb(symbol,interval)
     .then(dataObj  => {
         //console.log("symbol  "+dataObj.symbol);
        var data = JSON.parse(dataObj.data); 
@@ -262,47 +201,3 @@ function getStockDataByInterval(symbol,interval,strategy){
     }).catch(error => console.log(error));  
 }
 
-function getStock(symbol,interval)
-{
-    return new Promise((resolve, reject)=>{
-        var symbolfile;
-        try{      
-            symbolfile = path.resolve(path.join(__dirname, '..', 'db/stock/'+interval+'/'+symbol+'.db'));
-        }
-        catch(e){
-            console.log("getStock > Error > " + e);
-            reject(e);
-            e = null;
-        }
-        var lokiJson = new loki(symbolfile, 
-        {
-            autoload: true,
-            autoloadCallback : loadHandler,
-            autosave: true, 
-            autosaveInterval: 10000
-        }); 
-        
-        function loadHandler() {
-            var database = lokiJson.getCollection(symbol);
-            if(!database){
-                database = lokiJson.addCollection(symbol);
-            }  
-                   
-            try{
-               // console.log("\n \n  loadHandler > " +symbol +" >> "+ database.get(1));  
-                if(database.get(1) && database.get(1).data && database.get(1).data)
-                    resolve({"symbol":symbol,data:JSON.stringify(database.get(1).data)});
-                else
-                    resolve({"symbol":symbol,data:[]}); 
-
-
-                lokiJson.close();    
-            }
-            catch(e){
-                lokiJson.close();
-                reject(e);
-                e = null;
-            }   
-        } 
-    }); 
-}
