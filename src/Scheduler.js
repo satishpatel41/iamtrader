@@ -38,9 +38,9 @@ timezone: "Asia/Kolkata"
 });
 
 cron.schedule('59 23 * * *', () => {
-    store.unlink();
+    //store.unlink();
     //store.set('accessToken', ''); 
-    console.log(chalk.yellow('Clean cache data'));
+    //console.log(chalk.yellow('Clean cache data'));
 }, {
 scheduled: true,
 timezone: "Asia/Kolkata"

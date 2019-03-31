@@ -52,7 +52,7 @@ function getAcceToken(code)
             //res.sendFile("index.html", {"root": __dirname});
         })
         .catch(function (err) {
-            console.log( "getAccessToken > " + err);
+            console.log( "getAccessToken Error > " + JSON.stringify(err));
         });
 }
 

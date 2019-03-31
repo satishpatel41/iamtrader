@@ -173,6 +173,7 @@ if (cluster.isMaster) {
         res.send(store.get('percentage'));
     });
 
+    
     app.post('/signup', function (req, res) {
         var email = req.body.email;
         var psw = req.body.psw;
