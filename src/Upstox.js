@@ -206,24 +206,7 @@ function start() {
 var nseSymbolList = [];
 function getListOfAllSymbol()
 {
-  /*  upstox.getMasterContract({ exchange: "nse_eq",format:"json" })
-    .then(function (response) {
-        var list = response.data;
-        nseSymbolList.forEach(function(item) {   
-            if(item.SYMBOL)
-                nseSymbolList.push({ex:"NSE_FO", symbol:item.SYMBOL});
-            else if(item.Symbol)
-                nseSymbolList.push({ex:"NSE_EQ", symbol:item.Symbol});
-            
-        });
-
-        store.set('nseSymbolList', nseSymbolList); 
-        //getAllData();
-     })
-     .catch(function (err) {
-        console.log( "Error getListOfAllSymbol > " +  JSON.stringify(err));
-         //getAllData();
-    });  */
+    return store.get('niftyList'); 
 }
 
 // Get Balance

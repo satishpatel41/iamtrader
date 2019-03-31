@@ -123,7 +123,6 @@ async function getPercent_list(list){
     var india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata"); 
     var time = india.hour() +"-"+india.minute();
 
-
     console.log("getPercent_list  % " + time +" :: "+list.length);
     var intervalsArr = ['1DAY','15MINUTE'];
     Promise.all(intervalsArr.map(async (interval) => {  

@@ -64,7 +64,7 @@ if (cluster.isMaster) {
                 saveUninitialized: false,
                 secret: "00777",
                 cookie: {
-                    maxAge: 1000 * 60 * 60 * 1//24
+                    maxAge: 1000 * 60 * 60 * 8//24
                 }
             }    
         ));
@@ -637,12 +637,12 @@ if (cluster.isMaster) {
         var exchange = req.params.exchange;  
 
         var list = [];
-        if(exchange == "nifty")
+        //if(exchange == "nifty")
             list =  store.get('niftyList');
-        else if(exchange == "fno")
+        /* else if(exchange == "fno")
             list = store.get('fnoList');
         else
-            list = store.get('nseSymbolList');
+            list = store.get('nseSymbolList'); */
 
 
         Promise.all(list.map(async (x) =>  {
