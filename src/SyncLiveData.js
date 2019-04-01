@@ -2,20 +2,18 @@ var fs = require('fs');
 var path = require('path');
 
 var loki  = require( 'lokijs' );
-var intervalsArr =['1DAY','15MINUTE'];//
-var allIntervalsArr = ['1MONTH','1WEEK','1DAY','60MINUTE','30MINUTE','15MINUTE','10MINUTE','5MINUTE'];//
+var intervalsArr =['15MINUTE','1DAY'];
+var allIntervalsArr = ['15MINUTE','1DAY','1MONTH','1WEEK','60MINUTE','30MINUTE','10MINUTE','5MINUTE'];
 var database;
 
-
-
 async function syncLiveAllStockData(list,interval,start_date,end_date){ 
-    console.log('syncLiveAllStockData  - ' + list.length);
+    //console.log('syncLiveAllStockData  - ' + list.length);
     list.map(async (x) =>  {
         var symbol = x.symbol ? x.symbol:x;        
         var ex = x.ex;      
         //console.log('syncLiveAllStockData : Finished Queue  - ' + symbol +" :: "+ ex);
         queue.push({symbol: symbol,ex:ex,interval:interval,start_date:start_date,end_date:end_date}, function (err) {
-            //  console.log('SyncLiveAllStockData : Finished Queue  - ' + interval);
+            //console.log('syncLiveAllStockData : Finished Queue  - ' + interval);
         });
         x = symbol = ex= null;
     });        
@@ -31,7 +29,7 @@ async function syncAllUpstoxData(list){
     }
 
     await intervals.map(async (interval) =>  {
-        console.log('syncAllUpstoxData :  interval  - ' + interval);
+       // console.log('syncAllUpstoxData :  interval  - ' + interval);
         await list.map(async (x) =>  {
             var symbol = x.symbol ? x.symbol:x;        
             var ex = x.ex;      
@@ -50,7 +48,7 @@ async function syncAllUpstoxData(list){
         
 
             await queue.push({symbol:symbol,ex:ex,interval:interval,start_date:start_date,end_date:end_date}, function (err) {
-                //console.log('SyncLiveAllStockData : Finished Queue  - ' + interval);
+                //console.log('syncAllUpstoxData : Finished Queue  - ' + interval);
             });
         }); 
     });          
@@ -186,7 +184,7 @@ async function syncLiveStockDataByInterval(list,interval){
         var symbol = x.symbol ? x.symbol:x;    
         var ex = x.ex;        
         queue.push({symbol:symbol,ex:ex,interval:interval}, function (err) {
-            //console.log('syncLiveStockDataByInterval : Finished Queue' + interval);
+           console.log('syncLiveStockDataByInterval : Finished Queue' + interval);
         });       
     }); 
 }

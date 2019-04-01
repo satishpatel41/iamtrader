@@ -43,10 +43,8 @@ function getAcceToken(code)
              });
      
             store.set('tokenValidity', india); 
-
             console.log("accessToken : " +accessToken);
             upstox.setToken(accessToken);
-            
             start();
             //res.sendFile("index.html", {"root": __dirname});
         })
@@ -59,6 +57,8 @@ function getAcceToken(code)
 function start() {
     //console.log( 'start');
     // an example using an object instead of an array
+    queue.empty();
+
     async.parallel({
         getProfile,
         getBalance,
@@ -269,7 +269,74 @@ async function loadSymbol(symbol,exchange,interval='1day',start_date='',end_date
 }
 
 function getAllData(){
-    var p1= new Promise(function(resolve, reject) {
+    queue.empty();
+
+
+    let promise = new Promise(function(resolve, reject) {
+        syncAllUpstoxData(watchList);
+        setTimeout(function() {
+            resolve(1);
+        }, 20000);
+          
+    }).then(res=>{
+        console.log("syncAllUpstoxData - Process  " + res);
+        return Number(res) + 1;
+    });
+
+    promise.then(function(result)  {
+        strategyStrongList.map(async(strategy)=>{
+            applyStrategy(watchList,'1DAY',strategy); 
+        });
+       // console.log("strategyStrongList - applyStrategy " + result);
+        return Number(result) + 1;
+    });
+
+    promise.then(function(result)  {
+        strategyWeakList.map(async(strategy)=>{
+            applyStrategy(watchList,'1DAY',strategy); 
+        });
+        //console.log("strategyWeakList - applyStrategy " + result);
+        return Number(result) + 1;
+    });
+
+    promise.then(function(result)  {
+        getPercent_list(watchList);
+        //console.log("getPercent_list  " + result);
+    });
+
+
+    /* async.series([
+        function(callback){ 
+            syncAllUpstoxData(watchList);
+            setTimeout(function() {
+                callback(null, 1);
+            }, 10000);
+        },
+        function(callback){ 
+            strategyStrongList.map(async(strategy)=>{
+                applyStrategy(watchList,'1DAY',strategy); 
+            });
+            callback(null, 2);
+         },
+         function(callback){ 
+            strategyWeakList.map(async(strategy)=> {
+                applyStrategy(watchList,'1DAY',strategy); 
+            });
+            callback(null, 3);
+         },
+         function(callback){ 
+             getPercent_list(watchList);
+             callback(null, 4);
+        }
+    ],
+    // optional callback
+    function(err, results) {
+        // results is now equal to ['one', 'two']
+        console.log(results);
+    }); */
+
+
+    /* var p1= new Promise(function(resolve, reject) {
         resolve(syncAllUpstoxData(watchList))
     }).then(function(result) {
         return strategyStrongList.map(strategy =>{
@@ -281,7 +348,7 @@ function getAllData(){
        })
     }).then(function(result) {
         return getPercent_list(watchList);    
-    });
+    }); */
 }
 
 var stockData = []; 

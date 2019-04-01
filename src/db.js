@@ -154,3 +154,8 @@ var queue = async.queue(function(task, callback) {
         }  
     } 
 },10);
+
+// assign a callback
+queue.drain = function() {
+    console.log('all items have been processed');
+};

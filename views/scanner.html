@@ -69,8 +69,6 @@ $(document).ready( function () {
         };
 
           $.get({
-          //  data: JSON.stringify(reqObj),
-           // contentType: 'application/json',
             url: server+'/getDefaultIndicators/'+interval+'/'+exchange,
             success: function(response){
                   $(".loader").hide();
@@ -98,12 +96,12 @@ $(document).ready( function () {
                     ],  
                     columns:[
                         //{title:"Date", field:"timestamp"},
-                        {title:"Symbol", field:"symbol"},
-                        {title:"Close", field:"close"},
-                        {title:"Volume", field:"volume"},
-                        {title:"RSI", field:"rsi"},
-                        {title:"SMA", field:"sma"},
-                        {title:"Bolinger Band", field:"bb.isCrossed"}
+                        {title:"Symbol", field:"symbol",width:90,widthShrink:1},
+                        {title:"Close", field:"close",width:70,widthShrink:1},
+                        {title:"RSI", field:"rsi",width:60,widthShrink:1},
+                        {title:"SMA", field:"sma",width:60,widthShrink:1},
+                        {title:"Volume", field:"volume",width:60,widthShrink:1},          
+                        {title:"Bolinger Band", field:"bb.isCrossed",width:60,widthShrink:1}
                     ]
                 });
             }

@@ -4,9 +4,9 @@ var list;
 var moment = require('moment-timezone');
 
 
-cron.schedule('*/10 * * * *', () => {
-    //load10minData();
-    console.log(chalk.blue('running a task every 10 minutes'));
+cron.schedule('*/5 * * * *', () => {
+    //load5minData();
+    console.log(chalk.blue('running a task every 5 minutes'));
 }, {
 scheduled: true,
 timezone: "Asia/Kolkata"
@@ -46,8 +46,8 @@ scheduled: true,
 timezone: "Asia/Kolkata"
 });
 //9:30
-//cron.schedule('30 9 * * *', () => {
-cron.schedule('59 14 * * *', () => {
+cron.schedule('30 9 * * *', () => {
+//cron.schedule('30 14 * * *', () => {
     console.log('Good morning : 9:30 call');
     var interval = '15MINUTE';
 
@@ -123,6 +123,7 @@ var start_date = formatDate(india.date())+"-"+formatDate(india.month() + 1)+"-"+
 
 function load60minData()
 {
+    queue.empty();
     var interval = '60MINUTE';
     //if(store.get('accessToken')){   
         //syncLiveAllStockData(watchList,interval,start_date,end_date); 
@@ -131,6 +132,7 @@ function load60minData()
 
 function load30minData()
 { 
+    queue.empty();
     var interval = '30MINUTE';
     //if(store.get('accessToken')){    
         //syncLiveAllStockData(watchList,interval,start_date,end_date); 
@@ -139,6 +141,7 @@ function load30minData()
 
 function load10minData()
 {
+    queue.empty();
      var interval = '10MINUTE';   
     //if(store.get('accessToken')){    
       //syncLiveAllStockData(watchList,interval,start_date,end_date); 
@@ -147,29 +150,59 @@ function load10minData()
 
 function load5minData()
 {
-     var interval = '5MINUTE';
-    //if(store.get('accessToken')){
-       // syncLiveAllStockData(watchList,interval,start_date,end_date); 
-    //} 
-    //getPercent_list(watchList);   
+    var interval = '15MINUTE';
+    queue.empty();
 
-    /* strategyList.map(strategy =>{
-        applyStrategy(watchList,'5MINUTE',strategy); 
-    }); */
+    let promise = new Promise(function(resolve, reject) {
+        syncLiveAllStockData(watchList,interval,start_date,end_date);
+        setTimeout(function() {
+            resolve(1);
+        }, 10000);      
+    }).then(res=>{
+        //console.log("load15minData - Process p  " + res);
+        return Number(res) + 1;
+    });
+
+    promise.then(function(result)  {
+        strategyList.map(strategy =>{
+            applyStrategy(watchList,'15MINUTE',strategy); 
+        });
+        //console.log("load15minData " + result);
+        return Number(result) + 1;
+    });
+
+    promise.then(function(result)  {
+        getPercent_list(watchList);
+        //console.log("load15minData  " + result);
+    });
 }
 
 
 function load15minData()
 {   
     var interval = '15MINUTE';
+    queue.empty();
 
-    var p2= new Promise(function(resolve, reject) {
-        resolve( syncLiveAllStockData(watchList,interval,start_date,end_date))
-    }).then(function(result) {
-        return  strategyList.map(strategy =>{
-        applyStrategy(watchList,'15MINUTE',strategy); 
+    let promise = new Promise(function(resolve, reject) {
+        syncLiveAllStockData(watchList,interval,start_date,end_date);
+        setTimeout(function() {
+            resolve(1);
+        }, 10000);      
+    }).then(res=>{
+        //console.log("load15minData - Process p  " + res);
+        return Number(res) + 1;
     });
-    }).then(function(result) {
-        return getPercent_list(watchList);    
+
+    promise.then(function(result)  {
+        strategyList.map(strategy =>{
+            applyStrategy(watchList,'15MINUTE',strategy); 
+        });
+       // console.log("load15minData " + result);
+        return Number(result) + 1;
+    });
+
+    promise.then(function(result)  {
+        getPercent_list(watchList);
+       // console.log("load15minData  " + result);
     });
 }
