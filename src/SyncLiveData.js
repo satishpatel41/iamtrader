@@ -2,8 +2,9 @@ var fs = require('fs');
 var path = require('path');
 
 var loki  = require( 'lokijs' );
-var intervalsArr =['15MINUTE','1DAY'];
-var allIntervalsArr = ['15MINUTE','1DAY','1MONTH','1WEEK','60MINUTE','30MINUTE','10MINUTE','5MINUTE'];
+var intervalsArr =['1MINUTE','15MINUTE','1DAY'];
+var allIntervalsArr = ['15MINUTE','1DAY','1MONTH','1WEEK','60MINUTE','30MINUTE','10MINUTE','5MINUTE','3MINUTE','1MINUTE'];
+
 var database;
 
 async function syncLiveAllStockData(list,interval,start_date,end_date){ 
@@ -11,9 +12,9 @@ async function syncLiveAllStockData(list,interval,start_date,end_date){
     list.map(async (x) =>  {
         var symbol = x.symbol ? x.symbol:x;        
         var ex = x.ex;      
-        //console.log('syncLiveAllStockData : Finished Queue  - ' + symbol +" :: "+ ex);
+        //console.log('syncLiveAllStockData : Finished Queue  - ' + symbol +" :: "+ interval);
         queue.push({symbol: symbol,ex:ex,interval:interval,start_date:start_date,end_date:end_date}, function (err) {
-            //console.log('syncLiveAllStockData : Finished Queue  - ' + interval);
+           // console.log('syncLiveAllStockData : Finished Queue  - ' + interval);
         });
         x = symbol = ex= null;
     });        
@@ -21,9 +22,10 @@ async function syncLiveAllStockData(list,interval,start_date,end_date){
 
 //Sync Upstox data on first load
 async function syncAllUpstoxData(list){ 
-    var today= new Date();
-    var intervals = intervalsArr;
-    if(today.getDay() == 0 || today.getDay() == 6)
+    var now= new Date();
+    var india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata"); 
+    var intervals = intervalsArr; 
+    if(india.day() == 0 || india.day() == 6 || india.hour() >= 18 || india.hour() <= 9)
     {
         intervals = allIntervalsArr;
     }
@@ -37,8 +39,14 @@ async function syncAllUpstoxData(list){
             var now = new Date();
             var india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata"); 
             var end_date = formatDate(india.date())+"-"+formatDate(india.month() + 1)+"-"+india.year();
-            if(interval == '1DAY')
+            if(interval == '1DAY' || interval == '1MONTH' || interval == '1WEEK')
                 now.setDate(now.getDate() - 22);
+            else if(interval == '30MINUTE' || interval == '60MINUTE')
+                now.setDate(now.getDate() - 3);
+            else if(interval == '15MINUTE')
+                now.setDate(now.getDate() - 2);
+            else if(interval == '5MINUTE' || interval == '3MINUTE' || interval == '1MINUTE')
+                now.setDate(now.getDate() - 1);
             else
                 now.setDate(now.getDate() - 6);
 
@@ -49,6 +57,8 @@ async function syncAllUpstoxData(list){
 
             await queue.push({symbol:symbol,ex:ex,interval:interval,start_date:start_date,end_date:end_date}, function (err) {
                 //console.log('syncAllUpstoxData : Finished Queue  - ' + interval);
+
+                
             });
         }); 
     });          
@@ -58,9 +68,9 @@ async function syncAllUpstoxData(list){
 async function getPercent_list(list){ 
     var now = new Date();
     var india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata"); 
-    var time = india.hour() +"-"+india.minute();
+    var time = india.hour() +":"+india.minute();
 
-    console.log("getPercent_list  % " + time +" :: "+list.length);
+    console.log("getPercent_list  - time : " + time);
     var intervalsArr = ['1DAY','15MINUTE'];
     Promise.all(intervalsArr.map(async (interval) => {  
         return new Promise(function(resolved, rejected) {           
@@ -184,7 +194,7 @@ async function syncLiveStockDataByInterval(list,interval){
         var symbol = x.symbol ? x.symbol:x;    
         var ex = x.ex;        
         queue.push({symbol:symbol,ex:ex,interval:interval}, function (err) {
-           console.log('syncLiveStockDataByInterval : Finished Queue' + interval);
+           //console.log('syncLiveStockDataByInterval : Finished Queue' + interval);
         });       
     }); 
 }

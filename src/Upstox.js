@@ -57,7 +57,7 @@ function getAcceToken(code)
 function start() {
     //console.log( 'start');
     // an example using an object instead of an array
-    queue.empty();
+   //queue.empty();
 
     async.parallel({
         getProfile,
@@ -248,8 +248,11 @@ function getMaster(ex = "nse_fo"){
 } */
 
 async function loadSymbol(symbol,exchange,interval='1day',start_date='',end_date=''){ 
-   //console.log("loadSymbol > " + symbol + " > "+ interval +" > "+exchange +" > "+ start_date +" > "+ end_date+" :: "+ store.get('accessToken'));
+   //console.log("loadSymbol > " + symbol + " > "+accessToken +" :: "+ interval +" > "+exchange +" > "+ start_date +" > "+ end_date);
     //if(store.get('accessToken')){
+
+        upstox.setToken(accessToken);
+
         return new Promise(function(resolved, rejected) {   
             upstox.getOHLC({"exchange": exchange,
                 "symbol": symbol,
@@ -271,15 +274,13 @@ async function loadSymbol(symbol,exchange,interval='1day',start_date='',end_date
 function getAllData(){
     queue.empty();
 
-
     let promise = new Promise(function(resolve, reject) {
         syncAllUpstoxData(watchList);
         setTimeout(function() {
             resolve(1);
-        }, 20000);
+        }, 5000);
           
     }).then(res=>{
-        console.log("syncAllUpstoxData - Process  " + res);
         return Number(res) + 1;
     });
 
@@ -291,7 +292,7 @@ function getAllData(){
         return Number(result) + 1;
     });
 
-    promise.then(function(result)  {
+    /* promise.then(function(result)  {
         strategyWeakList.map(async(strategy)=>{
             applyStrategy(watchList,'1DAY',strategy); 
         });
@@ -302,7 +303,7 @@ function getAllData(){
     promise.then(function(result)  {
         getPercent_list(watchList);
         //console.log("getPercent_list  " + result);
-    });
+    }); */
 
 
     /* async.series([

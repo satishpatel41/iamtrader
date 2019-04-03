@@ -82,10 +82,7 @@ function getStockDataFromDb(symbol,interval)
     }); 
 }
 
-
-
 var queue = async.queue(function(task, callback) {
-   
     if(task.symbol){
         var symbolfile;
         try{      
@@ -153,9 +150,9 @@ var queue = async.queue(function(task, callback) {
             });
         }  
     } 
-},10);
+},200);
 
 // assign a callback
 queue.drain = function() {
-    console.log('all items have been processed');
+   // console.log('all items have been processed');
 };
