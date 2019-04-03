@@ -121,7 +121,7 @@ async function applyStrategy(list,interval,strategy){
                 });
             }
             catch(e){
-                console.log("applyStrategy Error: " + JSON.stringify(e));
+                //console.log("applyStrategy Error: " + JSON.stringify(e));
                 e = base = null;
             }
         });       

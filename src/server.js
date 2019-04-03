@@ -699,7 +699,7 @@ if (cluster.isMaster) {
                       
                     }
                     catch(e){
-                        console.log("stockData.map Error " + e);
+                        //console.log("stockData.map Error " + e);
                     }
                 });    
                 

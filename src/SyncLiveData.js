@@ -53,12 +53,8 @@ async function syncAllUpstoxData(list){
             india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
             india.format(); 
             var start_date = formatDate(india.date())+"-"+formatDate(india.month() + 1)+"-"+india.year();
-        
-
             await queue.push({symbol:symbol,ex:ex,interval:interval,start_date:start_date,end_date:end_date}, function (err) {
-                //console.log('syncAllUpstoxData : Finished Queue  - ' + interval);
-
-                
+                //console.log('syncAllUpstoxData : Finished Queue  - ' + interval);  
             });
         }); 
     });          
@@ -115,7 +111,7 @@ async function getPercent_list(list){
                     }
                 }
                 catch(error){ 
-                    console.log("getPercent_list Parsing error " +dataObj1.symbol +" : "+ error);
+                    //console.log("getPercent_list Parsing error " +dataObj1.symbol +" : "+ error);
                     //syncLiveStockDataByInterval([dataObj1.symbol],)
                 }
             }
