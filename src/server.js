@@ -64,7 +64,7 @@ if (cluster.isMaster) {
                 saveUninitialized: false,
                 secret: "00777",
                 cookie: {
-                    maxAge: 1000 * 60 * 60 * 8//24
+                    maxAge: 1000 * 60 * 60 * 10//24
                 }
             }    
         ));

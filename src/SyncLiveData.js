@@ -3,7 +3,7 @@ var path = require('path');
 
 var loki  = require( 'lokijs' );
 var intervalsArr =['1MINUTE','15MINUTE','1DAY'];
-var allIntervalsArr = ['15MINUTE','1DAY','1MONTH','1WEEK','60MINUTE','30MINUTE','10MINUTE','5MINUTE','3MINUTE','1MINUTE'];
+var allIntervalsArr = ['15MINUTE','1DAY','60MINUTE','30MINUTE','10MINUTE','5MINUTE','3MINUTE','1MONTH','1WEEK'];
 
 var database;
 
@@ -24,14 +24,14 @@ async function syncLiveAllStockData(list,interval,start_date,end_date){
 async function syncAllUpstoxData(list){ 
     var now= new Date();
     var india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata"); 
-    var intervals = intervalsArr; 
-    if(india.day() == 0 || india.day() == 6 || india.hour() >= 18 || india.hour() <= 9)
+    var intervals = allIntervalsArr; 
+   /*  if(india.day() == 0 || india.day() == 6 || india.hour() >= 18 || india.hour() <= 9)
     {
         intervals = allIntervalsArr;
     }
-
+ */
     await intervals.map(async (interval) =>  {
-       // console.log('syncAllUpstoxData :  interval  - ' + interval);
+        console.log('syncAllUpstoxData :  interval  - ' + interval);
         await list.map(async (x) =>  {
             var symbol = x.symbol ? x.symbol:x;        
             var ex = x.ex;      
@@ -39,12 +39,16 @@ async function syncAllUpstoxData(list){
             var now = new Date();
             var india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata"); 
             var end_date = formatDate(india.date())+"-"+formatDate(india.month() + 1)+"-"+india.year();
-            if(interval == '1DAY' || interval == '1MONTH' || interval == '1WEEK')
-                now.setDate(now.getDate() - 22);
+            if(interval == '1MONTH')
+                now.setMonth(now.getMonth() - 202);
+            else if(interval == '1WEEK')
+                now.setDate(now.getDate() - 202 * 7);
+            else if(interval == '1DAY')
+                now.setDate(now.getDate() - 202);    
             else if(interval == '30MINUTE' || interval == '60MINUTE')
-                now.setDate(now.getDate() - 3);
+                now.setDate(now.getDate() - 6);
             else if(interval == '15MINUTE')
-                now.setDate(now.getDate() - 2);
+                now.setDate(now.getDate() - 3);
             else if(interval == '5MINUTE' || interval == '3MINUTE' || interval == '1MINUTE')
                 now.setDate(now.getDate() - 1);
             else

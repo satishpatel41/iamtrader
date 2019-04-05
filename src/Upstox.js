@@ -278,7 +278,7 @@ function getAllData(){
         syncAllUpstoxData(watchList);
         setTimeout(function() {
             resolve(1);
-        }, 5000);
+        }, 47000);
           
     }).then(res=>{
         return Number(res) + 1;

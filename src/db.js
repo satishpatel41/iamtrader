@@ -36,13 +36,12 @@ async function getFirst(query,params){
     })    
 }
 
-
 function getStockDataFromDb(symbol,interval)
 {
     return new Promise((resolve, reject)=>{
         var symbolfile;
         try{      
-            symbolfile = path.resolve(path.join(__dirname, '..', 'db/stock/'+interval+'/'+symbol+'.db'));
+            symbolfile = path.resolve(path.join(__dirname, '..', 'db/stock/'+symbol+'.json'));
         }
         catch(e){
             console.log("getStockDataFromDb > Error > " + e);
@@ -54,18 +53,18 @@ function getStockDataFromDb(symbol,interval)
             autoload: true,
             autoloadCallback : loadHandler,
             autosave: true, 
-            autosaveInterval: 10000
+            autosaveInterval: 4000
         }); 
         
         function loadHandler() {
-            var database = lokiJson.getCollection(symbol);
-            if(!database){
-                database = lokiJson.addCollection(symbol);
-            }  
+            var database = lokiJson.getCollection(interval);
+           /*  if(!database){
+                database = lokiJson.addCollection(interval);
+            }   */
                    
             try{
-               // console.log("\n \n  loadHandler > " +symbol +" >> "+ database.get(1));  
-                if(database.get(1) && database.get(1).data && database.get(1).data)
+               //console.log("getStockDataFromDb > " +symbolfile +" >> "+ interval+" >> "+JSON.stringify(database) );  
+                if(database && database.get(1) && database.get(1).data && database.get(1).data)
                     resolve({"symbol":symbol,data:JSON.stringify(database.get(1).data)});
                 else
                     resolve({"symbol":symbol,data:[]}); 
@@ -83,10 +82,13 @@ function getStockDataFromDb(symbol,interval)
 }
 
 var queue = async.queue(function(task, callback) {
+    var allIntervalsArr = ['15MINUTE','5MINUTE','60MINUTE','30MINUTE','10MINUTE','3MINUTE'];
+
     if(task.symbol){
         var symbolfile;
         try{      
-            symbolfile = path.resolve(path.join(__dirname, '..', 'db/stock/'+task.interval+'/'+task.symbol+'.db'));
+            //symbolfile = path.resolve(path.join(__dirname, '..', 'db/stock/'+task.interval+'/'+task.symbol+'.db'));
+            symbolfile = path.resolve(path.join(__dirname, '..', 'db/stock/'+task.symbol+'.json'));
         }
         catch(e){
             console.log("symbolfile Error > " + e);
@@ -101,9 +103,9 @@ var queue = async.queue(function(task, callback) {
         }); 
         
         function loadHandler() {
-            var database = lokiJson.getCollection(task.symbol);
+            var database = lokiJson.getCollection(task.interval);
             if(!database){
-                database = lokiJson.addCollection(task.symbol);
+                database = lokiJson.addCollection(task.interval);
             }  
             var stockData = [];
 
@@ -121,13 +123,25 @@ var queue = async.queue(function(task, callback) {
                                 console.log('Queue error ' + task.symbol +" :: "+task.ex +" :: "+JSON.stringify(response.error));
                             }
                             else  */
-                            if(database.get(1) && database.get(1).data && database.get(1).data.timestamp && database.get(1).data.timestamp === response.timestamp){
+                            if(database && database.get(1) && database.get(1).data && database.get(1).data.timestamp && database.get(1).data.timestamp === response.timestamp){
                                 console.log('Do nothing   ' +task.interval+"> "+ task.symbol);
                             }
-                            else{
-                               // console.log('UPDATE   ' +task.interval+"> "+ task.symbol);
+                            else if(database && database.get(1) && database.get(1).data) {
+                                //console.log('UPDATE   ' +task.interval+"> "+ task.symbol);
                                 database.clear();
                                 database.insert(stockData);      
+
+                                if(task.interval == "1MINUTE"){
+                                    var intervalNo = parseInt(task.interval);
+                                    allIntervalsArr.map(async (allIntervalsArrObj) =>  {
+                                        await updateCollection(lokiJson,allIntervalsArrObj,stockData.data)
+                                    }); 
+                                    //console.log('UPDATE   ' +task.interval+"> "+ task.symbol);
+                                }
+                            }
+                            else{
+                                lokiJson.close();    
+                                
                             }
                             lokiJson.saveDatabase();   
                             lokiJson.close(); 
@@ -144,14 +158,64 @@ var queue = async.queue(function(task, callback) {
                     lokiJson.close();    
                     console.log("loadHandler queue : err   > " + err);
                     symbolfile = task = err = null;
-                    callback();    
+                    //callback();    
                     //return err;
                   }
             });
         }  
     } 
-},200);
+},50);
 
+
+
+
+function updateCollection(lokiJson,interval,stockData)
+{
+    return new Promise(function(resolve, reject) {
+        //console.log('updateCollection interval  ' +interval);
+        var intervalNo = parseInt(interval);
+        //var stockData = data.slice(-((data.length % intervalNo)));
+        
+        //if(data.length < stockData.length){
+            var database = lokiJson.getCollection(interval);
+            try{
+                if(database && database.get(1) && database.get(1).data && database.get(1).data.timestamp && database.get(1).data.timestamp === response.timestamp){
+                    console.log('Do nothing   ' +interval);
+                }
+                else if(database && database.get(1) && database.get(1).data){
+                    var symbolObj= {};
+                    var count = 0;
+                    for(var i = 0; i < stockData.length;i++)
+                    {
+                        var t = database.get(1).data[database.get(1).data.length - 1].timestamp;
+                        if(stockData[i].timestamp > t)
+                        {
+                            if(count % intervalNo == 0){
+                                symbolObj = stockData[i];
+                                database.get(1).data.push(stockData[i]);
+                                count = 0;
+                                //console.log('edit  ' +interval);
+                            }
+                           
+
+                            database.get(1).data[database.get(1).data.length - 1].low = Math.min((stockData[i] && stockData[i].low) ? stockData[i].low : 0,symbolObj.low);
+                            database.get(1).data[database.get(1).data.length - 1].close = Number(stockData[i].close);
+                            database.get(1).data[database.get(1).data.length - 1].timestamp = Number(stockData[i].timestamp);
+                            database.get(1).data[database.get(1).data.length - 1].high = Math.max((stockData[i] && stockData[i].high) ? stockData[i].high : 0,symbolObj.high);
+                            count++;
+                        }
+
+                    }
+            }
+           
+            resolve(1); 
+            }
+            catch(e){
+                reject(e);
+                e = null;
+            } 
+     });
+}
 // assign a callback
 queue.drain = function() {
    // console.log('all items have been processed');

@@ -18,6 +18,16 @@ fs.createReadStream('data/list/ind_nifty50list.csv')
     watchList =  niftyList.sort();
     store.set('niftyList',niftyList);
     watchList =  niftyList.sort(); 
+
+    /* watchList =[
+      {
+        "ex": "NSE_EQ",
+        "symbol": "ASIANPAINT"
+      },
+      {
+        "ex": "NSE_EQ",
+        "symbol": "IOC"
+      }]; */
   });
 
 

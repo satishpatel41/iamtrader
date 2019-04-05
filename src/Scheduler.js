@@ -37,7 +37,15 @@ scheduled: true,
 timezone: "Asia/Kolkata"
 });
 
-cron.schedule('*/15 * * * *', () => {
+cron.schedule('*/10 * * * *', () => {
+    load10minData();
+    console.log(chalk.blue('running a task every 10 minutes ' + new Date()));
+}, {
+scheduled: true,
+timezone: "Asia/Kolkata"
+});
+
+cron.schedule('*/16 * * * *', () => {
     load15minData();
     console.log(chalk.blue('running a task every 15 minutes ' + new Date()));
 }, {
@@ -100,15 +108,12 @@ scheduled: true,
 timezone: "Asia/Kolkata"
 });
 
-
 function load1WeekData()
 {
     interval = '1WEEK';
     if(accessToken)
     syncLiveAllStockData(watchList,interval,start_date,end_date);  
 }
-
-
 
 function load1dayData()
 {
