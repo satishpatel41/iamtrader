@@ -40,9 +40,9 @@ async function syncAllUpstoxData(list){
             var india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata"); 
             var end_date = formatDate(india.date())+"-"+formatDate(india.month() + 1)+"-"+india.year();
             if(interval == '1MONTH')
-                now.setMonth(now.getMonth() - 202);
+                now.setMonth(now.getMonth() - 20);
             else if(interval == '1WEEK')
-                now.setDate(now.getDate() - 202 * 7);
+                now.setDate(now.getDate() - 22 * 7);
             else if(interval == '1DAY')
                 now.setDate(now.getDate() - 202);    
             else if(interval == '30MINUTE' || interval == '60MINUTE')
@@ -51,6 +51,8 @@ async function syncAllUpstoxData(list){
                 now.setDate(now.getDate() - 3);
             else if(interval == '5MINUTE' || interval == '3MINUTE' || interval == '1MINUTE')
                 now.setDate(now.getDate() - 1);
+            else if(interval == '5MINUTE' || interval == '3MINUTE')
+                 now.setDate(now.getDate());
             else
                 now.setDate(now.getDate() - 6);
 

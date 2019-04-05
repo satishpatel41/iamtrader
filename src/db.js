@@ -51,28 +51,26 @@ function getStockDataFromDb(symbol,interval)
         var lokiJson = new loki(symbolfile, 
         {
             autoload: true,
-            autoloadCallback : loadHandler,
+            autoloadCallback : onLoaded,
             autosave: true, 
             autosaveInterval: 4000
         }); 
         
-        function loadHandler() {
+        function onLoaded() {
             var database = lokiJson.getCollection(interval);
-           /*  if(!database){
-                database = lokiJson.addCollection(interval);
-            }   */
                    
             try{
-               //console.log("getStockDataFromDb > " +symbolfile +" >> "+ interval+" >> "+JSON.stringify(database) );  
-                if(database && database.get(1) && database.get(1).data && database.get(1).data)
+                if(database != null && database.get(1) && database.get(1).data)
                     resolve({"symbol":symbol,data:JSON.stringify(database.get(1).data)});
                 else
                     resolve({"symbol":symbol,data:[]}); 
 
+                //console.log("\n\n > " + JSON.stringify(database.get(1).data));
 
                 lokiJson.close();    
             }
             catch(e){
+                console.log("getStockDataFromDb > Error > " + interval +"::"+e);
                 lokiJson.close();
                 reject(e);
                 e = null;
@@ -87,7 +85,6 @@ var queue = async.queue(function(task, callback) {
     if(task.symbol){
         var symbolfile;
         try{      
-            //symbolfile = path.resolve(path.join(__dirname, '..', 'db/stock/'+task.interval+'/'+task.symbol+'.db'));
             symbolfile = path.resolve(path.join(__dirname, '..', 'db/stock/'+task.symbol+'.json'));
         }
         catch(e){
@@ -105,7 +102,7 @@ var queue = async.queue(function(task, callback) {
         function loadHandler() {
             var database = lokiJson.getCollection(task.interval);
             if(!database){
-                database = lokiJson.addCollection(task.interval);
+                database = lokiJson.addCollection(task.interval);//,{unique: ['timestamp']}
             }  
             var stockData = [];
 
@@ -114,53 +111,50 @@ var queue = async.queue(function(task, callback) {
             
             loadSymbol(task.symbol,task.ex,task.interval,task.start_date,task.end_date).then(function (response) {
                 try {
-                        if(response != '' && response != undefined && response != null){
-                            stockData = response;
-                           /*  if(response.error){
-                                database.clear();
-                                lokiJson.close(); 
-                                //callback();         
-                                console.log('Queue error ' + task.symbol +" :: "+task.ex +" :: "+JSON.stringify(response.error));
-                            }
-                            else  */
-                            if(database && database.get(1) && database.get(1).data && database.get(1).data.timestamp && database.get(1).data.timestamp === response.timestamp){
-                                console.log('Do nothing   ' +task.interval+"> "+ task.symbol);
-                            }
-                            else if(database && database.get(1) && database.get(1).data) {
-                                //console.log('UPDATE   ' +task.interval+"> "+ task.symbol);
-                                database.clear();
-                                database.insert(stockData);      
-
-                                if(task.interval == "1MINUTE"){
-                                    var intervalNo = parseInt(task.interval);
-                                    allIntervalsArr.map(async (allIntervalsArrObj) =>  {
-                                        await updateCollection(lokiJson,allIntervalsArrObj,stockData.data)
-                                    }); 
-                                    //console.log('UPDATE   ' +task.interval+"> "+ task.symbol);
-                                }
-                            }
-                            else{
-                                lokiJson.close();    
-                                
-                            }
-                            lokiJson.saveDatabase();   
+                    if(response != '' && response != undefined && response != null){
+                        stockData = response;
+                        //console.log('response  >>> ' + task.symbol +" :: " + task.interval+"> "+stockData.data.length);
+                        if(response && response.error){
+                            // database.clear();
                             lokiJson.close(); 
-                            callback();         
-                        } 
+                            console.log('Queue error ' + task.symbol +" :: "+task.ex +" :: "+JSON.stringify(response.error));
+                        }
+                        else if(database != null && database.get(1) && database.get(1).data && database.get(1).data.timestamp && database.get(1).data.timestamp == response.timestamp){
+                            console.log('Skip ! Do nothing   ' +task.interval+"> "+ task.symbol);
+                        }
+                        else if(database != null) {
+                            //console.log('UPDATE   ' +task.interval+"> "+ task.symbol +" :: "+ database);
+                            database.clear();
+                            database.insert(stockData);  
+                            lokiJson.saveDatabase();       
+
+                            if(task.interval == "1MINUTE"){
+                                var intervalNo = parseInt(task.interval);
+                                allIntervalsArr.map(async (allIntervalsArrObj) =>  {
+                                    await updateCollection(lokiJson,allIntervalsArrObj,stockData.data)
+                                }); 
+                                //console.log('UPDATE   ' +task.interval+"> "+ task.symbol);
+                            }
+                        }
                         else{
                             lokiJson.close();    
-                            callback();     
                         }
-                      
-                        symbolfile = task = stockData = response = null;
+                        lokiJson.saveDatabase();   
+                        lokiJson.close(); 
+                        callback();         
+                    } 
+                    else{
+                        lokiJson.close();    
+                        callback();     
+                    }
                     
-                  } catch (err) {
+                    symbolfile = task = stockData = response = null;
+
+                } catch (err) {
                     lokiJson.close();    
                     console.log("loadHandler queue : err   > " + err);
                     symbolfile = task = err = null;
-                    //callback();    
-                    //return err;
-                  }
+                }
             });
         }  
     } 
@@ -172,11 +166,8 @@ var queue = async.queue(function(task, callback) {
 function updateCollection(lokiJson,interval,stockData)
 {
     return new Promise(function(resolve, reject) {
-        //console.log('updateCollection interval  ' +interval);
-        var intervalNo = parseInt(interval);
-        //var stockData = data.slice(-((data.length % intervalNo)));
-        
-        //if(data.length < stockData.length){
+            var intervalNo = parseInt(interval);
+       
             var database = lokiJson.getCollection(interval);
             try{
                 if(database && database.get(1) && database.get(1).data && database.get(1).data.timestamp && database.get(1).data.timestamp === response.timestamp){
@@ -194,20 +185,16 @@ function updateCollection(lokiJson,interval,stockData)
                                 symbolObj = stockData[i];
                                 database.get(1).data.push(stockData[i]);
                                 count = 0;
-                                //console.log('edit  ' +interval);
+                               // console.log('edit  ' +count +" : "+ stockData.length +" : "+ i+" : "+interval +" : "+ intervalNo  +" : "+  stockData[i].timestamp  +" : "+new Date(Number(stockData[i].timestamp)));
                             }
-                           
-
                             database.get(1).data[database.get(1).data.length - 1].low = Math.min((stockData[i] && stockData[i].low) ? stockData[i].low : 0,symbolObj.low);
                             database.get(1).data[database.get(1).data.length - 1].close = Number(stockData[i].close);
                             database.get(1).data[database.get(1).data.length - 1].timestamp = Number(stockData[i].timestamp);
                             database.get(1).data[database.get(1).data.length - 1].high = Math.max((stockData[i] && stockData[i].high) ? stockData[i].high : 0,symbolObj.high);
                             count++;
                         }
-
                     }
             }
-           
             resolve(1); 
             }
             catch(e){
