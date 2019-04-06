@@ -61,7 +61,11 @@ $(document).ready( function () {
                     ],  
                     columns:[
                         //{title:"Date", field:"timestamp"},
-                        {title:"Symbol", field:"symbol"},
+                        {title:"Symbol", field:"symbol",formatter:function(cell, formatterParams)
+                          {
+                            return "<a href='/views/chart.html?symbol="+cell.getValue() +"'>"+cell.getValue() +"</a>";
+                          } 
+                        },
                         {title:"Close", field:"close"},
                         //{title:"Volume", field:"volume"},
                         {title:"RSI", field:"rsi"},
@@ -85,7 +89,7 @@ $(document).ready( function () {
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>                        
         </button>
-      <a class="navbar-brand" href="#">Scanner</a>
+        <a class="navbar-brand" href="/index">Scanner</a>
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">

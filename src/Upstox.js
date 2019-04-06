@@ -249,26 +249,21 @@ function getMaster(ex = "nse_fo"){
 
 async function loadSymbol(symbol,exchange,interval='1day',start_date='',end_date=''){ 
    //console.log("loadSymbol > " + symbol + " > "+accessToken +" :: "+ interval +" > "+exchange +" > "+ start_date +" > "+ end_date);
-    //if(store.get('accessToken')){
-
-        upstox.setToken(accessToken);
-
-        return new Promise(function(resolved, rejected) {   
-            upstox.getOHLC({"exchange": exchange,
-                "symbol": symbol,
-                "start_date": start_date,
-                "end_date": end_date,
-                "format" : "json",
-                "interval" : interval
-            }).then(result =>{
-                resolved(result);
-             })
-            .catch(error =>{
-                rejected(error);
-            }); 
-        });
-    //}
-    
+    upstox.setToken(accessToken);
+    return new Promise(function(resolved, rejected) {   
+        upstox.getOHLC({"exchange": exchange,
+            "symbol": symbol,
+            "start_date": start_date,
+            "end_date": end_date,
+            "format" : "json",
+            "interval" : interval
+        }).then(result =>{
+            resolved(result);
+            })
+        .catch(error =>{
+            rejected(error);
+        }); 
+    });
 }
 
 function getAllData(){
@@ -288,68 +283,8 @@ function getAllData(){
         strategyStrongList.map(async(strategy)=>{
             applyStrategy(watchList,'1DAY',strategy); 
         });
-       // console.log("strategyStrongList - applyStrategy " + result);
         return Number(result) + 1;
     });
-
-    /* promise.then(function(result)  {
-        strategyWeakList.map(async(strategy)=>{
-            applyStrategy(watchList,'1DAY',strategy); 
-        });
-        //console.log("strategyWeakList - applyStrategy " + result);
-        return Number(result) + 1;
-    });
-
-    promise.then(function(result)  {
-        getPercent_list(watchList);
-        //console.log("getPercent_list  " + result);
-    }); */
-
-
-    /* async.series([
-        function(callback){ 
-            syncAllUpstoxData(watchList);
-            setTimeout(function() {
-                callback(null, 1);
-            }, 10000);
-        },
-        function(callback){ 
-            strategyStrongList.map(async(strategy)=>{
-                applyStrategy(watchList,'1DAY',strategy); 
-            });
-            callback(null, 2);
-         },
-         function(callback){ 
-            strategyWeakList.map(async(strategy)=> {
-                applyStrategy(watchList,'1DAY',strategy); 
-            });
-            callback(null, 3);
-         },
-         function(callback){ 
-             getPercent_list(watchList);
-             callback(null, 4);
-        }
-    ],
-    // optional callback
-    function(err, results) {
-        // results is now equal to ['one', 'two']
-        console.log(results);
-    }); */
-
-
-    /* var p1= new Promise(function(resolve, reject) {
-        resolve(syncAllUpstoxData(watchList))
-    }).then(function(result) {
-        return strategyStrongList.map(strategy =>{
-                applyStrategy(watchList,'1DAY',strategy); 
-       })
-    }).then(function(result) {
-        return strategyWeakList.map(strategy =>{
-                applyStrategy(watchList,'1DAY',strategy); 
-       })
-    }).then(function(result) {
-        return getPercent_list(watchList);    
-    }); */
 }
 
 var stockData = []; 

@@ -5,9 +5,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
 <script src="https://moment.github.io/luxon/global/luxon.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
@@ -45,64 +45,27 @@
       animation: chartjs-render-animation 1ms;
   }
 
-    
-    /* Safari */
-    @-webkit-keyframes spin {
-      0% { -webkit-transform: rotate(0deg); }
-      100% { -webkit-transform: rotate(360deg); }
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+  /* Safari */
+  @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 </style>
 
 <script type="text/javascript">
 $(document).ready( function () {
         var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
         $('#userTxt').text(localStorage.getItem('user'));
-        var interval = "1DAY";
-        var symbol = 'sbin';
+        var urlParams = new URLSearchParams(window.location.search);
 
-        $( "#intervalDropDown" ).change(function() {
-          interval = $("#intervalDropDown").val();
-
-          loadSymbolData(symbol,interval);
-        });
-
-        $( "#symbolTxt" ).change(function() {
-          symbol = $("#symbolTxt").val();
-          loadSymbolData(symbol,interval);
-        });
-
-        $(".loader").show();
-        $("#chartDiv").empty();
-        $.ajax({
-        type: "get",
-        url: server + '/getListOfAllSymbol',success: function(data){
-              helpers.buildDropdown(
-                  data,
-                  $('#symbolDropdown'),
-                  'Select an option'
-              );
-              $(".loader").hide();
-              //loadSymbolData("sbin",interval);
-          }
-        });
-
-        var helpers = {
-          buildDropdown: function(result, dropdown, emptyMessage){
-              dropdown.html('');
-              dropdown.append('<option value="">' + emptyMessage + '</option>');
-              if(result != ''){
-                  $.each(result, function(k, v) {
-                      dropdown.append('<option value="' + v.symbol + '">' + v.symbol + '</option>');
-                  });
-              }
-          }
-        }
-
+        var symbol =  urlParams.get('symbol');
+        loadSymbolData(symbol,'5MINUTE');
+        
         var ctx;
 
         function loadSymbolData(symbolName,interval){
@@ -111,11 +74,9 @@ $(document).ready( function () {
             url: server+'/getStockIndicators/'+symbolName+"/"+interval,
             success: function(response){
               response = response.slice(0, 40);
-
                 var dataSet = response.filter(function (el) {
                   return (el != null && el.close != null && el.close != undefined && el.close != "");
                 });
-
                 $(".loader").hide();       
                 dataSet.filter((obj) => obj );
                 $("#chartDiv").empty();
@@ -123,9 +84,8 @@ $(document).ready( function () {
                 canvas.id  = "myChart";
                 $( "#chartDiv" ).append(canvas);
                 ctx = document.getElementById("myChart").getContext('2d');
-                ctx.canvas.width = 1000;
-                ctx.canvas.height = 450;
-
+                ctx.canvas.width = 600;
+                ctx.canvas.height = 300;
                 var stockData = dataSet.map(obj =>{ 
                   var rObj = {};
                   rObj.t= Number(obj.timestamp);
@@ -135,23 +95,27 @@ $(document).ready( function () {
                   rObj.c= Number(obj.close);
                   return rObj;
                 });      
-                
                 stockData = stockData.reverse().slice(0, 60);
-
                 var chart = new Chart(ctx, 
                 {
                   type: 'candlestick',
                   data: {
                     datasets: [{
-                    label: symbolName,
-                    data: stockData
-                  }]
+                      label: symbolName,
+                      data: stockData
+                    }]
                   }
-                });  
-            }
+                });    
+                var dataset = chart.config.data.datasets[0];
+                dataset.color = {
+                  up: '#01ff01',
+                  down: '#fe0000',
+                  unchanged: '#999',
+                };
+                chart.update();
+	            }
       });  
   }
-          
 });
 </script>
 </head>
@@ -165,6 +129,7 @@ $(document).ready( function () {
             <span class="icon-bar"></span>                        
           </button>
         <a class="navbar-brand" href="/index">Scanner</a>
+        <!-- <a><i class="fa fa-line-chart" style="font-size:35px;color:blue"></i> </a> -->
       </div>
       <div class="collapse navbar-collapse" id="myNavbar">
         <ul class="nav navbar-nav">
@@ -190,41 +155,14 @@ $(document).ready( function () {
           
   <div class="container">
     <div class="row"></div>
-    <br></br>
-    <br></br>
+    <br></br><br></br>
+    
     <div class="row">
-          <div class="col-sm-2">
-            <label>Symbol</label>
-            
-            <input type="text" id="symbolTxt" list="symbolDropdown" class="form-control" placeholder="Search symbol" required autofocus>
-            <datalist id="symbolDropdown"></datalist>
-          </div>
-          <div class="col-sm-2">
-            <label>Interval</label>
-            <select id="intervalDropDown" class="form-control" >
-                <option value="5MINUTE">5MINUTE</option>
-                <option value="15MINUTE">15MINUTE</option>
-                <option value="30MINUTE">30MINUTE</option>
-                <option value="60MINUTE">60MINUTE</option>
-                <option value="1DAY" selected="selected">1DAY</option>
-                <option value="1WEEK">1WEEK</option>
-                <option value="1MONTH">1MONTH</option>
-              </select>
-          </div>
-          
-          <div class="col-sm-4">
-            <label>Update till :</label>
-            <label id="date_txt"></label>
-          </div> 
-    </div> 
-    <div class="row">
-      <div class="col-sm" id="chartDiv" style="position: relative; height:50vh; width:90vw">
-        
+      <div class="col-sm" id="chartDiv" style="position: relative; height:40vh; width:90vw">
           <canvas id="myChart"></canvas>
       </div>  
     </div>
   </div>
   <div class="loader"></div>
-
 </body>
 </html>

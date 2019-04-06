@@ -80,8 +80,9 @@ if (cluster.isMaster) {
         var today = date.getDate() +"-"+(date.getMonth() + 1) +"-"+date.getFullYear();
         var time = date +":"+date.getHours() +":"+date.getMinutes();   
         
-      
        
+        app.use(express.static('views'))
+        app.use('/views', express.static('views'))
         app.get('/', function (req, res) {
             var q = url.parse(req.url, true).query;
             code = q.code;
@@ -227,6 +228,11 @@ if (cluster.isMaster) {
 
     app.get('/index', checkSignIn,function (req, res) {
         res.sendFile("index.html", {"root": __dirname});
+    });
+
+    app.get('/chart/:symbol', checkSignIn,function (req, res) {
+        console.log('params: ' + JSON.stringify(req.params));
+        res.sendFile("chart.html", {"root": __dirname});
     });
 
     app.get('/scan', checkSignIn,function (req, res) {

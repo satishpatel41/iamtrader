@@ -98,8 +98,11 @@ $(document).ready( function () {
                     movableColumns:true,      //allow column order to be changed
                     
                     columns:[
-                        {title:"Symbol", field:"symbol"},
-                      
+                        {title:"Symbol", field:"symbol",formatter:function(cell, formatterParams)
+                          {
+                            return "<a href='/views/chart.html?symbol="+cell.getValue() +"'>"+cell.getValue() +"</a>";
+                          } 
+                        },
                         {title:"Change", field:"percentage",formatter:function(cell, formatterParams)
                         {
                             if(cell.getValue() > 0)

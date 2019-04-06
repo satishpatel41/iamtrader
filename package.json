@@ -50,6 +50,7 @@
     "node-cron": "^2.0.3",
     "nodemailer": "^4.7.0",
     "nodemon": "^1.18.9",
+    "ping": "^0.2.2",
     "promise-polyfill": "^8.1.0",
     "redis": "^2.8.0",
     "session-file-store": "^1.2.0",

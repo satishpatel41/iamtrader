@@ -24,7 +24,7 @@ var gulpSequence = require('gulp-sequence').use(gulp);
 
 gulp.task("html", function () {
     var tsResult = gulp.src("views/*.html")
-    .pipe(gulp.dest('./dist/'));
+    .pipe(gulp.dest('./dist/views/'));
 });
 
 
