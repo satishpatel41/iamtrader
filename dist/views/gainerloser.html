@@ -76,7 +76,7 @@ $(document).ready( function () {
         function loadAllSymbolData(interval,exchange){
           $(".loader").show();
           $.get({
-            url: server+'/api/gainerLoser',
+            url: server+'/api/gainerLoser/'+exchange,
             success: function(response){
                  $(".loader").hide();
                  
@@ -100,7 +100,7 @@ $(document).ready( function () {
                     columns:[
                         {title:"Symbol", field:"symbol",formatter:function(cell, formatterParams)
                           {
-                            return "<a href='/views/chart.html?symbol="+cell.getValue() +"'>"+cell.getValue() +"</a>";
+                            return "<a href='/chart?symbol="+cell.getValue() +"'>"+cell.getValue() +"</a>";
                           } 
                         },
                         {title:"Change", field:"percentage",formatter:function(cell, formatterParams)

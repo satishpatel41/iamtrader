@@ -95,7 +95,7 @@ $(document).ready( function () {
               dropdown.append('<option value="">' + emptyMessage + '</option>');
               if(result != ''){
                   $.each(result, function(k, v) {
-                      dropdown.append('<option value="' + v.symbol + '">' + v.symbol + '</option>');
+                      dropdown.append('<option value="' + v + '">' + v + '</option>');
                   });
               }
           }

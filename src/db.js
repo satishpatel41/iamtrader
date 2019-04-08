@@ -158,7 +158,7 @@ var queue = async.queue(function(task, callback) {
             });
         }  
     } 
-},50);
+},200);
 
 function updateCollection(lokiJson,interval,stockData)
 {

@@ -98,13 +98,25 @@ $(document).ready( function () {
                         //{title:"Date", field:"timestamp"},
                         {title:"Symbol", field:"symbol",formatter:function(cell, formatterParams)
                           {
-                            return "<a href='/views/chart.html?symbol="+cell.getValue() +"'>"+cell.getValue() +"</a>";
+                            return "<a href='/chart?symbol="+cell.getValue() +"'>"+cell.getValue() +"</a>";
                           } 
                         },
                         {title:"Close", field:"close",widthShrink:1},
                         {title:"RSI", field:"rsi",widthShrink:1},
                         {title:"SMA", field:"sma",widthShrink:1},
-                        {title:"Bolinger Band", field:"bb.isCrossed",widthShrink:1},
+                        //{title:"Bolinger Band", field:"bb.isCrossed",widthShrink:1},
+                        {title:"Bolinger Band",widthShrink:1,field:"bb",formatter:function(cell, formatterParams)
+                          {
+                            
+                            if(cell.getRow().getData().close > cell.getRow().getData().open  && cell.getRow().getData().close > cell.getValue().upper)
+                              return "<p><span>Above Upper BB</span></p>";
+                            else  if(cell.getRow().getData().close < cell.getRow().getData().open  && cell.getRow().getData().close < cell.getValue().lower)
+                              return "<p><span>Below Lower BB</span></p>";
+                            else
+                             return "<p><span></span></p>";
+                              
+                          } 
+                        },
                         {title:"Volume", field:"volume",widthShrink:0}  
                     ]
                 });

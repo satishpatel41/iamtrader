@@ -95,14 +95,19 @@ cron.schedule('59 23 * * *', () => {
 scheduled: true,
 timezone: "Asia/Kolkata"
 });
-//9:30
+
+
+// At 9:30
 cron.schedule('30 9 * * *', () => {
     console.log('Good morning : 9:30 call');
     interval = '15MINUTE';
 
-    Promise.all(open_band_List.map(async(strategy) =>{
-            applyStrategy(watchList,interval,strategy); 
+    Promise.all(open_low_high_List.map(async(strategy) =>{
+        applyStrategy(watchList,interval,strategy); 
     })).then(function(result) {
+        open_band_List.map(async(strategy) =>{
+            applyStrategy(watchList,interval,strategy); 
+        });
         console.log('9:30 call result : ' + result);        
     })
 }, {

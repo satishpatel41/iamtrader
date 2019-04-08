@@ -168,7 +168,7 @@ function start() {
             });
 
             //console.log("niftyList" + niftyList);
-            var niftyStr = niftyList.join();
+            var niftyStr = nifty.join();
             //console.log("join" + niftyStr);
 
             upstox.subscribeFeed({

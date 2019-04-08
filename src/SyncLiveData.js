@@ -144,7 +144,6 @@ async function getDefaultIndicatorsValues(list,interval){
         var arr = stockData.map(async (dataObj) =>  {
             try{
                 var data = JSON.parse(dataObj.data); 
-                
             }
             catch(e){
                 console.log("Error " + e);

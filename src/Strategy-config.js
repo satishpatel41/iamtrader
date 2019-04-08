@@ -241,4 +241,43 @@ strategy : [
 }; 
 
 var strategyStrongList = [strategy_rsi_above_60];
+
+
 var strategyWeakList = [strategy_rsi_below_40];
+
+
+
+/******OPEN = HIGH / OPEN = LOW *****/
+
+var open_low = {
+    name:"OPEN = LOW",
+    description : "OPEN = LOW",
+    isLive:false,
+    isBuyOrSell:"b",
+    strategy : [
+        {
+            indicators:
+            [
+                {indicator:''}
+            ],output:[],strategy:"open[i] == low[i]"
+        }  
+    ]
+}; 
+
+
+var open_high = {
+    name:"OPEN = HIGH",
+    description : "OPEN = HIGH",
+    isLive:false,
+    isBuyOrSell:"s",
+    strategy : [
+        {
+            indicators:
+            [
+                {indicator:''}
+            ],output:[],strategy:"open[i] == high[i]"
+        }  
+    ]
+}; 
+
+var open_low_high_List = [open_high,open_low];

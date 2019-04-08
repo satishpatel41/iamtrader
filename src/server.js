@@ -81,13 +81,13 @@ if (cluster.isMaster) {
         var time = date +":"+date.getHours() +":"+date.getMinutes();   
         
        
-        app.use(express.static('views'))
-        app.use('/views', express.static('views'))
+       // app.use(express.static('views'))
+       // app.use('/views', express.static('views'))
         app.get('/', function (req, res) {
             var q = url.parse(req.url, true).query;
             code = q.code;
 
-            console.log(chalk.green("session > " + JSON.stringify(req.session.cookie)));
+            console.log("******* code > " + code);
             getAcceToken(code);        
             res.sendFile("index.html", {"root": __dirname});
             //checkBankNiftyExpiry();
@@ -170,11 +170,37 @@ if (cluster.isMaster) {
         res.sendFile("gainerloser.html", {"root": __dirname});
     });
 
-    app.get('/api/gainerLoser', function (req, res) {
-        res.send(store.get('percentage'));
+   // app.get('/api/gainerLoser', function (req, res) {
+
+           
+    app.get('/api/gainerLoser/:exchange', checkSignIn,function (req, res) { 
+        var exchange = req.params.exchange;  
+        var list = [];
+        if(exchange == "nifty")
+            list =  nifty;
+        else if(exchange == "fno")
+            list = fno;
+        else
+            list = nse; 
+           
+        var response = store.get('percentage').filter(isMatching);
+        function isMatching(sItem) {
+            var isMatch = false;
+            for (var i = 0; i < list.length; i++) {
+               
+                if(list[i] == sItem.symbol){
+                    isMatch = true;
+                    break;
+                }
+            }
+            return isMatch;
+        }
+       
+        res.send(response);
+        response =list= exchange = null;
+        res.end();
     });
 
-    
     app.post('/signup', function (req, res) {
         var email = req.body.email;
         var psw = req.body.psw;
@@ -230,9 +256,8 @@ if (cluster.isMaster) {
         res.sendFile("index.html", {"root": __dirname});
     });
 
-    app.get('/chart/:symbol', checkSignIn,function (req, res) {
-        console.log('params: ' + JSON.stringify(req.params));
-        res.sendFile("chart.html", {"root": __dirname});
+    app.get('/chart', checkSignIn,function (req, res) {
+         res.sendFile("chart.html", {"root": __dirname});      
     });
 
     app.get('/scan', checkSignIn,function (req, res) {
@@ -446,29 +471,32 @@ if (cluster.isMaster) {
         var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
         console.log("start_date > " + interval +" >> "+start_date);
         
-        var inputRSI = {
-            values : [],
-            period : 14
-        };
-        var rsi = new technicalindicators.RSI(inputRSI);
-        var inputSMA = {
-            values : [],
-            period : 20
-        };
-        //console.log("rsi");
-        var sma= new technicalindicators.SMA(inputSMA);
-
-        var inputBB = {
-            period : 14, 
-            values : [],
-            stdDev : 2 
-        }
-        //console.log("sma");
-        var bb = new technicalindicators.BollingerBands(inputBB);
-        inputBB = inputRSI = inputSMA = null;
+       
 
         stockData = [];
         loadSymbol(symbol,"NSE_EQ",interval,start_date).then(function (response) {
+
+            var inputRSI = {
+                values : [],
+                period : 14
+            };
+            var rsi = new technicalindicators.RSI(inputRSI);
+            var inputSMA = {
+                values : [],
+                period : 20
+            };
+            //console.log("rsi");
+            var sma= new technicalindicators.SMA(inputSMA);
+    
+            var inputBB = {
+                period : 14, 
+                values : [],
+                stdDev : 2 
+            }
+            //console.log("sma");
+            var bb = new technicalindicators.BollingerBands(inputBB);
+            inputBB = inputRSI = inputSMA = null;
+
             res.setHeader('Content-Type', 'application/json');
             stockData =response.data;
             //console.log("loadSymbol stockData : " + response);
@@ -643,42 +671,44 @@ if (cluster.isMaster) {
         var exchange = req.params.exchange;  
 
         var list = [];
-        //if(exchange == "nifty")
-            list =  store.get('niftyList');
-        /* else if(exchange == "fno")
-            list = store.get('fnoList');
+        if(exchange == "nifty")
+            list =  nifty;
+        else if(exchange == "fno")
+            list = fno;
         else
-            list = store.get('nseSymbolList'); */
+            list = nse; 
 
 
         Promise.all(list.map(async (x) =>  {
             var symbol = x.symbol ? x.symbol:x;    
             return getStockDataFromDb(symbol,interval);          
             })).then(stockData => {
-                var inputRSI = {
-                    values : [],
-                    period : 14
-                };
-                rsi = new technicalindicators.RSI(inputRSI);
-                var inputSMA = {
-                    values : [],
-                    period : 20
-                };
-                //console.log("rsi");
-                sma= new technicalindicators.SMA(inputSMA);
-        
-                var inputBB = {
-                    period : 14, 
-                    values : [],
-                    stdDev : 2 
-                }
-                //console.log("sma");
-                bb = new technicalindicators.BollingerBands(inputBB);
-                inputBB = inputRSI = inputSMA = null;
+               
 
                 var arr = stockData.map(async (dataObj) =>  {
                     try{
                         var data = JSON.parse(dataObj.data); 
+
+                        var inputRSI = {
+                            values : [],
+                            period : 14
+                        };
+                        rsi = new technicalindicators.RSI(inputRSI);
+                        var inputSMA = {
+                            values : [],
+                            period : 20
+                        };
+                        //console.log("rsi");
+                        sma= new technicalindicators.SMA(inputSMA);
+                
+                        var inputBB = {
+                            period : 14, 
+                            values : [],
+                            stdDev : 2 
+                        }
+                        //console.log("sma");
+                        bb = new technicalindicators.BollingerBands(inputBB);
+                        inputBB = inputRSI = inputSMA = null;
 
                         data.map(row => {
                             var india = moment.tz(new Date(Number(row.timestamp)), "Asia/Kolkata");
@@ -738,11 +768,11 @@ if (cluster.isMaster) {
 
         var list = [];
         if(exchange == "nifty")
-            list =  store.get('niftyList');//niftyList;
+            list =  nifty;
         else if(exchange == "fno")
-            list = store.get('fnoList');//fnoList;
+            list = fno;
         else{
-            list = store.get('nseSymbolList');
+            list = nse;
         }
 
         var stockData = [];
@@ -853,12 +883,8 @@ if (cluster.isMaster) {
     app.get('/getListOfAllSymbol', checkSignIn,function (req, res) {   
         res.setHeader('Content-Type', 'application/json');
         
-        fnoList =  store.get('fnoList');
-        if(fnoList && fnoList.length > 0)
-            res.send(JSON.stringify(fnoList));
-        else
-            res.send(JSON.stringify(getListOfAllSymbol()));
-            
+        
+        res.send(watchList);
         res.end();
     });
 
