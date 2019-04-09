@@ -24,7 +24,7 @@ timezone: "Asia/Kolkata"
 });
 
 cron.schedule('*/3 * * * *', () => {
-    load3minData();
+    //load3minData();
     console.log(chalk.blue('running a task every 3 minutes ' + new Date()));
 }, {
 scheduled: true,
@@ -40,7 +40,7 @@ timezone: "Asia/Kolkata"
 });
 
 cron.schedule('*/10 * * * *', () => {
-    load10minData();
+    //load10minData();
     console.log(chalk.blue('running a task every 10 minutes ' + new Date()));
 }, {
 scheduled: true,
@@ -238,6 +238,7 @@ function load1minData()
 
     let promise = new Promise(function(resolve, reject) {
         if(accessToken)
+             syncLiveAllStockData(indices,interval,start_date,end_date);
              syncLiveAllStockData(watchList,interval,start_date,end_date);
         resolve(1);      
     }).then(res=>{

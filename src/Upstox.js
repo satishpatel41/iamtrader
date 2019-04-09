@@ -248,7 +248,7 @@ function getMaster(ex = "nse_fo"){
 } */
 
 async function loadSymbol(symbol,exchange,interval='1day',start_date='',end_date=''){ 
-   //console.log("loadSymbol > " + symbol + " > "+accessToken +" :: "+ interval +" > "+exchange +" > "+ start_date +" > "+ end_date);
+    //console.log("loadSymbol > " + symbol + " > "+accessToken +" :: "+ interval +" > "+exchange +" > "+ start_date +" > "+ end_date);
     upstox.setToken(accessToken);
     return new Promise(function(resolved, rejected) {   
         upstox.getOHLC({"exchange": exchange,
@@ -270,9 +270,14 @@ function getAllData(){
     queue.empty();
 
     let promise = new Promise(function(resolve, reject) {
-        syncAllUpstoxData(watchList);
+        syncAllUpstoxData(indices);
+        setTimeout(function() {
+            syncAllUpstoxData(watchList);
+        }, 500);
+
         setTimeout(function() {
             resolve(1);
+           // syncAllUpstoxData(indices);
         }, 47000);
           
     }).then(res=>{

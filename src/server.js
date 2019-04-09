@@ -170,6 +170,10 @@ if (cluster.isMaster) {
         res.sendFile("gainerloser.html", {"root": __dirname});
     });
 
+
+    app.get('/index', function (req, res) {
+        res.sendFile("index.html", {"root": __dirname});
+    });
    // app.get('/api/gainerLoser', function (req, res) {
 
            
@@ -252,15 +256,15 @@ if (cluster.isMaster) {
         res.sendFile("contactus.html", {"root": __dirname});
     });
 
-    app.get('/index', checkSignIn,function (req, res) {
-        res.sendFile("index.html", {"root": __dirname});
+    app.get('/allCharts', checkSignIn,function (req, res) {
+        res.sendFile("allStockCharts.html", {"root": __dirname});
     });
 
     app.get('/chart', checkSignIn,function (req, res) {
          res.sendFile("chart.html", {"root": __dirname});      
     });
 
-    app.get('/scan', checkSignIn,function (req, res) {
+    app.get('/scanner', checkSignIn,function (req, res) {
         res.sendFile("scanner.html", {"root": __dirname});
     });
 
@@ -885,6 +889,16 @@ if (cluster.isMaster) {
         
         
         res.send(watchList);
+        res.end();
+    });
+
+
+
+    app.get('/getIndices', checkSignIn,function (req, res) {   
+        res.setHeader('Content-Type', 'application/json');
+        
+        
+        res.send(indices);
         res.end();
     });
 

@@ -80,8 +80,8 @@ function getStockDataFromDb(symbol,interval)
 }
 
 var queue = async.queue(function(task, callback) {
-    var allIntervalsArr = ['15MINUTE','5MINUTE','60MINUTE','30MINUTE','10MINUTE','3MINUTE'];
-
+    var allIntervalsArr = ['15MINUTE','5MINUTE','60MINUTE','30MINUTE'];
+    
     if(task.symbol){
         var symbolfile;
         try{      
@@ -135,6 +135,13 @@ var queue = async.queue(function(task, callback) {
                                 }); 
                                 //console.log('UPDATE   ' +task.interval+"> "+ task.symbol);
                             }
+                           /*  else if(task.interval == "15MINUTE"){
+                                var intervalNo = parseInt(task.interval);
+                                ['1DAY'].map(async (intervalsArrObj) =>  {
+                                    await updateCollection(lokiJson,intervalsArrObj,stockData.data)
+                                }); 
+                                //console.log('UPDATE   ' +task.interval+"> "+ task.symbol);
+                            } */
                         }
                         else{
                             lokiJson.close();    
@@ -158,7 +165,7 @@ var queue = async.queue(function(task, callback) {
             });
         }  
     } 
-},200);
+},50);
 
 function updateCollection(lokiJson,interval,stockData)
 {
@@ -173,9 +180,10 @@ function updateCollection(lokiJson,interval,stockData)
                 else if(database && database.get(1) && database.get(1).data){
                     var symbolObj= {};
                     var count = 0;
+                    var t = (database.get(1).data && database.get(1).data[database.get(1).data.length - 1] && database.get(1).data[database.get(1).data.length - 1].timestamp) ? database.get(1).data[database.get(1).data.length - 1].timestamp : 0;
+
                     for(var i = 0; i < stockData.length;i++)
                     {
-                        var t = database.get(1).data[database.get(1).data.length - 1].timestamp;
                         if(stockData[i].timestamp > t)
                         {
                             if(count % intervalNo == 0){

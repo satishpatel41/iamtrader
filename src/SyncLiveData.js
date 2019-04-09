@@ -3,7 +3,7 @@ var path = require('path');
 
 var loki  = require( 'lokijs' );
 var intervalsArr =['1MINUTE','15MINUTE','1DAY'];
-var allIntervalsArr = ['15MINUTE','1DAY','60MINUTE','30MINUTE','10MINUTE','5MINUTE','3MINUTE','1MONTH','1WEEK'];
+var allIntervalsArr = ['15MINUTE','5MINUTE','1DAY','60MINUTE','30MINUTE','1MONTH','1WEEK'];
 
 var database;
 
@@ -12,7 +12,7 @@ async function syncLiveAllStockData(list,interval,start_date,end_date){
     list.map(async (x) =>  {
         var symbol = x.symbol ? x.symbol:x;        
         var ex = x.ex;      
-        //console.log('syncLiveAllStockData : Finished Queue  - ' + symbol +" :: "+ interval);
+        //console.log('syncLiveAllStockData : Finished Queue  - ' + symbol +" :: "+ interval +" :: "+ ex);
         queue.push({symbol: symbol,ex:ex,interval:interval,start_date:start_date,end_date:end_date}, function (err) {
            // console.log('syncLiveAllStockData : Finished Queue  - ' + interval);
         });
@@ -51,7 +51,7 @@ async function syncAllUpstoxData(list){
                 now.setDate(now.getDate() - 3);
             else if(interval == '5MINUTE' || interval == '3MINUTE' || interval == '1MINUTE')
                 now.setDate(now.getDate() - 1);
-            else if(interval == '5MINUTE' || interval == '3MINUTE')
+            else if(interval == '1MINUTE')
                  now.setDate(now.getDate());
             else
                 now.setDate(now.getDate() - 6);
@@ -59,6 +59,9 @@ async function syncAllUpstoxData(list){
             india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
             india.format(); 
             var start_date = formatDate(india.date())+"-"+formatDate(india.month() + 1)+"-"+india.year();
+           
+           // console.log('Queue  - ' + symbol +" :: "+ interval +" :: "+ ex);
+
             await queue.push({symbol:symbol,ex:ex,interval:interval,start_date:start_date,end_date:end_date}, function (err) {
                 //console.log('syncAllUpstoxData : Finished Queue  - ' + interval);  
             });

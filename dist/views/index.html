@@ -78,14 +78,14 @@ $(document).ready( function () {
         $("#chartDiv").empty();
         $.ajax({
         type: "get",
-        url: server + '/getListOfAllSymbol',success: function(data){
+        url: server + '/getIndices',success: function(data){
               helpers.buildDropdown(
                   data,
                   $('#symbolDropdown'),
                   'Select an option'
               );
               $(".loader").hide();
-              //loadSymbolData("sbin",interval);
+              loadSymbolData("NIFTY_50",'15MINUTE');
           }
         });
 
@@ -95,7 +95,7 @@ $(document).ready( function () {
               dropdown.append('<option value="">' + emptyMessage + '</option>');
               if(result != ''){
                   $.each(result, function(k, v) {
-                      dropdown.append('<option value="' + v + '">' + v + '</option>');
+                      dropdown.append('<option value="' + v.symbol + '">' + v.symbol + '</option>');
                   });
               }
           }
@@ -168,7 +168,7 @@ $(document).ready( function () {
       <div class="collapse navbar-collapse" id="myNavbar">
         <ul class="nav navbar-nav">
           <li class="active"><a href="/index">Home</a></li>
-          <li><a href="/scan">Scanner</a></li>
+          <li><a href="/scanner">Scanner</a></li>
           <li><a href="/strategy">Strategy</a></li>
           <li><a href="/gainerloser">Top Gainer / Looser</a></li>
           <li><a href="/contactus">Contact Us</a></li>  

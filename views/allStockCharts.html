@@ -78,14 +78,14 @@ $(document).ready( function () {
         $("#chartDiv").empty();
         $.ajax({
         type: "get",
-        url: server + '/getIndices',success: function(data){
+        url: server + '/getListOfAllSymbol',success: function(data){
               helpers.buildDropdown(
                   data,
                   $('#symbolDropdown'),
                   'Select an option'
               );
               $(".loader").hide();
-              loadSymbolData("NIFTY_50",'15MINUTE');
+              //loadSymbolData("sbin",interval);
           }
         });
 
@@ -95,7 +95,7 @@ $(document).ready( function () {
               dropdown.append('<option value="">' + emptyMessage + '</option>');
               if(result != ''){
                   $.each(result, function(k, v) {
-                      dropdown.append('<option value="' + v.symbol + '">' + v.symbol + '</option>');
+                      dropdown.append('<option value="' + v + '">' + v + '</option>');
                   });
               }
           }
@@ -167,11 +167,15 @@ $(document).ready( function () {
       </div>
       <div class="collapse navbar-collapse" id="myNavbar">
         <ul class="nav navbar-nav">
-          <li class="active"><a href="/index">Home</a></li>
-          <li><a href="/scanner">Scanner</a></li>
-          <li><a href="/strategy">Strategy</a></li>
-          <li><a href="/gainerloser">Top Gainer / Looser</a></li>
+       
+
+          <li ><a href="/index">Home</a></li>
+          <li ><a href="/gainerloser">Top Gainer / Looser</a></li>
+          <li class="active"><a href="/allCharts">Stocks Charts</a></li>
+          <li ><a href="/scanner">Scanner</a></li>
+          <li ><a href="/strategy">Strategy</a></li>
           <li><a href="/contactus">Contact Us</a></li>  
+
         </ul>
         <ul class="nav navbar-nav pull-right">
           <li class="dropdown pull-right"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome, <span id="userTxt"></span> <span class="glyphicon glyphicon-user"></span><b class="caret"></b></a>
