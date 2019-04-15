@@ -117,7 +117,7 @@ var queue = async.queue(function(task, callback) {
                         if(response && response.error){
                             // database.clear();
                             lokiJson.close(); 
-                            console.log('Queue error ' + task.symbol +" :: "+task.ex +" :: "+JSON.stringify(response.error));
+                            //console.log('Queue error ' + task.symbol +" :: "+task.ex +" :: "++task.interval+"> "JSON.stringify(response.error));
                         }
                         else if(database != null && database.get(1) && database.get(1).data && database.get(1).data.timestamp && database.get(1).data.timestamp == response.timestamp){
                             console.log('Skip ! Do nothing   ' +task.interval+"> "+ task.symbol);
@@ -133,6 +133,26 @@ var queue = async.queue(function(task, callback) {
                                 allIntervalsArr.map(async (allIntervalsArrObj) =>  {
                                     await updateCollection(lokiJson,allIntervalsArrObj,stockData.data)
                                 }); 
+
+
+                                /* var percentageChangeArray =  store.get("percentage");
+                               // console.log("len : " + task.symbol +" :: "+percentageChangeArray.length);
+                                for(var i = 0; i < percentageChangeArray.length;i++){
+                                    try{
+                                        if(percentageChangeArray[i].symbol == task.symbol)
+                                        {
+                                            var percObj = percentageChangeArray[i];
+                                            percObj.low = Math.min((percentageChangeArray[i] && percentageChangeArray[i].low) ? percentageChangeArray[i].low : stockData.data[0].low,stockData.data[0].low);
+                                            percObj.high = Math.max((percentageChangeArray[i] && percentageChangeArray[i].high) ? percentageChangeArray[i].high : stockData.data[0].high,stockData.data[0].high);
+                                            percentageChangeArray[i] = percObj;
+                                            store.set("percentage",percentageChangeArray);
+                                        }
+                                    }
+                                    catch(error){ 
+                                        console.log("error  : " + error);
+                                    }
+                                } */
+                                
                                 //console.log('UPDATE   ' +task.interval+"> "+ task.symbol);
                             }
                            /*  else if(task.interval == "15MINUTE"){
@@ -165,7 +185,7 @@ var queue = async.queue(function(task, callback) {
             });
         }  
     } 
-},50);
+},20);
 
 function updateCollection(lokiJson,interval,stockData)
 {
@@ -186,17 +206,21 @@ function updateCollection(lokiJson,interval,stockData)
                     {
                         if(stockData[i].timestamp > t)
                         {
+                            
                             if(count % intervalNo == 0){
                                 symbolObj = stockData[i];
                                 database.get(1).data.push(stockData[i]);
                                 count = 0;
                                // console.log('edit  ' +count +" : "+ stockData.length +" : "+ i+" : "+interval +" : "+ intervalNo  +" : "+  stockData[i].timestamp  +" : "+new Date(Number(stockData[i].timestamp)));
                             }
-                            database.get(1).data[database.get(1).data.length - 1].low = Math.min((stockData[i] && stockData[i].low) ? stockData[i].low : 0,symbolObj.low);
+
+                            database.get(1).data[database.get(1).data.length - 1].low = Math.min((stockData[i] && stockData[i].low) ? stockData[i].low : symbolObj.low,symbolObj.low);
                             database.get(1).data[database.get(1).data.length - 1].close = Number(stockData[i].close);
                             database.get(1).data[database.get(1).data.length - 1].timestamp = Number(stockData[i].timestamp);
-                            database.get(1).data[database.get(1).data.length - 1].high = Math.max((stockData[i] && stockData[i].high) ? stockData[i].high : 0,symbolObj.high);
+                            database.get(1).data[database.get(1).data.length - 1].high = Math.max((stockData[i] && stockData[i].high) ? stockData[i].high : symbolObj.high,symbolObj.high);
                             count++;
+
+                            
                         }
                     }
             }

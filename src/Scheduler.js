@@ -242,6 +242,7 @@ function load1minData()
              syncLiveAllStockData(watchList,interval,start_date,end_date);
         resolve(1);      
     }).then(res=>{
+        getPercent_list(watchList);
         return Number(res) + 1;
     });
 }
