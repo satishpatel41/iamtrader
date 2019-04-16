@@ -60,7 +60,7 @@
 $(document).ready( function () {
         var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
         $('#userTxt').text(localStorage.getItem('user'));
-        var interval = "1DAY";
+        var interval = "15MINUTE";
         var symbol = 'sbin';
 
         $( "#intervalDropDown" ).change(function() {
@@ -85,7 +85,9 @@ $(document).ready( function () {
                   'Select an option'
               );
               $(".loader").hide();
-              loadSymbolData("NIFTY_50",'15MINUTE');
+              symbol = 'NIFTY_50';
+              interval = "15MINUTE";
+              loadSymbolData(symbol,interval);
           }
         });
 
@@ -119,8 +121,8 @@ $(document).ready( function () {
                 canvas.id  = "myChart";
                 $( "#chartDiv" ).append(canvas);
                 ctx = document.getElementById("myChart").getContext('2d');
-                ctx.canvas.width = 600;
-                ctx.canvas.height = 400;
+                ctx.canvas.width = 550;
+                ctx.canvas.height = 250;
                 var stockData = dataSet.map(obj =>{ 
                   var rObj = {};
                   rObj.t= Number(obj.timestamp);
@@ -205,10 +207,10 @@ $(document).ready( function () {
             <label>Interval</label>
             <select id="intervalDropDown" class="form-control" >
                 <option value="5MINUTE">5MINUTE</option>
-                <option value="15MINUTE">15MINUTE</option>
+                <option value="15MINUTE" selected="selected">15MINUTE</option>
                 <option value="30MINUTE">30MINUTE</option>
                 <option value="60MINUTE">60MINUTE</option>
-                <option value="1DAY" selected="selected">1DAY</option>
+                <option value="1DAY" >1DAY</option>
                 <option value="1WEEK">1WEEK</option>
                 <option value="1MONTH">1MONTH</option>
               </select>

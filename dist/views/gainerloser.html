@@ -81,7 +81,7 @@ $(document).ready( function () {
                  $(".loader").hide();
                  
 
-                 // $("#date_txt").html(dataSet[0].timestamp);
+                  $("#date_txt").html(response[0].timestamp);
                   var table = new Tabulator("#example-table", {
                     data:response,
                     ajaxLoader: true,
@@ -90,27 +90,39 @@ $(document).ready( function () {
                     height:"90%",
                     width:"96%",
                     layout:"fitDataFill",      //fit columns to width of table
-                    responsiveLayout:"hide",  //hide columns that dont fit on the table
                     tooltips:true,            //show tool tips on cells
                     history:true,             //allow undo and redo actions on the table
                     pagination:"local",       //paginate the data
                     paginationSize:20,         //allow 7 rows per page of data
                     movableColumns:true,      //allow column order to be changed
-                    
+                    rowFormatter:function(row){
+                            var data = row.getData();
+                            if(data.open == data.low){
+                              row.getElement().style.backgroundColor='#79f183';
+                            }else if(data.open == data.high){
+                              row.getElement().style.backgroundColor='#ff8585';
+                            }
+                    },
+                                        
                     columns:[
-                        {title:"Symbol", field:"symbol",formatter:function(cell, formatterParams)
+                        {title:"Symbol",widthShrink:1, field:"symbol",formatter:function(cell, formatterParams)
                           {
                             return "<a href='/chart?symbol="+cell.getValue() +"'>"+cell.getValue() +"</a>";
                           } 
                         },
-                        {title:"Change", field:"percentage",formatter:function(cell, formatterParams)
+                        {title:"Change",widthShrink:1,field:"percentage",formatter:function(cell, formatterParams)
                         {
                             if(cell.getValue() > 0)
                               return "<p><span class='arrow-up'></span><span style='margin: 16px;'>"+cell.getValue() +"%</span></p>";
                             else 
                             return "<p><span class='arrow-down'></span><span style='margin: 16px;'>"+cell.getValue() +"%</span></p>";
                           } 
-                        }
+                        },
+                        {title:"Close", field:"close",widthShrink:1},
+                        {title:"Open", field:"open",widthShrink:1},
+                        {title:"Low", field:"low",widthShrink:1},
+                        {title:"High", field:"high",widthShrink:1},
+                       
                     ]
                 });
             }

@@ -40,7 +40,7 @@
 <script type="text/javascript">
 $(document).ready( function () {
         var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;       
-        var interval = "1DAY";
+        var interval = "15MINUTE";
         var exchange = "nifty";
         $('#userTxt').text(localStorage.getItem('user'));
 
@@ -85,7 +85,6 @@ $(document).ready( function () {
                     height:"90%",
                     width:"96%",
                     layout:"fitDataFill",      //fit columns to width of table
-                    responsiveLayout:"hide",  //hide columns that dont fit on the table
                     tooltips:true,            //show tool tips on cells
                     history:true,             //allow undo and redo actions on the table
                     pagination:"local",       //paginate the data
@@ -95,8 +94,7 @@ $(document).ready( function () {
                       {column:"timestamp", dir:"asc"},
                     ],  
                     columns:[
-                        //{title:"Date", field:"timestamp"},
-                        {title:"Symbol", field:"symbol",formatter:function(cell, formatterParams)
+                       {title:"Symbol", field:"symbol",formatter:function(cell, formatterParams)
                           {
                             return "<a href='/chart?symbol="+cell.getValue() +"'>"+cell.getValue() +"</a>";
                           } 
@@ -104,19 +102,7 @@ $(document).ready( function () {
                         {title:"Close", field:"close",widthShrink:1},
                         {title:"RSI", field:"rsi",widthShrink:1},
                         {title:"SMA", field:"sma",widthShrink:1},
-                        //{title:"Bolinger Band", field:"bb.isCrossed",widthShrink:1},
-                        {title:"Bolinger Band",widthShrink:1,field:"bb",formatter:function(cell, formatterParams)
-                          {
-                            
-                            if(cell.getRow().getData().close > cell.getRow().getData().open  && cell.getRow().getData().close > cell.getValue().upper)
-                              return "<p><span>Above Upper BB</span></p>";
-                            else  if(cell.getRow().getData().close < cell.getRow().getData().open  && cell.getRow().getData().close < cell.getValue().lower)
-                              return "<p><span>Below Lower BB</span></p>";
-                            else
-                             return "<p><span></span></p>";
-                              
-                          } 
-                        },
+                        {title:"Bolinger Band", field:"bb.isCrossed",widthShrink:1},
                         {title:"Volume", field:"volume",widthShrink:0}  
                     ]
                 });
@@ -183,13 +169,11 @@ $(document).ready( function () {
       <div class="col-sm-2">
         <label>interval</label>
         <select id="intervalDropDown" class="form-control" >
-           
-            <option value="5MINUTE">5MINUTE</option>
-            
-            <option value="15MINUTE">15MINUTE</option>
+           <option value="5MINUTE">5MINUTE</option>
+            <option value="15MINUTE" selected="selected">15MINUTE</option>
             <option value="30MINUTE">30MINUTE</option>
             <option value="60MINUTE">60MINUTE</option>
-            <option value="1DAY" selected="selected">1DAY</option>
+            <option value="1DAY" >1DAY</option>
             <option value="1WEEK">1WEEK</option>
             <option value="1MONTH">1MONTH</option>
           </select>

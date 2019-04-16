@@ -133,27 +133,6 @@ var queue = async.queue(function(task, callback) {
                                 allIntervalsArr.map(async (allIntervalsArrObj) =>  {
                                     await updateCollection(lokiJson,allIntervalsArrObj,stockData.data)
                                 }); 
-
-
-                                /* var percentageChangeArray =  store.get("percentage");
-                               // console.log("len : " + task.symbol +" :: "+percentageChangeArray.length);
-                                for(var i = 0; i < percentageChangeArray.length;i++){
-                                    try{
-                                        if(percentageChangeArray[i].symbol == task.symbol)
-                                        {
-                                            var percObj = percentageChangeArray[i];
-                                            percObj.low = Math.min((percentageChangeArray[i] && percentageChangeArray[i].low) ? percentageChangeArray[i].low : stockData.data[0].low,stockData.data[0].low);
-                                            percObj.high = Math.max((percentageChangeArray[i] && percentageChangeArray[i].high) ? percentageChangeArray[i].high : stockData.data[0].high,stockData.data[0].high);
-                                            percentageChangeArray[i] = percObj;
-                                            store.set("percentage",percentageChangeArray);
-                                        }
-                                    }
-                                    catch(error){ 
-                                        console.log("error  : " + error);
-                                    }
-                                } */
-                                
-                                //console.log('UPDATE   ' +task.interval+"> "+ task.symbol);
                             }
                            /*  else if(task.interval == "15MINUTE"){
                                 var intervalNo = parseInt(task.interval);
@@ -191,7 +170,6 @@ function updateCollection(lokiJson,interval,stockData)
 {
     return new Promise(function(resolve, reject) {
             var intervalNo = parseInt(interval);
-       
             var database = lokiJson.getCollection(interval);
             try{
                 if(database && database.get(1) && database.get(1).data && database.get(1).data.timestamp && database.get(1).data.timestamp === response.timestamp){

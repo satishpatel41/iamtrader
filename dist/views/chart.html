@@ -84,8 +84,8 @@ $(document).ready( function () {
                 canvas.id  = "myChart";
                 $( "#chartDiv" ).append(canvas);
                 ctx = document.getElementById("myChart").getContext('2d');
-                ctx.canvas.width = 600;
-                ctx.canvas.height = 300;
+                ctx.canvas.width = 550;
+                ctx.canvas.height = 250;
                 var stockData = dataSet.map(obj =>{ 
                   var rObj = {};
                   rObj.t= Number(obj.timestamp);
@@ -160,7 +160,7 @@ $(document).ready( function () {
     <br></br><br></br>
     
     <div class="row">
-      <div class="col-sm" id="chartDiv" style="position: absolute; height:70vh; width:95vw;top: 0;bottom: 0;margin: auto;"> 
+      <div class="col-sm" id="chartDiv" style="position: absolute; height:50vh; width:90vw;top: 0;bottom: 0;margin: auto;"> 
           <canvas id="myChart"></canvas>
       </div>  
     </div>

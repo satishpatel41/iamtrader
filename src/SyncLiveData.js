@@ -91,14 +91,12 @@ async function getPercent_list(list){
     })).then(dataArr => {
             var percentageChangeArray = [];
             var configChangeArray =  store.get("percentage");
-            // console.log("len : " + task.symbol +" :: "+percentageChangeArray.length);
-             
-
-
+           
             for(var i = 0; i < dataArr[0].length;i++){
                 try{
                     var dataObj1 = dataArr[0][i];
                     var dataObj2 = dataArr[1][i];
+
                     if(dataObj1.symbol == dataObj2.symbol)
                     {
                         var percObj = {};
@@ -114,33 +112,37 @@ async function getPercent_list(list){
                                 console.log("error  : " + error);
                             }
                         } 
-
                         var stock1 = [];
-                        //console.log(dataObj1.symbol +" : "+ dataObj1.data);
                         stock1 = JSON.parse(dataObj1.data);
                         stock1.reverse();
                         var stock2 = [];
                         stock2 = JSON.parse(dataObj2.data);
                         stock2.reverse();
+
+                        var lows = [];
+                        var highs = [];
+                      
+                        for(var j = 0; j < stock2.length;j++){
+                            var d = new Date(Number(stock2[j].timestamp));
+                            if(d.getDate() == now.getDate()){
+                                lows.push(stock2[j].low);
+                                highs.push(stock2[j].high);
+                            }
+                        }
                         var perc = getPercentageChange(stock1[0].close,stock2[0].close);
-                       
                         percObj.symbol = dataObj1.symbol;
                         percObj.percentage = perc;
-                        if(time == "9-30")
-                            percObj.open = stock2[0].open;
-                        
-                        //percObj.low = Math.min((percentageChangeArray[i] && percentageChangeArray[i].low) ? percentageChangeArray[i].low : 0,stock2[0].low);
-                        //percObj.high = Math.max((percentageChangeArray[i] && percentageChangeArray[i].high) ? percentageChangeArray[i].high : 0,stock2[0].high);
-                        percObj.low = Math.min((configChangeArray[id] && configChangeArray[id].low) ? configChangeArray[id].low : stock2[0].low,stock2[0].low);
-                        percObj.high = Math.max((configChangeArray[id] && configChangeArray[id].high) ? configChangeArray[id].high : stock2[0].high,stock2[0].high);
-                        
-
+                        var india = moment.tz(new Date(Number(stock2[0].timestamp)), "Asia/Kolkata");
+                        india.format(); 
+                        percObj.timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();//new Date(row.timestamp);
+                        percObj.low = Math.min(...lows);
+                        percObj.high = Math.max(...highs);
                         percObj.close = Number(stock2[0].close);
                         percObj.open = Number(stock2[stock2.length - 1].open);
                         
                         percentageChangeArray.push(percObj);
-                        //console.log(dataObj1.symbol +" ::::::::::::::: "+ JSON.stringify(percObj));
-                        stock1 =  stock2 =  null;
+                        var india = moment.tz(new Date(Number(stock2[0].timestamp)), "Asia/Kolkata");
+                        stock1 =  stock2 = lows = highs = perc = percObj = dataObj1 = dataObj2 =india = null;
                     }
                 }
                 catch(error){ 

@@ -720,7 +720,16 @@ if (cluster.isMaster) {
                             row.timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();//new Date(row.timestamp);
                             row.rsi = rsi.nextValue(Number(row.close));
                             row.sma = sma.nextValue(Number(row.close));
-                            row.bb = bb.nextValue(Number(row.close)); 
+                            row.bb = bb.nextValue(Number(row.close));
+                            
+                            if(row.bb && Number(row.close) >= Number(row.bb.upper) && Number(row.low) <= Number(row.bb.upper))
+                            {
+                                row.bb.isCrossed = 'Crossed Above';
+                            }
+                            else if(row.bb && Number(row.close) <= Number(row.bb.lower)  && Number(row.high) >= Number(row.bb.lower))
+                            {
+                                row.bb.isCrossed = 'Crossed Below';
+                            }
                             
                             lastObject = row;
                             return row;
