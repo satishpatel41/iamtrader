@@ -117,7 +117,7 @@ async function getPercent_list(list){
                         stock1.reverse();
                         var stock2 = [];
                         stock2 = JSON.parse(dataObj2.data);
-                        stock2.reverse();
+                        
 
                         var lows = [];
                         var highs = [];
@@ -125,16 +125,24 @@ async function getPercent_list(list){
                         for(var j = 0; j < stock2.length;j++){
                             var d = new Date(Number(stock2[j].timestamp));
                             if(d.getDate() == now.getDate()){
-                                lows.push(stock2[j].low);
-                                highs.push(stock2[j].high);
+                                break;
                             }
                         }
+
+                        stock2 = stock2.slice(j, stock2.length);  //**********  dont't change **********  
+                        stock2.reverse();
+                        for(var k = 0; k < stock2.length;k++){
+                            lows.push(stock2[k].low);
+                            highs.push(stock2[k].high);
+                        }
+
                         var perc = getPercentageChange(stock1[0].close,stock2[0].close);
                         percObj.symbol = dataObj1.symbol;
                         percObj.percentage = perc;
                         var india = moment.tz(new Date(Number(stock2[0].timestamp)), "Asia/Kolkata");
                         india.format(); 
                         percObj.timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();//new Date(row.timestamp);
+                        percObj.prevClose = Number(stock1[0].close);
                         percObj.low = Math.min(...lows);
                         percObj.high = Math.max(...highs);
                         percObj.close = Number(stock2[0].close);
@@ -146,13 +154,119 @@ async function getPercent_list(list){
                     }
                 }
                 catch(error){ 
-                    //console.log("getPercent_list Parsing error " +dataObj1.symbol +" : "+ error);
-                    //syncLiveStockDataByInterval([dataObj1.symbol],)
+                    console.log("getPercent_list Parsing error " +dataObj1.symbol +" : "+ error);
+                    
                 }
             }
             percentageChangeArray.sort(function(a, b){return a.percentage - b.percentage});
             percentageChangeArray.reverse();
             store.set("percentage",percentageChangeArray);
+            
+            percentageChangeArray = dataArr =  intervalsArr = null;
+            return 1;
+    })
+    .catch(error => { 
+        console.log(error)
+    }); 
+}
+
+//Get Gap up / Down
+async function getGapUpDown(list){ 
+    var now = new Date();
+    var india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata"); 
+    var time = india.hour() +":"+india.minute();
+
+    console.log("getGapUpDown  - time : " + time);
+    var intervalsArr = ['1DAY','1MINUTE'];
+    Promise.all(intervalsArr.map(async (interval) => {  
+        return new Promise(function(resolved, rejected) {           
+            Promise.all(list.map(async (x) =>  {
+                return getStockDataFromDb(x.symbol ? x.symbol:x,interval);          
+            })).then(stockData => {
+                resolved(stockData);
+            })
+            .catch(error => { 
+                console.log(error)
+            }); 
+        })
+    })).then(dataArr => {
+            var percentageChangeArray = [];
+            var configChangeArray =  store.get("gap");
+           
+            for(var i = 0; i < dataArr[0].length;i++){
+                try{
+                    var dataObj1 = dataArr[0][i];
+                    var dataObj2 = dataArr[1][i];
+
+                    if(dataObj1.symbol == dataObj2.symbol)
+                    {
+                        var percObj = {};
+                        for(var id = 0; id < configChangeArray.length;id++){
+                            try{
+                                if(configChangeArray[i].symbol == dataObj2.symbol)
+                                {
+                                    percObj = configChangeArray[id];
+                                    break;
+                                }
+                            }
+                            catch(error){ 
+                                console.log("error  : " + error);
+                            }
+                        } 
+                        var stock1 = [];
+                        stock1 = JSON.parse(dataObj1.data);
+                        stock1.reverse();
+                        var stock2 = [];
+                        stock2 = JSON.parse(dataObj2.data);
+                        //stock2.reverse();
+
+                        var lows = [];
+                        var highs = [];
+                        //console.log(stock2.length);
+
+                        for(var j = 0; j < stock2.length;j++){
+                            var d = new Date(Number(stock2[j].timestamp));
+                            //console.log(d.getDate() +"==="+ now.getDate());
+                            if(d.getDate() == now.getDate()){
+                                break;
+                            }
+                        }
+                        //console.log(j +"==="+ stock2.length);
+                        stock2 = stock2.slice(j, stock2.length);  //**********  dont't change **********  
+                        stock2.reverse();
+                        //console.log(stock2.length);
+
+
+                        for(var k = 0; k < stock2.length;k++){
+                            lows.push(stock2[k].low);
+                            highs.push(stock2[k].high);
+                        }
+
+                        var perc = getPercentageChange(stock1[0].close,Number(stock2[stock2.length - 1].open));
+                        percObj.symbol = dataObj1.symbol;
+                        percObj.gap = perc;
+                        var india = moment.tz(new Date(Number(stock2[0].timestamp)), "Asia/Kolkata");
+                        india.format(); 
+                        percObj.timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();//new Date(row.timestamp);
+                        percObj.low = Math.min(...lows);
+                        percObj.high = Math.max(...highs);
+                        percObj.prevClose = Number(stock1[0].close);
+                        percObj.close = Number(stock2[0].close);
+                        percObj.open = Number(stock2[stock2.length - 1].open);
+                        
+                        percentageChangeArray.push(percObj);
+                        var india = moment.tz(new Date(Number(stock2[0].timestamp)), "Asia/Kolkata");
+                        stock1 =  stock2 = lows = highs = perc = percObj = dataObj1 = dataObj2 =india = null;
+                    }
+                }
+                catch(error){ 
+                    console.log("getGapUpDown Parsing error " +dataObj1.symbol +" : "+ error);
+                  
+                }
+            }
+            percentageChangeArray.sort(function(a, b){return a.percentage - b.percentage});
+            percentageChangeArray.reverse();
+            store.set("gap",percentageChangeArray);
             
             percentageChangeArray = dataArr =  intervalsArr = null;
             return 1;

@@ -281,6 +281,7 @@ function getAllData(){
         }, 47000);
           
     }).then(res=>{
+        getGapUpDown(watchList);
         return Number(res) + 1;
     });
 

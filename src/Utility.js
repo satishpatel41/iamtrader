@@ -55,6 +55,7 @@ function getPercentageChange(oldNumber, newNumber){
   return ((decreaseValue / oldNumber) * 100).toFixed(2);
 }
 
+
 Array.prototype.insert = function(i,...rest){
   return this.slice(0,i).concat(rest,this.slice(i));
 }
