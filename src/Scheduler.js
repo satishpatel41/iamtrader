@@ -2,7 +2,7 @@ var cron = require('node-cron');
 var chalk = require('chalk');
 var list;
 var moment = require('moment-timezone');
-var ping = require('ping');
+
 var hosts = ['robo-trader.herokuapp.com', 'https://robo-trader.herokuapp.com/'];
 
 var now = new Date();
@@ -56,19 +56,6 @@ timezone: "Asia/Kolkata"
 });
 
 
-cron.schedule('*/45 * * * *', () => {
-    hosts.forEach(function (host) {
-        ping.promise.probe(host)
-            .then(function (res) {
-                console.log(res);
-            });
-    });
-
-     console.log(chalk.blue('Ping --- every 45 minutes' + new Date()));
- }, {
- scheduled: true,
- timezone: "Asia/Kolkata"
- });
 
 
 cron.schedule('*/30 * * * *', () => {
@@ -243,6 +230,7 @@ function load1minData()
         resolve(1);      
     }).then(res=>{
         getPercent_list(watchList);
+        getGapUpDown(watchList);
         return Number(res) + 1;
     });
 }

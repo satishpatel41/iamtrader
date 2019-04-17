@@ -171,12 +171,45 @@ if (cluster.isMaster) {
     });
 
 
+    app.get('/gapupdown', function (req, res) {
+        res.sendFile("gapUpDown.html", {"root": __dirname});
+    });
+
+
     app.get('/index', function (req, res) {
         res.sendFile("index.html", {"root": __dirname});
     });
    // app.get('/api/gainerLoser', function (req, res) {
 
+    
+    app.get('/api/gapupdown/:exchange', checkSignIn,function (req, res) { 
+        var exchange = req.params.exchange;  
+        var list = [];
+        if(exchange == "nifty")
+            list =  nifty;
+        else if(exchange == "fno")
+            list = fno;
+        else
+            list = nse; 
            
+        var response = store.get('gap').filter(isMatching);
+        function isMatching(sItem) {
+            var isMatch = false;
+            for (var i = 0; i < list.length; i++) {
+               
+                if(list[i] == sItem.symbol){
+                    isMatch = true;
+                    break;
+                }
+            }
+            return isMatch;
+        }
+       
+        res.send(response);
+        response =list= exchange = null;
+        res.end();
+    });
+
     app.get('/api/gainerLoser/:exchange', checkSignIn,function (req, res) { 
         var exchange = req.params.exchange;  
         var list = [];

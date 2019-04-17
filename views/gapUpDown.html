@@ -76,7 +76,7 @@ $(document).ready( function () {
         function loadAllSymbolData(interval,exchange){
           $(".loader").show();
           $.get({
-            url: server+'/api/gainerLoser/'+exchange,
+            url: server+'/api/gapupdown/'+exchange,
             success: function(response){
                  $(".loader").hide();
                  
@@ -110,7 +110,7 @@ $(document).ready( function () {
                             return "<a href='/chart?symbol="+cell.getValue() +"'>"+cell.getValue() +"</a>";
                           } 
                         },
-                        {title:"Change",widthShrink:1,field:"percentage",formatter:function(cell, formatterParams)
+                        {title:"Change",widthShrink:1,field:"gap",formatter:function(cell, formatterParams)
                         {
                             if(cell.getValue() > 0)
                               return "<p><span class='arrow-up'></span><span style='margin: 16px;'>"+cell.getValue() +"%</span></p>";
@@ -148,8 +148,8 @@ $(document).ready( function () {
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
         <!-- <li><a href="/index">Home</a></li> -->
-        <li class="active"><a href="/gainerloser">Top Gainer / Looser</a></li>
-        <li><a href="/gapupdown">Gap up/Down</a></li>
+        <li ><a href="/gainerloser">Top Gainer / Looser</a></li>
+        <li class="active"><a href="/gapupdown">Gap up/Down</a></li>
         <li><a href="/allCharts">Stocks Charts</a></li>
         <li><a href="/scanner">Scanner</a></li>
         <li><a href="/strategy">Strategy</a></li>

@@ -170,6 +170,7 @@ function updateCollection(lokiJson,interval,stockData)
 {
     return new Promise(function(resolve, reject) {
             var intervalNo = parseInt(interval);
+            var now = new Date();
             var database = lokiJson.getCollection(interval);
             try{
                 if(database && database.get(1) && database.get(1).data && database.get(1).data.timestamp && database.get(1).data.timestamp === response.timestamp){
@@ -179,28 +180,38 @@ function updateCollection(lokiJson,interval,stockData)
                     var symbolObj= {};
                     var count = 0;
                     var t = (database.get(1).data && database.get(1).data[database.get(1).data.length - 1] && database.get(1).data[database.get(1).data.length - 1].timestamp) ? database.get(1).data[database.get(1).data.length - 1].timestamp : 0;
-
+                    var lows = [];
+                    var highs = [];
+                  
                     for(var i = 0; i < stockData.length;i++)
                     {
                         if(stockData[i].timestamp > t)
                         {
                             
+                            /* for(var j = 0; j < stockData.length;j++){
+                                var d = new Date(Number(stockData[j].timestamp));
+                                if(d.getDate() == now.getDate()){
+                                    lows.push(stockData[j].low);
+                                    highs.push(stockData[j].high);
+                                }
+                            } */
                             if(count % intervalNo == 0){
                                 symbolObj = stockData[i];
                                 database.get(1).data.push(stockData[i]);
                                 count = 0;
                                // console.log('edit  ' +count +" : "+ stockData.length +" : "+ i+" : "+interval +" : "+ intervalNo  +" : "+  stockData[i].timestamp  +" : "+new Date(Number(stockData[i].timestamp)));
                             }
-
+                            /* database.get(1).data[database.get(1).data.length - 1].low = Math.min(...lows);
+                            database.get(1).data[database.get(1).data.length - 1].high = Math.max(...highs);
+ */
                             database.get(1).data[database.get(1).data.length - 1].low = Math.min((stockData[i] && stockData[i].low) ? stockData[i].low : symbolObj.low,symbolObj.low);
                             database.get(1).data[database.get(1).data.length - 1].close = Number(stockData[i].close);
                             database.get(1).data[database.get(1).data.length - 1].timestamp = Number(stockData[i].timestamp);
                             database.get(1).data[database.get(1).data.length - 1].high = Math.max((stockData[i] && stockData[i].high) ? stockData[i].high : symbolObj.high,symbolObj.high);
-                            count++;
-
-                            
+                            count++;   
                         }
                     }
+                    t = count =  null;
             }
             resolve(1); 
             }
