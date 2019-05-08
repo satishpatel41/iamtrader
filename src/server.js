@@ -14,14 +14,14 @@ var async = require('async');
 const querystring = require('querystring');
 var store = new Store({ path: 'config.json' });
 var Upstox = require("upstox");
-var api = "OknufM07tm1g9EfN4fHKP2Eqi9DSw40I2Y3xliHg";
+var api = "8gtPZrzCsNayGnraaxVc792UuksNxV2q3Niif4U9";
 var upstox = new Upstox(api);
 const PORT = process.env.PORT || 3000;
 var redirect_uri = "http://localhost:"+PORT;
 
 if(process.env.NODE_ENV=="production")
 {
-    api = "OknufM07tm1g9EfN4fHKP2Eqi9DSw40I2Y3xliHg";
+    api = "8gtPZrzCsNayGnraaxVc792UuksNxV2q3Niif4U9";
     redirect_uri = "https://robo-trader.herokuapp.com/";
 }
 

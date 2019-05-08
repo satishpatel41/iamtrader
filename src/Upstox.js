@@ -2,14 +2,14 @@ var Upstox = require("upstox");
 var moment = require('moment-timezone');
 
 
-var api = "OknufM07tm1g9EfN4fHKP2Eqi9DSw40I2Y3xliHg";
+var api = "8gtPZrzCsNayGnraaxVc792UuksNxV2q3Niif4U9";
 var upstox = new Upstox(api);
 var fs = require('fs');
 var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 var code = '';
 var __dirname = "views"
 var exchanges =  [ 'MCX_FO', 'BSE_EQ', 'NSE_EQ', 'NSE_FO', 'NCD_FO'];
-var api_secret = "69xldylnvf";
+var api_secret = "697b2whx04";
 var client_id="";
 
 var accessToken;
