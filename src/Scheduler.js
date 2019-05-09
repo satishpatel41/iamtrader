@@ -17,7 +17,7 @@ var start_date = formatDate(india.date())+"-"+formatDate(india.month() + 1)+"-"+
 
 cron.schedule('*/1 * * * *', () => {
     load1minData();
-    console.log(chalk.blue('running a task every 1 minutes ' + new Date()));
+    //console.log(chalk.blue('running a task every 1 minutes ' + new Date()));
 }, {
 scheduled: true,
 timezone: "Asia/Kolkata"
@@ -25,7 +25,7 @@ timezone: "Asia/Kolkata"
 
 cron.schedule('*/3 * * * *', () => {
     //load3minData();
-    console.log(chalk.blue('running a task every 3 minutes ' + new Date()));
+    //console.log(chalk.blue('running a task every 3 minutes ' + new Date()));
 }, {
 scheduled: true,
 timezone: "Asia/Kolkata"
@@ -33,7 +33,7 @@ timezone: "Asia/Kolkata"
 
 cron.schedule('*/5 * * * *', () => {
     load5minData();
-    console.log(chalk.blue('running a task every 5 minutes ' + new Date()));
+    //console.log(chalk.blue('running a task every 5 minutes ' + new Date()));
 }, {
 scheduled: true,
 timezone: "Asia/Kolkata"
@@ -41,7 +41,7 @@ timezone: "Asia/Kolkata"
 
 cron.schedule('*/10 * * * *', () => {
     //load10minData();
-    console.log(chalk.blue('running a task every 10 minutes ' + new Date()));
+    //console.log(chalk.blue('running a task every 10 minutes ' + new Date()));
 }, {
 scheduled: true,
 timezone: "Asia/Kolkata"
@@ -56,11 +56,9 @@ timezone: "Asia/Kolkata"
 });
 
 
-
-
 cron.schedule('*/30 * * * *', () => {
-   load30minData();
-    console.log(chalk.blue('running a task every 30 minutes' + new Date()));
+   //load30minData();
+    //console.log(chalk.blue('running a task every 30 minutes' + new Date()));
 }, {
 scheduled: true,
 timezone: "Asia/Kolkata"
@@ -85,7 +83,7 @@ timezone: "Asia/Kolkata"
 
 
 // At 9:30
-cron.schedule('30 9 * * *', () => {
+cron.schedule('31 9 * * *', () => {
     console.log('Good morning : 9:30 call');
     interval = '15MINUTE';
 
@@ -177,7 +175,7 @@ function load10minData()
 function load5minData()
 {
     interval = '5MINUTE';
-    //queue.empty();
+    queue.empty();
     now = new Date();
     now.setDate(now.getDate() - 1);
     india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
@@ -227,7 +225,8 @@ function load1minData()
         if(accessToken)
              syncLiveAllStockData(indices,interval,start_date,end_date);
              syncLiveAllStockData(watchList,interval,start_date,end_date);
-        resolve(1);      
+             is15MinDataSync = false;
+             resolve(1);      
     }).then(res=>{
         getPercent_list(watchList);
         getGapUpDown(watchList);
@@ -238,7 +237,9 @@ function load1minData()
 function load15minData()
 {   
     interval = '15MINUTE';
-    //queue.empty();
+    
+            
+    queue.empty();
     now = new Date();
     now.setDate(now.getDate() - 1);
     india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
@@ -250,6 +251,7 @@ function load15minData()
         
         setTimeout(function() {
             resolve(1);
+            is15MinDataSync = true;
         }, 10000);      
     }).then(res=>{
         //console.log("load15minData - Process p  " + res);
@@ -266,6 +268,14 @@ function load15minData()
 
     promise.then(function(result)  {
         getPercent_list(watchList);
-       // console.log("load15minData  " + result);
+        // console.log("load15minData  " + result);
+    });
+
+    promise.then(function(result)  {
+        rsiList.map(async(strategy)=>{
+            //console.log("\n rsiList > "+strategy);
+            applyStrategy(bankNifty_indices,'15MINUTE',strategy); 
+        });
+        return Number(result) + 1;
     });
 }

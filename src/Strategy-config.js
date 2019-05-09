@@ -245,6 +245,8 @@ var strategyStrongList = [strategy_rsi_above_60];
 
 var strategyWeakList = [strategy_rsi_below_40];
 
+var rsiList = [strategy_rsi_above_60,strategy_rsi_below_40];
+
 
 
 /******OPEN = HIGH / OPEN = LOW *****/

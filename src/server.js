@@ -64,8 +64,7 @@ if (cluster.isMaster) {
                 saveUninitialized: false,
                 secret: "00777",
                 cookie: {
-                    maxAge: 1000 * 60 * 60 * 10//24
-                }
+                    maxAge: 1000 * 60 * 60 * 10 * 15                }
             }    
         ));
     
@@ -205,10 +204,16 @@ if (cluster.isMaster) {
             return isMatch;
         }
        
-        res.send(response);
-        response =list= exchange = null;
+          
+        var filteredResponse = response.filter(isBigGap);
+        res.send(filteredResponse);
+        response =filteredResponse = list= exchange = null;
         res.end();
     });
+
+    function isBigGap(value) {
+        return value.gap > 1 || value.gap < -1;
+      }
 
     app.get('/api/gainerLoser/:exchange', checkSignIn,function (req, res) { 
         var exchange = req.params.exchange;  

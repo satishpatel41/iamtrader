@@ -167,33 +167,7 @@ function backTesting(stockData,path){
   console.log(stockData); */
 }
 
-
-function mappedFunction()
-{
- 
-}
-
-function transform(row)
-{
-    var timestamp = '';
-    if(row.timestamp > 0){
-        var d =new Date(Number(row.timestamp));
-        var india = moment.tz(d, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
-        india.format(); 
-        //console.log(india +" : "+ stockData[0].timestamp +" : "+ d);
-        /*  if(india.minute() > 0)
-            timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();
-        else
-            timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year();      */       
-    }  
-
-    row.timestamp = india;
-
-  //row.timestamp = new Date(row.timestamp);
-  return row;
-}
-
-/* function searchPattern(row)
+function searchPattern(row)
 {
     var now = new Date();
     var thisMonth = months[now.getMonth()].slice(0,3).toUpperCase();
@@ -253,7 +227,7 @@ function transform(row)
       return 0;
   }
 }
- */
+
 
 
 
@@ -400,19 +374,19 @@ function addIndicators(response,path){
   backTesting(stockData,path);
   //log(stockData);
 }
-/* 
+
 var bankNiftyCall;
-function checkBankNiftyExpiry()
+function checkBankNiftyExpiry(data)
 {
       bankNiftyCall = new Object();
 
-      fs.readFile('data/index/nse_fo.txt', function(err, response) {      
-        var  data= JSON.parse(response).data;
+     // fs.readFile('data/index/nse_fo.txt', function(err, response) {      
+        //var  data= JSON.parse(response).data;
         const transformedData = new dataForge.DataFrame(data)
         .where(row => searchPattern(row)) // Filter rows.
         .toArray();                        // Back to normal JavaScript data!.
    
        console.log("WATCH BANK NIFTY  ****** " + JSON.stringify(bankNiftyCall)); 
        console.log(" \n \n BANK NIFTY >> data >>" + transformedData);
-    });
-} */
+    //});
+}

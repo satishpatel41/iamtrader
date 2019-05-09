@@ -13,6 +13,7 @@ var api_secret = "697b2whx04";
 var client_id="";
 
 var accessToken;
+var is15MinDataSync = false;
 
 function getAcceToken(code)
 {
@@ -249,28 +250,38 @@ function getMaster(ex = "nse_fo"){
 
 async function loadSymbol(symbol,exchange,interval='1day',start_date='',end_date=''){ 
     //console.log("loadSymbol > " + symbol + " > "+accessToken +" :: "+ interval +" > "+exchange +" > "+ start_date +" > "+ end_date);
-    upstox.setToken(accessToken);
-    return new Promise(function(resolved, rejected) {   
-        upstox.getOHLC({"exchange": exchange,
-            "symbol": symbol,
-            "start_date": start_date,
-            "end_date": end_date,
-            "format" : "json",
-            "interval" : interval
-        }).then(result =>{
-            resolved(result);
-            })
-        .catch(error =>{
-            rejected(error);
-        }); 
-    });
+   
+    if(accessToken){
+        upstox.setToken(accessToken);
+        return new Promise(function(resolved, rejected) {   
+            upstox.getOHLC({"exchange": exchange,
+                "symbol": symbol,
+                "start_date": start_date,
+                "end_date": end_date,
+                "format" : "json",
+                "interval" : interval
+            }).then(result =>{
+                resolved(result);
+                })
+            .catch(error =>{
+                rejected(error);
+            }); 
+        });
+    }
 }
 
 function getAllData(){
     queue.empty();
-
+    var result = 0;
     let promise = new Promise(function(resolve, reject) {
         syncAllUpstoxData(indices);
+    
+        setTimeout(function() {
+            var interval = '15MINUTE';
+            getBankNifty(bankNiftySymbol,interval,'');
+        }, 500);
+
+       
         setTimeout(function() {
             syncAllUpstoxData(watchList);
         }, 500);
@@ -282,15 +293,24 @@ function getAllData(){
           
     }).then(res=>{
         getGapUpDown(watchList);
-        return Number(res) + 1;
+        result += 1;
     });
 
     promise.then(function(result)  {
         strategyStrongList.map(async(strategy)=>{
             applyStrategy(watchList,'1DAY',strategy); 
         });
-        return Number(result) + 1;
+        result += 1;
     });
+
+  
+    promise.then(function(result)  {
+        rsiList.map(async(strategy)=>{
+            applyStrategy(bankNifty_indices,'15MINUTE',strategy); 
+        });
+        result += 1;
+    });
+    
 }
 
 var stockData = []; 

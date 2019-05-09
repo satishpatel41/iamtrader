@@ -187,24 +187,18 @@ function updateCollection(lokiJson,interval,stockData)
                     {
                         if(stockData[i].timestamp > t)
                         {
+                            var d1 = new Date(stockData[i].timestamp);
+                            var d2 = new Date(t);
                             
-                            /* for(var j = 0; j < stockData.length;j++){
-                                var d = new Date(Number(stockData[j].timestamp));
-                                if(d.getDate() == now.getDate()){
-                                    lows.push(stockData[j].low);
-                                    highs.push(stockData[j].high);
-                                }
-                            } */
-                            if(count % intervalNo == 0){
+                            if(count % intervalNo == 0 && is15MinDataSync){
                                 symbolObj = stockData[i];
                                 database.get(1).data.push(stockData[i]);
                                 count = 0;
-                               // console.log('edit  ' +count +" : "+ stockData.length +" : "+ i+" : "+interval +" : "+ intervalNo  +" : "+  stockData[i].timestamp  +" : "+new Date(Number(stockData[i].timestamp)));
-                            }
-                            /* database.get(1).data[database.get(1).data.length - 1].low = Math.min(...lows);
-                            database.get(1).data[database.get(1).data.length - 1].high = Math.max(...highs);
- */
+                            }     
                             database.get(1).data[database.get(1).data.length - 1].low = Math.min((stockData[i] && stockData[i].low) ? stockData[i].low : symbolObj.low,symbolObj.low);
+                            if(database.get(1).data[database.get(1).data.length - 1].open < 0){
+                                database.get(1).data[database.get(1).data.length - 1].open = Number(stockData[i].open); 
+                            }
                             database.get(1).data[database.get(1).data.length - 1].close = Number(stockData[i].close);
                             database.get(1).data[database.get(1).data.length - 1].timestamp = Number(stockData[i].timestamp);
                             database.get(1).data[database.get(1).data.length - 1].high = Math.max((stockData[i] && stockData[i].high) ? stockData[i].high : symbolObj.high,symbolObj.high);

@@ -10,6 +10,7 @@
                 {symbol:"BANKNIFTY1950929300PE",ex:"NSE_FO"},
                 {symbol:"NIFTY19APRFUT",ex:"NSE_FO"}];
 
-
-  watchList =  nifty;
+var bankNifty_indices = [{symbol:"BANKNIFTY19MAYFUT",ex:"NSE_FO"}];
+var bankNiftySymbol = "BANKNIFTY19MAYFUT";
+watchList =  nifty;
   

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Home Page</title>
+<title>Stock charts</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -86,6 +86,11 @@ $(document).ready( function () {
                 ctx = document.getElementById("myChart").getContext('2d');
                 ctx.canvas.width = 550;
                 ctx.canvas.height = 250;
+
+                var now = new Date(Number(dataSet[0].timestamp))
+                var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear() +"  "+now.getHours()+":"+now.getMinutes();
+                $("#date_txt").html(start_date);
+
                 var stockData = dataSet.map(obj =>{ 
                   var rObj = {};
                   rObj.t= Number(obj.timestamp);
@@ -157,11 +162,19 @@ $(document).ready( function () {
   </nav>
           
   <div class="container">
-    <div class="row"></div>
-    <br></br><br></br>
+    
+    <br></br>
+    <br></br>
     
     <div class="row">
-      <div class="col-sm" id="chartDiv" style="position: absolute; height:50vh; width:90vw;top: 0;bottom: 0;margin: auto;"> 
+      <div class="col-sm-4">
+        <label>Update till :</label>
+        <label id="date_txt"></label>
+      </div> 
+    </div>
+    
+    <div class="row">
+      <div class="col-sm" id="chartDiv" style="position: absolute; height:50vh; width:90vw;max-width: 550px;"> 
           <canvas id="myChart"></canvas>
       </div>  
     </div>
