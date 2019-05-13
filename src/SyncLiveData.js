@@ -31,7 +31,7 @@ async function syncAllUpstoxData(list){
     }
  */
     await intervals.map(async (interval) =>  {
-        console.log('syncAllUpstoxData :  interval  - ' + interval);
+        //console.log('syncAllUpstoxData :  interval  - ' + interval);
         await list.map(async (x) =>  {
             var symbol = x.symbol ? x.symbol:x;        
             var ex = x.ex;      
@@ -109,7 +109,7 @@ async function getPercent_list(list){
                                 }
                             }
                             catch(error){ 
-                                console.log("error  : " + error);
+                                //console.log("error  : " + error);
                             }
                         } 
                         var stock1 = [];
@@ -210,7 +210,7 @@ async function getGapUpDown(list){
                                 }
                             }
                             catch(error){ 
-                                console.log("error  : " + error);
+                                //console.log("error  : " + error);
                             }
                         } 
                         var stock1 = [];
@@ -260,8 +260,7 @@ async function getGapUpDown(list){
                     }
                 }
                 catch(error){ 
-                    console.log("getGapUpDown Parsing error " +dataObj1.symbol +" : "+ error);
-                  
+                    //console.log("getGapUpDown Parsing error " +dataObj1.symbol +" : "+ error);
                 }
             }
             percentageChangeArray.sort(function(a, b){return a.percentage - b.percentage});
@@ -356,25 +355,29 @@ function getStockDataByInterval(symbol,interval,strategy){
 function getBankNifty(symbol,interval,strategy){ 
     getStockDataFromDb(symbol,interval)
     .then(dataObj  => {
-       var data = JSON.parse(dataObj.data); 
-       
-        var close = data[data.length - 1].close;
-        var currentPrice = Math.round(close / 100) * 100;
-        var pricePattern = new RegExp(String(currentPrice), 'gi');
-        
-       /*  data.map(row => {
-            var india = moment.tz(new Date(Number(row.timestamp)), "Asia/Kolkata");
-            india.format(); 
-            row.timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();
-            row.rsi = rsi.nextValue(Number(row.close));
-            row.sma = sma.nextValue(Number(row.close));
-            row.bb = bb.nextValue(Number(row.close)); 
-            
-            return row;
-        });
-        data.reverse(); */
 
-        console.log("getBankNifty \n " + JSON.stringify(data[0]) +":"+currentPrice);
+        if(dataObj && dataObj.data){
+            //console.log("getBankNifty \n " + JSON.stringify(dataObj) );
+            var data = JSON.parse(dataObj.data); 
+            
+                var close = data[data.length - 1].close;
+                var currentPrice = Math.round(close / 100) * 100;
+                var pricePattern = new RegExp(String(currentPrice), 'gi');
+                
+                data.map(row => {
+                    var india = moment.tz(new Date(Number(row.timestamp)), "Asia/Kolkata");
+                    india.format(); 
+                    row.timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();
+                    row.rsi = rsi.nextValue(Number(row.close));
+                    row.sma = sma.nextValue(Number(row.close));
+                    row.bb = bb.nextValue(Number(row.close)); 
+                    
+                    return row;
+                });
+                data.reverse();
+
+                console.log("getBankNifty \n " + JSON.stringify(data[0]) +":"+currentPrice);
+            }
 
         //checkBankNiftyExpiry(data);
        // getIndicator(dataObj.symbol,data,strategy,true);

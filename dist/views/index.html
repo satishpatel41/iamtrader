@@ -7,11 +7,15 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
 <script src="https://moment.github.io/luxon/global/luxon.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@0.1.1"></script>
 <script src="https://www.chartjs.org/chartjs-chart-financial/chartjs-chart-financial.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+<script src="https://moment.github.io/luxon/global/luxon.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.25/moment-timezone-with-data.js"></script>
 
 <style>
     .loader {
@@ -72,6 +76,7 @@ $(document).ready( function () {
         $( "#symbolTxt" ).change(function() {
           symbol = $("#symbolTxt").val();
           loadSymbolData(symbol,interval);
+          $( "#symbolTxt" ).val("");
         });
 
         $(".loader").show();
@@ -110,7 +115,7 @@ $(document).ready( function () {
           $.get({
             url: server+'/getStockIndicators/'+symbolName+"/"+interval,
             success: function(response){
-              response = response.slice(0, 40);
+              response = response.slice(0, 28);
                 var dataSet = response.filter(function (el) {
                   return (el != null && el.close != null && el.close != undefined && el.close != "");
                 });
@@ -128,16 +133,30 @@ $(document).ready( function () {
                 var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear() +"  "+now.getHours()+":"+now.getMinutes();
                 $("#date_txt").html(start_date);
 
+                
                 var stockData = dataSet.map(obj =>{ 
                   var rObj = {};
-                  rObj.t= Number(obj.timestamp);
+
+                  var india = moment.tz(new Date(Number(obj.timestamp)), "Asia/Kolkata");
+                  india.format(); 
+
+                  var d = new Date();
+                  d.setDate(india.date());
+                  d.setMonth(india.month() + 1);
+                  d.setFullYear(india.year());
+                  d.setHours(india.hour());
+                  d.setMinutes(india.minute());
+
+                  rObj.t= d.getTime();
                   rObj.o= Number(obj.open);
                   rObj.h= Number(obj.high);
                   rObj.l= Number(obj.low);
                   rObj.c= Number(obj.close);
                   return rObj;
-                });      
-                stockData = stockData.reverse().slice(0, 60);
+                }); 
+                
+                
+                stockData = stockData.reverse().slice(0, 28);
                 var chart = new Chart(ctx, 
                 {
                   type: 'candlestick',

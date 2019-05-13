@@ -8,11 +8,15 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
 <script src="https://moment.github.io/luxon/global/luxon.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@0.1.1"></script>
 <script src="https://www.chartjs.org/chartjs-chart-financial/chartjs-chart-financial.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+<script src="https://moment.github.io/luxon/global/luxon.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.25/moment-timezone-with-data.js"></script>
 
 <style>
     .loader {
@@ -93,14 +97,28 @@ $(document).ready( function () {
 
                 var stockData = dataSet.map(obj =>{ 
                   var rObj = {};
-                  rObj.t= Number(obj.timestamp);
+
+                  var india = moment.tz(new Date(Number(obj.timestamp)), "Asia/Kolkata");
+                  india.format(); 
+
+                  var d = new Date();
+                  d.setDate(india.date());
+                  d.setMonth(india.month() + 1);
+                  d.setFullYear(india.year());
+                  d.setHours(india.hour());
+                  d.setMinutes(india.minute());
+
+                  rObj.t= d.getTime();
                   rObj.o= Number(obj.open);
                   rObj.h= Number(obj.high);
                   rObj.l= Number(obj.low);
                   rObj.c= Number(obj.close);
                   return rObj;
-                });      
-                stockData = stockData.reverse().slice(0, 60);
+                }); 
+                
+                
+
+                stockData = stockData.reverse().slice(0, 40);
                 var chart = new Chart(ctx, 
                 {
                   type: 'candlestick',
@@ -174,7 +192,7 @@ $(document).ready( function () {
     </div>
     
     <div class="row">
-      <div class="col-sm" id="chartDiv" style="position: absolute; height:50vh; width:90vw;max-width: 550px;"> 
+      <div class="col-sm" id="chartDiv" style="position: absolute; height:50vh; width:90vw;max-width: 600px;"> 
           <canvas id="myChart"></canvas>
       </div>  
     </div>

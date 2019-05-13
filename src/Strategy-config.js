@@ -114,7 +114,7 @@ var strategy_rsi40_crossed ={
 ]
 }; 
 
-var strategy_bbLower ={
+var bbLower_band_crossed ={
     name:"Bollinger band : lower band Cross Over",
     description : "Bollinger band : lower band Cross Over",
     isBuyOrSell:"s",
@@ -147,7 +147,7 @@ var strategy_bbLower ={
 ]
 }; 
 
-var strategy_bbUpper_band_crossed ={
+var bbUpper_band_crossed ={
     name:"Bollinger band : Upper band Cross Over",
     description : "Bollinger band : Upper band Cross Over",
     isBuyOrSell:"b",
@@ -179,10 +179,77 @@ var strategy_bbUpper_band_crossed ={
     } 
 ]
 }; 
-    
-var strategyList = [strategy_rsi60_crossed,strategy_bbUpper_band_crossed,strategy_bbLower];
 
-var open_band_List = [strategy_bbUpper_band_crossed,strategy_bbLower];
+var bbLower_band_reversal ={
+    name:"Bollinger band : lower band reversal",
+    description : "Bollinger band : lower band reversal",
+    isBuyOrSell:"b",
+    isLive:false,
+    strategy : [
+    {
+        indicators:
+        [
+            {indicator:'BB',period : 14,values:"closes",stdDev : 2}
+        ],output:[],strategy:"closes[i] >= output[0][i]['lower']"
+    },
+    {
+        indicators:
+        [
+            {indicator:'BB',period : 14,values:"closes",stdDev : 2}
+        ],output:[],strategy:"opens[i] <= output[0][i]['lower']"
+    },
+    {
+        indicators:
+        [
+            {indicator:''}
+        ],output:[],strategy:"closes[i] > opens[i]"
+    },
+    {
+        indicators:
+        [
+            {indicator:''}
+        ],output:[],strategy:"((closes[i] - opens[i]) / (highs[i] - lows[i])) >= 0.5"
+    }
+]
+}; 
+
+var bbUpper_band_reversal ={
+    name:"Bollinger band : Upper band reversal",
+    description : "Bollinger band : Upper band reversal",
+    isBuyOrSell:"s",
+    isLive:false,
+    strategy : [
+    {
+        indicators:
+        [
+            {indicator:'BB',period : 14,values:"closes",stdDev : 2}
+        ],output:[],strategy:"closes[i] <= output[0][i]['upper']"
+    },
+    {
+        indicators:
+        [
+            {indicator:'BB',period : 14,values:"closes",stdDev : 2}
+        ],output:[],strategy:"opens[i] >= output[0][i]['upper']"
+    },
+    {
+        indicators:
+        [
+            {indicator:''}
+        ],output:[],strategy:"closes[i] < opens[i]"
+    },
+    {
+        indicators:
+        [
+            {indicator:''}
+        ],output:[],strategy:"((closes[i] - opens[i]) / (highs[i] - lows[i])) <= -0.5"
+    } 
+]
+}; 
+    
+var strategyList = [strategy_rsi60_crossed,bbUpper_band_crossed,bbLower_band_crossed];
+
+var bollinger_open_List = [bbUpper_band_crossed,bbLower_band_crossed,bbUpper_band_reversal,bbLower_band_reversal];
+
 
 /******Strong / week *****/
 

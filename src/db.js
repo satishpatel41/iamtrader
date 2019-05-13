@@ -113,7 +113,7 @@ var queue = async.queue(function(task, callback) {
                 try {
                     if(response != '' && response != undefined && response != null){
                         stockData = response;
-                        //console.log('response  >>> ' + task.symbol +" :: " + task.interval+"> "+stockData.data.length);
+                        //console.log('response  >>> ' + task.symbol +" :: " + task.interval+"> "+ task.start_date+"> "+ task.end_date+"> "+JSON.stringify(response));
                         if(response && response.error){
                             // database.clear();
                             lokiJson.close(); 
@@ -122,7 +122,7 @@ var queue = async.queue(function(task, callback) {
                         else if(database != null && database.get(1) && database.get(1).data && database.get(1).data.timestamp && database.get(1).data.timestamp == response.timestamp){
                             console.log('Skip ! Do nothing   ' +task.interval+"> "+ task.symbol);
                         }
-                        else if(database != null) {
+                        else if(database != null && response && response.code == 200) {
                             //console.log('UPDATE   ' +task.interval+"> "+ task.symbol +" :: "+ database);
                             database.clear();
                             database.insert(stockData);  
@@ -164,7 +164,7 @@ var queue = async.queue(function(task, callback) {
             });
         }  
     } 
-},20);
+},50);
 
 function updateCollection(lokiJson,interval,stockData)
 {
@@ -177,6 +177,23 @@ function updateCollection(lokiJson,interval,stockData)
                     console.log('Do nothing   ' +interval);
                 }
                 else if(database && database.get(1) && database.get(1).data){
+
+                    /* for(var i = 0; i < database.get(1).data.length;i++)
+                    {
+                        var d = Number(database.get(1).data[i].timestamp);
+ 
+                        var india = moment.tz(d, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
+                        india.format(); 
+                        
+                        if(india.minute() % intervalNo != 0)
+                        {
+                               console.log("Problem " + india.minute() +":: "+i) ;
+                               var op = database.get(1).data.slice(0, i);  //**********  dont't change **********  
+                               lokiJson.saveDatabase();   
+                               break;
+                        }
+                    } */
+                    
                     var symbolObj= {};
                     var count = 0;
                     var t = (database.get(1).data && database.get(1).data[database.get(1).data.length - 1] && database.get(1).data[database.get(1).data.length - 1].timestamp) ? database.get(1).data[database.get(1).data.length - 1].timestamp : 0;
@@ -195,13 +212,12 @@ function updateCollection(lokiJson,interval,stockData)
                                 database.get(1).data.push(stockData[i]);
                                 count = 0;
                             }     
-                            database.get(1).data[database.get(1).data.length - 1].low = Math.min((stockData[i] && stockData[i].low) ? stockData[i].low : symbolObj.low,symbolObj.low);
                             if(database.get(1).data[database.get(1).data.length - 1].open < 0){
                                 database.get(1).data[database.get(1).data.length - 1].open = Number(stockData[i].open); 
                             }
                             database.get(1).data[database.get(1).data.length - 1].close = Number(stockData[i].close);
-                            database.get(1).data[database.get(1).data.length - 1].timestamp = Number(stockData[i].timestamp);
-                            database.get(1).data[database.get(1).data.length - 1].high = Math.max((stockData[i] && stockData[i].high) ? stockData[i].high : symbolObj.high,symbolObj.high);
+                            database.get(1).data[database.get(1).data.length - 1].low = Math.min((stockData[i] && Number(stockData[i].low)) ? Number(stockData[i].low) : Number(symbolObj.low,symbolObj.low));
+                            database.get(1).data[database.get(1).data.length - 1].high = Math.max((stockData[i] && Number(stockData[i].high)) ? Number(stockData[i].high) : Number(symbolObj.high,symbolObj.high));
                             count++;   
                         }
                     }

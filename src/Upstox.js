@@ -279,12 +279,12 @@ function getAllData(){
         setTimeout(function() {
             var interval = '15MINUTE';
             getBankNifty(bankNiftySymbol,interval,'');
-        }, 500);
+        }, 100);
 
        
         setTimeout(function() {
             syncAllUpstoxData(watchList);
-        }, 500);
+        }, 300);
 
         setTimeout(function() {
             resolve(1);
@@ -311,114 +311,5 @@ function getAllData(){
         result += 1;
     });
     
-}
-
-var stockData = []; 
-var data = {};
-var promiseArr = [];
- 
-async function loadAllSymbolData(response,interval='1DAY',start_date='11-11-2018'){ 
-    console.log('* Step 1 : loadSymbol ');
-    promiseArr = [];
-    return Promise.all(response.map(function(symbol) { 
-      return loadSymbol(symbol,'NSE_EQ',interval,start_date).then(function (response) {
-            try {
-                    console.log('* loadSymbol ' + JSON.stringify(response));
-                    stockData =response.data;
-                    //console.log('* loadSymbol symbol  > ' +symbol +" :: "+interval +" :: "+start_date+" :: "+ stockData);// +":: "+stockData);
-
-                    var inputRSI = {
-                        values : [],
-                        period : 14
-                    };
-                    /* rsi = new technicalindicators.RSI(inputRSI);
-                    var inputSMA = {
-                        values : [],
-                        period : 20
-                    };
-                    sma= new technicalindicators.SMA(inputSMA);
-                    var inputBB = {
-                        period : 14, 
-                        values : [],
-                        stdDev : 2 
-                    }
-                    bb = new technicalindicators.BollingerBands(inputBB); */
-                    inputBB = inputRSI = inputSMA = null;
-                    
-                    stockData.map(row => {
-                        if(row && Number(row.close) > 0){
-                            /* row.rsi = rsi.nextValue(Number(row.close));
-                            row.sma = sma.nextValue(Number(row.close));
-                            row.bb = bb.nextValue(Number(row.close));  */
-                        }
-                        row.change = getPercentageChange(Number(lastObject.close),Number(row.close)); 
-                    
-                        if(row.bb && Number(row.close) >= Number(row.bb.upper))// && lastObject && Number(lastObject.close) < Number(lastObject.bb.upper))
-                        {
-                            row.bb.isCrossed = 'Crossed Above';
-                        }
-                        else if(row.bb && Number(row.close) <= Number(row.bb.lower))// && lastObject && Number(lastObject.close) > Number(lastObject.bb.lower))
-                        {
-                            row.bb.isCrossed = 'Crossed Below';
-                        }
-                        lastObject = row;
-                        
-                        return row;
-                    });
-               
-                stockData.reverse();
-                var timestamp;
-               
-                if(stockData[0].timestamp > 0){
-                    var d =new Date(Number(stockData[0].timestamp));
-                    var india = moment.tz(d, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
-                    india.format(); 
-                    //console.log(india +" : "+ stockData[0].timestamp +" : "+ d);
-                    if(india.minute() > 0)
-                        timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();
-                    else
-                        timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year();            
-                }   
-                
-                
-                data = {
-                    "symbol":symbol,
-                    "close":stockData[0].close,
-                    "volume":stockData[0].volume,
-                    "rsi":stockData[0].rsi,
-                    "timestamp":timestamp,
-                    "sma":stockData[0].sma, 
-                    "bb":stockData[0].bb,
-                    "change":stockData[0].change
-                }; 
-                //console.log("data   > " + JSON.stringify(data));
-                stockData = null;
-                promiseArr.push(data);
-                return data;
-              } catch (err) {
-                console.log("loadAllSymbolData : err   > " + err);
-                //return err;
-              }
-        });
-    }));
-}
-
-
-async function getUpstoxData(response,interval='1DAY',start_date='',end_date=''){ 
-    console.log('* Step 1 : loadSymbol ');
-    promiseArr = [];
-    return Promise.all(response.map(function(symbol) { 
-      return loadSymbol(symbol,'NSE_EQ',interval,start_date,end_date).then(function (response) {
-            try {
-                    console.log('* loadSymbol ' + JSON.stringify(response));
-                    stockData =response.data;
-                    promiseArr.push(data);
-                    return data;
-                } catch (err) {
-                console.log("loadAllSymbolData : err   > " + err);
-                //return err;
-                }
-        });
-    }));
 }
 

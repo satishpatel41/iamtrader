@@ -47,9 +47,25 @@ scheduled: true,
 timezone: "Asia/Kolkata"
 });
 
-cron.schedule('*/16 * * * *', () => {
+cron.schedule('*/15 * * * *', () => {
     load15minData();
     console.log(chalk.blue('running a task every 15 minutes ' + new Date()));
+}, {
+scheduled: true,
+timezone: "Asia/Kolkata"
+});
+
+cron.schedule('*/16 * * * *', () => {
+    load15minData();
+    //console.log(chalk.blue('running a task every 16 minutes ' + new Date()));
+}, {
+scheduled: true,
+timezone: "Asia/Kolkata"
+});
+
+cron.schedule('*/17 * * * *', () => {
+    load15minData();
+    //console.log(chalk.blue('running a task every 16 minutes ' + new Date()));
 }, {
 scheduled: true,
 timezone: "Asia/Kolkata"
@@ -90,7 +106,7 @@ cron.schedule('31 9 * * *', () => {
     Promise.all(open_low_high_List.map(async(strategy) =>{
         applyStrategy(watchList,interval,strategy); 
     })).then(function(result) {
-        open_band_List.map(async(strategy) =>{
+        bollinger_open_List.map(async(strategy) =>{
             applyStrategy(watchList,interval,strategy); 
         });
         console.log('9:30 call result : ' + result);        

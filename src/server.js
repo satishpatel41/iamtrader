@@ -482,107 +482,7 @@ if (cluster.isMaster) {
 
     });
 
-    app.get('/loadSymbol/:symbol/:interval',checkSignIn, function (req, res) { 
-        console.log('params: ' + JSON.stringify(req.params));
-     
-        var symbol = req.params.symbol;  
-        var interval = req.params.interval; 
 
-        var now = new Date();
-        if(interval == "5MINUTE") // 1WEEK, 1MONTH
-            now.setMinutes(now.getMinutes() - 5* 20);
-        else if(interval == "3MINUTE")
-            now.setMinutes(now.getMinutes() - 3 * 20);
-        else if(interval == "10MINUTE")
-            now.setMinutes(now.getMinutes() - 10 * 20);
-        else if(interval == "15MINUTE")
-            now.setMinutes(now.getMinutes() - 15 * 20);    
-        else if(interval == "30MINUTE")
-            now.setMinutes(now.getMinutes() - 30* 20);
-        else if(interval == "60MINUTE")
-            now.setMinutes(now.getMinutes() - 60* 20);
-        else if(interval == "1DAY")
-            now.setDate(now.getDate() - 20);
-        else if(interval == "1WEEK")
-            now.setDate(now.getDate() - 7*20);
-        else if(interval == "1MONTH")
-            now.setMonth(now.getMonth() - 20);  
-        else 
-            now.setDate(now.getDate() - 20);  
-
-        var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
-        console.log("start_date > " + interval +" >> "+start_date);
-        
-       
-
-        stockData = [];
-        loadSymbol(symbol,"NSE_EQ",interval,start_date).then(function (response) {
-
-            var inputRSI = {
-                values : [],
-                period : 14
-            };
-            var rsi = new technicalindicators.RSI(inputRSI);
-            var inputSMA = {
-                values : [],
-                period : 20
-            };
-            //console.log("rsi");
-            var sma= new technicalindicators.SMA(inputSMA);
-    
-            var inputBB = {
-                period : 14, 
-                values : [],
-                stdDev : 2 
-            }
-            //console.log("sma");
-            var bb = new technicalindicators.BollingerBands(inputBB);
-            inputBB = inputRSI = inputSMA = null;
-
-            res.setHeader('Content-Type', 'application/json');
-            stockData =response.data;
-            //console.log("loadSymbol stockData : " + response);
-            lastObject = {open:'',close:'',low:'',high:'',volume:'',timestamp:'',rsi:'',sma:'',bb:{upper:'',lower:'',isCrossed:'',middel:'',pb:''}};
-            stockData.map(row => {
-                var india = moment.tz(new Date(Number(row.timestamp)), "Asia/Kolkata");
-                india.format(); 
-               // row.timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();//new Date(row.timestamp);
-                row.rsi = rsi.nextValue(Number(row.close));
-                row.sma = sma.nextValue(Number(row.close));
-                row.bb = bb.nextValue(Number(row.close)); 
-                if(row && row.bb && Number(row.close) >= Number(row.bb.upper))// && Number(lastObject.close) < Number(lastObject.bb.upper))
-                {
-                    row.bb.isCrossed = 'Crossed Above';
-                }
-                else if(row && row.bb && Number(row.close) <= Number(row.bb.lower))// && Number(lastObject.close) > Number(lastObject.bb.lower))
-                {
-                    row.bb.isCrossed = 'Crossed Below';
-                }
-                
-                lastObject = row;
-                return row;
-            });
-            stockData.reverse();
-            res.send(JSON.stringify(stockData));
-            stockData = null;
-            res.end();
-        })
-        .catch(function(error){
-            if(error.code == 401){
-               // accessToken = '';
-               // store.set('accessToken', accessToken); 
-
-                var loginUrl = upstox.getLoginUri(redirect_uri);
-                res.status(200).header('Content-type', 'text/html');
-                code = req.params.code;
-                res.status(302).setHeader('Location', loginUrl);
-                res.end();
-                error = loginUrl = null;
-            }
-            console.log("/loadSymbol/:symbol/:interval error > " +  JSON.stringify(error));
-        });
-
-    });
 
     function initiateIndicator()
     {
@@ -685,16 +585,18 @@ if (cluster.isMaster) {
             inputBB = inputRSI = inputSMA = null;
             var data = [];
             try{
-                data = JSON.parse(stockData.data); 
-                data.map(row => {
-                    row.rsi = rsi.nextValue(Number(row.close));
-                    row.sma = sma.nextValue(Number(row.close));
-                    row.bb = bb.nextValue(Number(row.close));                
-                    
-                    return row;
-                });
-                data.reverse();          
-                res.setHeader('Content-Type', 'application/json');
+                if(stockData && stockData.data && stockData.data != null ){
+                    data = JSON.parse(stockData.data); 
+                    data.map(row => {
+                        row.rsi = rsi.nextValue(Number(row.close));
+                        row.sma = sma.nextValue(Number(row.close));
+                        row.bb = bb.nextValue(Number(row.close));                
+                        
+                        return row;
+                    });
+                    data.reverse();          
+                    res.setHeader('Content-Type', 'application/json');
+                }
             }
             catch(e){
                 console.log(e);
@@ -760,13 +662,21 @@ if (cluster.isMaster) {
                             row.sma = sma.nextValue(Number(row.close));
                             row.bb = bb.nextValue(Number(row.close));
                             
-                            if(row.bb && Number(row.close) >= Number(row.bb.upper) && Number(row.low) <= Number(row.bb.upper))
+                            if(row.bb && Number(row.close) > Number(row.open) && Number(row.close) >= Number(row.bb.upper) && Number(row.open) < Number(row.bb.upper))
                             {
                                 row.bb.isCrossed = 'Crossed Above';
                             }
-                            else if(row.bb && Number(row.close) <= Number(row.bb.lower)  && Number(row.high) >= Number(row.bb.lower))
+                            else if(row.bb && Number(row.close) < Number(row.open) && Number(row.close) <= Number(row.bb.lower)  && Number(row.open) > Number(row.bb.lower))
                             {
                                 row.bb.isCrossed = 'Crossed Below';
+                            }
+                            else if(row.bb && Number(row.close) < Number(row.open) && Number(row.close) <= Number(row.bb.upper)  && Number(row.open) > Number(row.bb.upper))
+                            {
+                                row.bb.isCrossed = 'Reversal Upper Band';
+                            }
+                            else if(row.bb && Number(row.close) > Number(row.open) && Number(row.close) >= Number(row.bb.lower)  && Number(row.open) < Number(row.bb.lower))
+                            {
+                                row.bb.isCrossed = 'Reversal Lower Band';
                             }
                             
                             lastObject = row;
@@ -811,125 +721,7 @@ if (cluster.isMaster) {
     var result = [];
     var map = new Map();
 
-    app.get('/loadAllSymbolData/:interval/:exchange', checkSignIn,function (req, res) { 
-        console.log('params: ' + JSON.stringify(req.params));
-        
-        var interval = req.params.interval;  
-        var exchange = req.params.exchange;  
-
-        var list = [];
-        if(exchange == "nifty")
-            list =  nifty;
-        else if(exchange == "fno")
-            list = fno;
-        else{
-            list = nse;
-        }
-
-        var stockData = [];
-        if(interval == "5MINUTE") 
-            stockData =store.get('data5');
-        else if(interval == "3MINUTE")
-            stockData =store.get('data3');
-        else if(interval == "10MINUTE")
-            stockData =store.get('data10');
-        else if(interval == "15MINUTE")
-            stockData =store.get('data15');    
-        else if(interval == "30MINUTE")
-            stockData =store.get('data30');
-        else if(interval == "60MINUTE")
-            stockData = store.get('data60');
-        else if(interval == "1DAY")
-            stockData = store.get('data1day');         
-        else if(interval == "1WEEK")
-            stockData = store.get('data1week');       
-        else if(interval == "1MONTH")
-            stockData = store.get('data1month');        
-
-        var data = [];
-        if(stockData && stockData != undefined && stockData.length > 0)
-        {
-            stockData.filter(function (el) {
-                return (el != null && el.close != null && el.close != undefined && el.close != "");
-            });
-        }
-            
-        //console.log('*stockData interval : ' +interval +">"+ stockData.length);
-        if(stockData && stockData.length > 0 && stockData[0])
-        {
-            res.setHeader('Content-Type', 'application/json');
-            res.send(JSON.stringify(stockData));
-            res.end();
-        }
-        else{ 
-            console.log('*No data available '+ interval+' Fetch it.');
-            
-            var now = new Date();
-            if(interval == "5MINUTE")
-                    now.setDate(now.getDate() - 2);
-            else if(interval == "3MINUTE")
-                    now.setDate(now.getDate() - 2);
-            else if(interval == "10MINUTE")
-                    now.setDate(now.getDate() - 3); 
-            else if(interval == "15MINUTE")
-                    now.setDate(now.getDate() - 3);               
-            else if(interval == "30MINUTE")
-                now.setDate(now.getDate() - 4);
-            else if(interval == "60MINUTE")
-                now.setDate(now.getDate() - 4);
-            else if(interval == "1DAY")
-                now.setDate(now.getDate() - 30);
-            else if(interval == "1WEEK")
-                now.setDate(now.getDate() - 7*20);
-            else if(interval == "1MONTH")
-                now.setMonth(now.getMonth() - 20);    
-            
-            var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
-                
-            //console.log("start_date :: "+interval +"> "+start_date);
-            loadAllSymbolData(list,interval,start_date).then(function (response) {
-                console.log("\n loadAllSymbolData **"+JSON.stringify(response));
-                var data = [];
-            
-                if(interval == "5MINUTE")
-                {
-                    store.set('data5', response); 
-                }
-                else if(interval == "3MINUTE"){
-                    store.set('data3', response); 
-                }
-                else if(interval == "10MINUTE"){
-                    store.set('data10', response); 
-                }
-                else if(interval == "15MINUTE"){
-                    store.set('data15', response); 
-                }
-                else if(interval == "30MINUTE"){
-                    store.set('data30', response); 
-                }
-                else if(interval == "60MINUTE"){
-                    store.set('data60', response); 
-                }
-                else if(interval == "1DAY"){
-                    store.set('data1day', response); 
-                } 
-                else if(interval == "1WEEK"){
-                    store.set('data1week', response); 
-                } 
-                else if(interval == "1MONTH"){
-                    store.set('data1month', response); 
-                } 
-                        
-                res.setHeader('Content-Type', 'application/json');
-                res.send(JSON.stringify(response));
-                exchange = list = interval = data = null;
-                res.end();
-            })
-            .catch(function(error){
-                console.log("loadAllSymbolData/ error > " +  JSON.stringify(error));
-            });
-        }
-    });
+ 
 
     app.get('/getListOfAllSymbol', checkSignIn,function (req, res) {   
         res.setHeader('Content-Type', 'application/json');
