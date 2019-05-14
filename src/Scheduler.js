@@ -33,6 +33,7 @@ timezone: "Asia/Kolkata"
 
 cron.schedule('*/5 * * * *', () => {
     load5minData();
+    load15minData();
     //console.log(chalk.blue('running a task every 5 minutes ' + new Date()));
 }, {
 scheduled: true,
@@ -40,6 +41,7 @@ timezone: "Asia/Kolkata"
 });
 
 cron.schedule('*/10 * * * *', () => {
+    load15minData();
     //load10minData();
     //console.log(chalk.blue('running a task every 10 minutes ' + new Date()));
 }, {
@@ -55,21 +57,6 @@ scheduled: true,
 timezone: "Asia/Kolkata"
 });
 
-cron.schedule('*/16 * * * *', () => {
-    load15minData();
-    //console.log(chalk.blue('running a task every 16 minutes ' + new Date()));
-}, {
-scheduled: true,
-timezone: "Asia/Kolkata"
-});
-
-cron.schedule('*/17 * * * *', () => {
-    load15minData();
-    //console.log(chalk.blue('running a task every 16 minutes ' + new Date()));
-}, {
-scheduled: true,
-timezone: "Asia/Kolkata"
-});
 
 
 cron.schedule('*/30 * * * *', () => {

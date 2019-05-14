@@ -70,6 +70,53 @@ function start() {
     });
 
    
+
+    upstox.connectSocket()
+    .then(function(){
+        upstox.on("orderUpdate", function(message) {
+            console.log("orderUpdate"+ message);
+        });
+        upstox.on("positionUpdate", function(message) {
+            //message for position conversion
+            console.log("positionUpdate"+ message);
+        });
+        upstox.on("tradeUpdate", function(message) {
+            //message for trade updates
+            console.log("tradeUpdate"+ message);
+        });
+
+        //console.log("niftyList" + niftyList);
+        var niftyStr = nifty.join();
+        //console.log(" niftyStr join    " + niftyStr);
+
+        upstox.subscribeFeed({
+            "exchange": "NSE_EQ",
+            "symbol": niftyStr,//'BANKNIFTY27DECFUT',//NIFTY29NOVFUT NIFTY18NOVFUT,BANKNIFTY18NOVFUT
+            "type": "ltp"
+        })
+        .then(function (response) {
+            console.log('feedsymbols subscribeFeed response ', response);
+        })
+        .catch(function (error) {
+            //res.send({ error: error });
+            console.log('Error in subscribe feed ', error);
+        });  
+
+        upstox.on("liveFeed", function(message) {
+            //message for live feed
+            console.log("liveFeed"+ message);
+        });
+        upstox.on("disconnected", function(message) {
+            //listener after socket connection is disconnected
+            console.log("disconnected > "+ message);
+        });
+        upstox.on("error", function(error) {
+            //error listener
+            console.log("upstox.on error"+ error);
+        });
+    }).catch(function(error) {
+        console.log( "connectSocket #" + error);
+});
        
     var bankNiftyCall;
           
@@ -153,53 +200,6 @@ function start() {
             console.log(err);
         });
     */
-
-    upstox.connectSocket()
-        .then(function(){
-            upstox.on("orderUpdate", function(message) {
-                console.log("orderUpdate"+ message);
-            });
-            upstox.on("positionUpdate", function(message) {
-                //message for position conversion
-                console.log("positionUpdate"+ message);
-            });
-            upstox.on("tradeUpdate", function(message) {
-                //message for trade updates
-                console.log("tradeUpdate"+ message);
-            });
-
-            //console.log("niftyList" + niftyList);
-            var niftyStr = nifty.join();
-            //console.log("join" + niftyStr);
-
-            upstox.subscribeFeed({
-                "exchange": "NSE_EQ",
-                "symbol": niftyStr,//'BANKNIFTY27DECFUT',//NIFTY29NOVFUT NIFTY18NOVFUT,BANKNIFTY18NOVFUT
-                "type": "ltp"
-            })
-            .then(function (response) {
-                console.log('feedsymbols subscribeFeed response ', response);
-            })
-            .catch(function (error) {
-                //res.send({ error: error });
-                console.log('Error in subscribe feed ', error);
-            });  
-
-            upstox.on("liveFeed", function(message) {
-                //message for live feed
-                console.log("liveFeed"+ message);
-            });
-            upstox.on("disconnected", function(message) {
-                //listener after socket connection is disconnected
-                console.log("disconnected > "+ message);
-            });
-            upstox.on("error", function(error) {
-                //error listener
-                console.log("upstox.on error"+ error);
-            });
-        }).catch(function(error) {
-            console.log( "connectSocket #" + error);
-    });
 }
 
 

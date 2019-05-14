@@ -280,8 +280,8 @@ async function getDefaultIndicatorsValues(list,interval){
 // console.log("* getAllStockDataByInterval   >> "+list.length);
     var matchSymbols = [];
     Promise.all(list.map(async (x) =>  {
-    var symbol = x.symbol ? x.symbol:x;    
-    return getStockDataFromDb(symbol,interval);          
+        var symbol = x.symbol ? x.symbol:x;    
+        return getStockDataFromDb(symbol,interval);          
     })).then(stockData => {
         var arr = stockData.map(async (dataObj) =>  {
             try{

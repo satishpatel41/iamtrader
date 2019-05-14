@@ -126,8 +126,11 @@ $(document).ready( function () {
                 ctx = document.getElementById("myChart").getContext('2d');
                 ctx.canvas.width = 550;
                 ctx.canvas.height = 250;
-                var now = new Date(Number(dataSet[0].timestamp))
-                var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear() +"  "+now.getHours()+":"+now.getMinutes();
+                
+                var now = new Date(Number(dataSet[0].timestamp));
+                var india = moment.tz(now, "Asia/Kolkata");
+                india.format(); 
+                var start_date =india.date()+"-"+(india.month())+"-"+india.year() +"  "+india.hour()+":"+india.minute();
                 $("#date_txt").html(start_date);
 
                 var stockData = dataSet.map(obj =>{ 
@@ -138,7 +141,7 @@ $(document).ready( function () {
 
                   var d = new Date();
                   d.setDate(india.date());
-                  d.setMonth(india.month() + 1);
+                  d.setMonth(india.month());
                   d.setFullYear(india.year());
                   d.setHours(india.hour());
                   d.setMinutes(india.minute());
@@ -152,7 +155,7 @@ $(document).ready( function () {
                 }); 
                 
                 
-                stockData = stockData.reverse().slice(0, 28);
+                stockData = stockData.slice(0, 25);
                 var chart = new Chart(ctx, 
                 {
                   type: 'candlestick',
@@ -245,7 +248,7 @@ $(document).ready( function () {
           </div> 
     </div> 
     <div class="row">
-      <div class="col-sm" id="chartDiv" style="position: relative; height:50vh; width:90vw;max-width: 600px;">
+      <div class="col-sm" id="chartDiv" style="position: relative; height:80vh; width:100vw;max-width: 600px;">
           <canvas id="myChart"></canvas>
       </div>  
     </div>

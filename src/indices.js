@@ -7,8 +7,8 @@
                 {symbol:"NIFTY%20BANK",ex:"NSE_INDEX"},
                 {symbol:"NIFTY_100",ex:"NSE_INDEX"},
                 {symbol:"BANKNIFTY19MAYFUT",ex:"NSE_FO"},
-                {symbol:"BANKNIFTY1950929300PE",ex:"NSE_FO"},
-                {symbol:"NIFTY19APRFUT",ex:"NSE_FO"}];
+                {symbol:"BANKNIFTY1951629000CE",ex:"NSE_FO"},
+                {symbol:"NIFTY19MAYFUT",ex:"NSE_FO"}];
 
 var bankNifty_indices = [{symbol:"BANKNIFTY19MAYFUT",ex:"NSE_FO"}];
 var bankNiftySymbol = "BANKNIFTY19MAYFUT";

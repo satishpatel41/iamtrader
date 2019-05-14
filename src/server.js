@@ -560,54 +560,49 @@ if (cluster.isMaster) {
         var symbol = req.params.symbol;  
         var interval = req.params.interval;  
         
-        new Promise(function(resolved, rejected) {
-            var data = getStockDataFromDb(symbol,interval);    
-            resolved(data); 
-        }).then(stockData => {
-            var inputRSI = {
-                values : [],
-                period : 14
-            };
-            rsi = new technicalindicators.RSI(inputRSI);
-            var inputSMA = {
-                values : [],
-                period : 20
-            };    
-            sma= new technicalindicators.SMA(inputSMA);
-            
-            var inputBB = {
-                period : 14, 
-                values : [],
-                stdDev : 2 
-            }
-         
-            bb = new technicalindicators.BollingerBands(inputBB);
-            inputBB = inputRSI = inputSMA = null;
-            var data = [];
-            try{
-                if(stockData && stockData.data && stockData.data != null ){
-                    data = JSON.parse(stockData.data); 
-                    data.map(row => {
-                        row.rsi = rsi.nextValue(Number(row.close));
-                        row.sma = sma.nextValue(Number(row.close));
-                        row.bb = bb.nextValue(Number(row.close));                
-                        
-                        return row;
-                    });
-                    data.reverse();          
-                    res.setHeader('Content-Type', 'application/json');
-                }
-            }
-            catch(e){
-                console.log(e);
-            }
-            res.send(JSON.stringify(data));
-            exchange = list = interval =  null;
-            res.end();                    
-            
-        })
-        .catch();
+        var data = getStockDataFromDb(symbol,interval).then(stockData =>{
 
+                var inputRSI = {
+                    values : [],
+                    period : 14
+                };
+                rsi = new technicalindicators.RSI(inputRSI);
+                var inputSMA = {
+                    values : [],
+                    period : 20
+                };    
+                sma= new technicalindicators.SMA(inputSMA);
+                
+                var inputBB = {
+                    period : 14, 
+                    values : [],
+                    stdDev : 2 
+                }
+             
+                bb = new technicalindicators.BollingerBands(inputBB);
+                inputBB = inputRSI = inputSMA = null;
+                var data = [];
+                try{
+                    if(stockData && stockData.data && stockData.data != null){
+                        data = JSON.parse(stockData.data); 
+                        data.map(row => {
+                            row.rsi = rsi.nextValue(Number(row.close));
+                            row.sma = sma.nextValue(Number(row.close));
+                            row.bb = bb.nextValue(Number(row.close));                
+                            
+                            return row;
+                        });
+                        data.reverse();          
+                        res.setHeader('Content-Type', 'application/json');
+                    }
+                }
+                catch(e){
+                    console.log(e);
+                }
+                res.send(JSON.stringify(data));
+                exchange = list = interval =  null;
+                res.end(); 
+             });
     });
     
     app.get('/getDefaultIndicators/:interval/:exchange', checkSignIn,function (req, res) { 

@@ -57,15 +57,28 @@ function getStockDataFromDb(symbol,interval)
         }); 
         
         function onLoaded() {
+            var database1 =  lokiJson.getCollection('1MINUTE');
             var database = lokiJson.getCollection(interval);
-                   
+       
             try{
-                if(database != null && database.get(1) && database.get(1).data)
+                var result = interval.match(/MINUTE/gi);
+
+                if(database1 != null && database1.get(1) && database1.get(1).data && result && result != ""){
+                    stockData = database1.get(1).data;
+                }
+                else{
                     resolve({"symbol":symbol,data:JSON.stringify(database.get(1).data)});
+                    return;
+                }
+
+                if(database != null && database.get(1) && database.get(1).data){
+                    var newJson = backFill(lokiJson,stockData,interval)
+                    .then(data =>{
+                        resolve({"symbol":symbol,data:JSON.stringify(data)});
+                    });
+                }
                 else
                     resolve({"symbol":symbol,data:[]}); 
-
-                //console.log("\n\n > " + JSON.stringify(database.get(1).data));
 
                 lokiJson.close();    
             }
@@ -96,13 +109,14 @@ var queue = async.queue(function(task, callback) {
             autoload: true,
             autoloadCallback : loadHandler,
             autosave: true, 
+            unique: 'name',
             autosaveInterval: 10000
         }); 
         
         function loadHandler() {
             var database = lokiJson.getCollection(task.interval);
             if(!database){
-                database = lokiJson.addCollection(task.interval);//,{unique: ['timestamp']}
+                database = lokiJson.addCollection(task.interval,{unique: ['timestamp']});//
             }  
             var stockData = [];
 
@@ -128,12 +142,12 @@ var queue = async.queue(function(task, callback) {
                             database.insert(stockData);  
                             lokiJson.saveDatabase();       
 
-                            if(task.interval == "1MINUTE"){
+                            /* if(task.interval == "1MINUTE"){
                                 var intervalNo = parseInt(task.interval);
                                 allIntervalsArr.map(async (allIntervalsArrObj) =>  {
                                     await updateCollection(lokiJson,allIntervalsArrObj,stockData.data)
                                 }); 
-                            }
+                            } */
                            /*  else if(task.interval == "15MINUTE"){
                                 var intervalNo = parseInt(task.interval);
                                 ['1DAY'].map(async (intervalsArrObj) =>  {
@@ -235,3 +249,67 @@ function updateCollection(lokiJson,interval,stockData)
 queue.drain = function() {
    // console.log('all items have been processed');
 };
+
+
+function backFill(lokiJson,stockData,interval)
+{
+    return new Promise(function(resolve, reject) {
+            var intervalNo = parseInt(interval);
+            var now = new Date();
+            var database = lokiJson.getCollection(interval);
+            var stockJSON =  database.get(1).data;
+            try{
+                if(database && database.get(1) && database.get(1).data && database.get(1).data.timestamp && database.get(1).data.timestamp === response.timestamp){
+                    console.log('Do nothing   ' +interval);
+                }
+                else if(database && database.get(1) && database.get(1).data){
+                    var symbolObj= {};
+                    var count = 0;
+                    var t = (database.get(1).data && database.get(1).data[database.get(1).data.length - 1] && database.get(1).data[database.get(1).data.length - 1].timestamp) ? database.get(1).data[database.get(1).data.length - 1].timestamp : 0;
+                    var lows = [];
+                    var highs = [];
+                    
+                    if(stockData && stockData.length > 0){
+                        for(var i = 0; i < stockData.length;i++)
+                        {
+                            if(stockData[i].timestamp > t)
+                            {
+                                var d1 = new Date(stockData[i].timestamp);
+                                var d2 = new Date(t);
+                                
+                                if(count % intervalNo == 0){
+                                    if(i+intervalNo < stockData.length && isDuplicate(stockJSON,stockData[i + intervalNo]['timestamp'])){
+                                        i = i + intervalNo;
+                                        symbolObj = stockData[i];
+                                        stockJSON.push(stockData[i]);
+                                        count = 0;
+                                    }
+                                }     
+                                if(stockJSON[stockJSON.length - 1].open < 0){
+                                    stockJSON[stockJSON.length - 1].open = Number(stockData[i].open); 
+                                }
+                                stockJSON[stockJSON.length - 1].close = Number(stockData[i].close);
+                                stockJSON[stockJSON.length - 1].low = Math.min((stockData[i] && Number(stockData[i].low)) ? Number(stockData[i].low) : Number(symbolObj.low,symbolObj.low));
+                                stockJSON[stockJSON.length - 1].high = Math.max((stockData[i] && Number(stockData[i].high)) ? Number(stockData[i].high) : Number(symbolObj.high,symbolObj.high));
+                                count++;   
+                            }
+                        }
+                    } 
+                    t = count =  null;
+            }
+            
+            resolve(stockJSON); 
+            
+            }
+            catch(e){
+                reject(e);
+                e = null;
+            } 
+     });
+}
+
+function isDuplicate(arr,value)
+{
+    var flag = arr.find(a=>a.timestamp == value);
+    return flag;
+}
