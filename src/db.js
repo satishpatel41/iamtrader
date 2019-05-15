@@ -278,7 +278,7 @@ function backFill(lokiJson,stockData,interval)
                                 var d2 = new Date(t);
                                 
                                 if(count % intervalNo == 0){
-                                    if(i+intervalNo < stockData.length && isDuplicate(stockJSON,stockData[i + intervalNo]['timestamp'])){
+                                    if(i+intervalNo < stockData.length){
                                         i = i + intervalNo;
                                         symbolObj = stockData[i];
                                         stockJSON.push(stockData[i]);
@@ -299,6 +299,7 @@ function backFill(lokiJson,stockData,interval)
             }
             
             resolve(stockJSON); 
+            stockJSON =stockData = null;
             
             }
             catch(e){
