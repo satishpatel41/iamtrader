@@ -33,7 +33,7 @@ timezone: "Asia/Kolkata"
 
 cron.schedule('*/5 * * * *', () => {
     load5minData();
-    load15minData();
+    //load15minData();
     //console.log(chalk.blue('running a task every 5 minutes ' + new Date()));
 }, {
 scheduled: true,
@@ -41,7 +41,7 @@ timezone: "Asia/Kolkata"
 });
 
 cron.schedule('*/10 * * * *', () => {
-    load15minData();
+    //load15minData();
     //load10minData();
     //console.log(chalk.blue('running a task every 10 minutes ' + new Date()));
 }, {
@@ -60,7 +60,7 @@ timezone: "Asia/Kolkata"
 
 
 cron.schedule('*/30 * * * *', () => {
-   //load30minData();
+    load30minData();
     //console.log(chalk.blue('running a task every 30 minutes' + new Date()));
 }, {
 scheduled: true,
@@ -145,7 +145,7 @@ function load60minData()
 
     interval = '60MINUTE';
     if(accessToken)
-    syncLiveAllStockData(watchList,interval,start_date,end_date); 
+        syncLiveAllStockData(watchList,interval,start_date,end_date); 
 }
 
 function load30minData()
@@ -159,7 +159,7 @@ function load30minData()
 
     interval = '30MINUTE';
     if(accessToken)
-    syncLiveAllStockData(watchList,interval,start_date,end_date);   
+            syncLiveAllStockData(watchList,interval,start_date,end_date);   
 }
 
 function load10minData()
@@ -172,7 +172,7 @@ function load10minData()
     india.format(); 
     start_date = formatDate(india.date())+"-"+formatDate(india.month() + 1)+"-"+india.year();//india.date()+"-"+(india.month())+"-"+india.year();
     if(accessToken)
-    syncLiveAllStockData(watchList,interval,start_date,end_date);   
+        syncLiveAllStockData(watchList,interval,start_date,end_date);   
 }
 
 function load5minData()
@@ -190,6 +190,7 @@ function load5minData()
         syncLiveAllStockData(watchList,interval,start_date,end_date);
         resolve(1);    
     }).then(res=>{
+        now = interval = india = start_date = null;
         getPercent_list(watchList);
     });
    
@@ -211,6 +212,7 @@ function load3minData()
     }).then(res=>{
         return Number(res) + 1;
         getPercent_list(watchList);
+        now = interval = india = start_date = null;
     });
 }
 
@@ -233,6 +235,7 @@ function load1minData()
     }).then(res=>{
         getPercent_list(watchList);
         getGapUpDown(watchList);
+        now = interval = india = start_date = null;
         return Number(res) + 1;
     });
 }
@@ -258,6 +261,7 @@ function load15minData()
         }, 10000);      
     }).then(res=>{
         //console.log("load15minData - Process p  " + res);
+        now = interval = india = start_date = null;
         return Number(res) + 1;
     });
 

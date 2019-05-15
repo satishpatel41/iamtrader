@@ -72,15 +72,22 @@ function getStockDataFromDb(symbol,interval)
                 }
 
                 if(database != null && database.get(1) && database.get(1).data){
+
+                    //console.log("First " +  database.get(1).data.length);
+                    //database.get(1).data =database.get(1).data.slice(0, database.get(1).data.length - 2);
+                    //console.log("Sec  " + database.get(1).data.length);
+                    lokiJson.saveDatabase();       
                     var newJson = backFill(lokiJson,stockData,interval)
                     .then(data =>{
+                       // console.log("Third  " + data.length);
                         resolve({"symbol":symbol,data:JSON.stringify(data)});
                     });
                 }
                 else
                     resolve({"symbol":symbol,data:[]}); 
 
-                lokiJson.close();    
+                lokiJson.close();  
+                result   =database1 = database = null;
             }
             catch(e){
                 console.log("getStockDataFromDb > Error > " + interval +"::"+e);
@@ -140,7 +147,7 @@ var queue = async.queue(function(task, callback) {
                             //console.log('UPDATE   ' +task.interval+"> "+ task.symbol +" :: "+ database);
                             database.clear();
                             database.insert(stockData);  
-                            lokiJson.saveDatabase();       
+                            //lokiJson.saveDatabase();       
 
                             /* if(task.interval == "1MINUTE"){
                                 var intervalNo = parseInt(task.interval);
@@ -161,6 +168,7 @@ var queue = async.queue(function(task, callback) {
                         }
                         lokiJson.saveDatabase();   
                         lokiJson.close(); 
+                        
                         callback();         
                     } 
                     else{
@@ -168,7 +176,7 @@ var queue = async.queue(function(task, callback) {
                         callback();     
                     }
                     
-                    symbolfile = task = stockData = response = null;
+                    lokiJson   = database = symbolfile = task = stockData = response = null;
 
                 } catch (err) {
                     lokiJson.close();    
@@ -250,14 +258,14 @@ queue.drain = function() {
    // console.log('all items have been processed');
 };
 
-
+var stockJSON = {};
 function backFill(lokiJson,stockData,interval)
 {
     return new Promise(function(resolve, reject) {
             var intervalNo = parseInt(interval);
-            var now = new Date();
+            //var now = new Date();
             var database = lokiJson.getCollection(interval);
-            var stockJSON =  database.get(1).data;
+            stockJSON =  database.get(1).data;
             try{
                 if(database && database.get(1) && database.get(1).data && database.get(1).data.timestamp && database.get(1).data.timestamp === response.timestamp){
                     console.log('Do nothing   ' +interval);
@@ -274,32 +282,29 @@ function backFill(lokiJson,stockData,interval)
                         {
                             if(stockData[i].timestamp > t)
                             {
-                                var d1 = new Date(stockData[i].timestamp);
-                                var d2 = new Date(t);
-                                
-                                if(count % intervalNo == 0){
-                                    if(i+intervalNo < stockData.length){
-                                        i = i + intervalNo;
+                                if(count % intervalNo  == 0){
+                                    if(i + intervalNo - 1 < stockData.length - 1 && !isDuplicate(stockJSON,stockData[i + intervalNo - 1].timestamp)){
+                                        i = i + intervalNo - 1;
                                         symbolObj = stockData[i];
                                         stockJSON.push(stockData[i]);
                                         count = 0;
                                     }
-                                }     
-                                if(stockJSON[stockJSON.length - 1].open < 0){
-                                    stockJSON[stockJSON.length - 1].open = Number(stockData[i].open); 
+                                } 
+                                else{    
+                                    stockJSON[stockJSON.length - 1].close = Number(stockData[i].close);
+                                    stockJSON[stockJSON.length - 1].low = Math.min((stockData[i] && Number(stockData[i].low)) ? Number(stockData[i].low) : Number(symbolObj.low,symbolObj.low));
+                                    stockJSON[stockJSON.length - 1].high = Math.max((stockData[i] && Number(stockData[i].high)) ? Number(stockData[i].high) : Number(symbolObj.high,symbolObj.high));
                                 }
-                                stockJSON[stockJSON.length - 1].close = Number(stockData[i].close);
-                                stockJSON[stockJSON.length - 1].low = Math.min((stockData[i] && Number(stockData[i].low)) ? Number(stockData[i].low) : Number(symbolObj.low,symbolObj.low));
-                                stockJSON[stockJSON.length - 1].high = Math.max((stockData[i] && Number(stockData[i].high)) ? Number(stockData[i].high) : Number(symbolObj.high,symbolObj.high));
                                 count++;   
                             }
                         }
                     } 
-                    t = count =  null;
+                    symbolObj = lows = highs =  t = count =  null;
             }
-            
+            database = null;
+            stockData = null;
             resolve(stockJSON); 
-            stockJSON =stockData = null;
+            stockJSON = null;
             
             }
             catch(e){
