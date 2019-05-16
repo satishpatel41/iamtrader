@@ -82,6 +82,7 @@ async function getPercent_list(list){
             Promise.all(list.map(async (x) =>  {
                 return getStockDataFromDb(x.symbol ? x.symbol:x,interval);          
             })).then(stockData => {
+                //console.log("stockData : " + interval +"::"+stockData.length);
                 resolved(stockData);
             })
             .catch(error => { 
@@ -109,7 +110,7 @@ async function getPercent_list(list){
                                 }
                             }
                             catch(error){ 
-                                //console.log("error  : " + error);
+                                console.log("percentage error  : " + error);
                             }
                         } 
                         var stock1 = [];
@@ -154,7 +155,7 @@ async function getPercent_list(list){
                     }
                 }
                 catch(error){ 
-                   // console.log("getPercent_list Parsing error " +dataObj1.symbol +" : "+ error);
+                    console.log("getPercent_list Parsing error " +dataObj1.symbol +" : "+ error);
                     
                 }
             }

@@ -38,6 +38,7 @@ async function getFirst(query,params){
 
 function getStockDataFromDb(symbol,interval)
 {
+    //console.log("getStockDataFromDb  " + symbol +" ::"+ interval);
     return new Promise((resolve, reject)=>{
         var symbolfile;
         try{      
@@ -59,27 +60,32 @@ function getStockDataFromDb(symbol,interval)
         function onLoaded() {
             var database1 =  lokiJson.getCollection('1MINUTE');
             var database = lokiJson.getCollection(interval);
-       
+            var stockData = [];
             try{
                 var result = interval.match(/MINUTE/gi);
 
-                if(database1 != null && database1.get(1) && database1.get(1).data && result && result != ""){
+                if(interval =='1MINUTE'){
+                    resolve({"symbol":symbol,data:JSON.stringify(database.get(1).data)});
+                    lokiJson.close();  
+                    result =database1 = database = null;
+                    return;
+                }
+                else if(result && result != "" && database1 != null && database1.get(1) && database1.get(1).data){
                     stockData = database1.get(1).data;
                 }
                 else{
                     resolve({"symbol":symbol,data:JSON.stringify(database.get(1).data)});
+                    lokiJson.close();  
+                    result =database1 = database = null;
                     return;
                 }
 
-                if(database != null && database.get(1) && database.get(1).data){
-
-                    //console.log("First " +  database.get(1).data.length);
-                    //database.get(1).data =database.get(1).data.slice(0, database.get(1).data.length - 2);
-                    //console.log("Sec  " + database.get(1).data.length);
-                    lokiJson.saveDatabase();       
-                    var newJson = backFill(lokiJson,stockData,interval)
+                
+                if(result && result != "" && database != null && interval !='1MINUTE'){
+                    //lokiJson.saveDatabase();       
+                    backFill(lokiJson,stockData,interval)
                     .then(data =>{
-                       // console.log("Third  " + data.length);
+                        //console.log("Third  " + data.length);
                         resolve({"symbol":symbol,data:JSON.stringify(data)});
                     });
                 }
@@ -87,13 +93,13 @@ function getStockDataFromDb(symbol,interval)
                     resolve({"symbol":symbol,data:[]}); 
 
                 lokiJson.close();  
-                result   =database1 = database = null;
+                result =database1 = database = null;
             }
             catch(e){
                 console.log("getStockDataFromDb > Error > " + interval +"::"+e);
                 lokiJson.close();
                 reject(e);
-                e = null;
+                database1 = database =e = null;
             }   
         } 
     }); 
@@ -123,7 +129,7 @@ var queue = async.queue(function(task, callback) {
         function loadHandler() {
             var database = lokiJson.getCollection(task.interval);
             if(!database){
-                database = lokiJson.addCollection(task.interval,{unique: ['timestamp']});//
+                database = lokiJson.addCollection(task.interval,{unique: ['timestamp']});
             }  
             var stockData = [];
 
@@ -134,11 +140,8 @@ var queue = async.queue(function(task, callback) {
                 try {
                     if(response != '' && response != undefined && response != null){
                         stockData = response;
-                        //console.log('response  >>> ' + task.symbol +" :: " + task.interval+"> "+ task.start_date+"> "+ task.end_date+"> "+JSON.stringify(response));
                         if(response && response.error){
-                            // database.clear();
                             lokiJson.close(); 
-                            //console.log('Queue error ' + task.symbol +" :: "+task.ex +" :: "++task.interval+"> "JSON.stringify(response.error));
                         }
                         else if(database != null && database.get(1) && database.get(1).data && database.get(1).data.timestamp && database.get(1).data.timestamp == response.timestamp){
                             console.log('Skip ! Do nothing   ' +task.interval+"> "+ task.symbol);
@@ -261,43 +264,74 @@ queue.drain = function() {
 var stockJSON = {};
 function backFill(lokiJson,stockData,interval)
 {
+   // console.log("interval  " + interval);
     return new Promise(function(resolve, reject) {
             var intervalNo = parseInt(interval);
-            //var now = new Date();
+            
             var database = lokiJson.getCollection(interval);
             stockJSON =  database.get(1).data;
             try{
-                if(database && database.get(1) && database.get(1).data && database.get(1).data.timestamp && database.get(1).data.timestamp === response.timestamp){
-                    console.log('Do nothing   ' +interval);
-                }
-                else if(database && database.get(1) && database.get(1).data){
+            
+                if(stockJSON){
                     var symbolObj= {};
                     var count = 0;
-                    var t = (database.get(1).data && database.get(1).data[database.get(1).data.length - 1] && database.get(1).data[database.get(1).data.length - 1].timestamp) ? database.get(1).data[database.get(1).data.length - 1].timestamp : 0;
+                   // console.log(' stockJSON   ' +stockJSON.length);
+                    //stockJSON = stockJSON.slice(0, stockJSON.length - 3);
+                  //  console.log(' Sec stockJSON   ' +stockJSON.length);
+                    var t = (stockJSON[stockJSON.length - 1] && stockJSON[stockJSON.length - 1].timestamp) ? stockJSON[stockJSON.length - 1].timestamp : 0;
                     var lows = [];
                     var highs = [];
-                    
-                    if(stockData && stockData.length > 0){
-                        for(var i = 0; i < stockData.length;i++)
+                    var d1 = new Date(Number(t));
+                    /* if(stockData){
+                        stockJSON.data = stockJSON.slice(0, stockJSON.length - 3);
+                        console.log(' database :  ' +stockData.get(1).data.length +" :: "+stockJSON.length);
+                        var arr = stockData.find({timestamp: {'$gt': t}});
+                        //stockData.chain().find({timestamp: {'$gt': t}}).data();
+
+                        console.log(' stockData   ' +stockData.get(1).data.length +" : "+ arr.length);
+                        for(var i = 0; i < stockData.get(1).data.length;i++)
                         {
-                            if(stockData[i].timestamp > t)
-                            {
-                                if(count % intervalNo  == 0){
-                                    if(i + intervalNo - 1 < stockData.length - 1 && !isDuplicate(stockJSON,stockData[i + intervalNo - 1].timestamp)){
-                                        i = i + intervalNo - 1;
-                                        symbolObj = stockData[i];
-                                        stockJSON.push(stockData[i]);
-                                        count = 0;
-                                    }
-                                } 
-                                else{    
-                                    stockJSON[stockJSON.length - 1].close = Number(stockData[i].close);
-                                    stockJSON[stockJSON.length - 1].low = Math.min((stockData[i] && Number(stockData[i].low)) ? Number(stockData[i].low) : Number(symbolObj.low,symbolObj.low));
-                                    stockJSON[stockJSON.length - 1].high = Math.max((stockData[i] && Number(stockData[i].high)) ? Number(stockData[i].high) : Number(symbolObj.high,symbolObj.high));
+                            //console.log(' timestamp   ' +d1 +" > "+ stockData.get(1).data[i].timestamp + " >>"+new Date(Number(stockData.get(1).data[i].timestamp));
+                            if(count % intervalNo  == 0){
+                                if(i + intervalNo - 1 < stockData.get(1).data.length - 1 && !isDuplicate(stockJSON,stockData.get(1).data[i + intervalNo - 1].timestamp)){
+                                    i = i + intervalNo - 1;
+                                    symbolObj = stockData.get(1).data[i];
+                                    stockJSON.push(stockData.get(1).data[i]);
+                                    count = 0;
                                 }
-                                count++;   
+                            } 
+                            else{    
+                                stockJSON[stockJSON.length - 1].close = Number(stockData.get(1).data[i].close);
+                                stockJSON[stockJSON.length - 1].low = Math.min((stockData.get(1).data[i] && Number(stockData.get(1).data[i].low)) ? Number(stockData.get(1).data[i].low) : Number(symbolObj.low,symbolObj.low));
+                                stockJSON[stockJSON.length - 1].high = Math.max((stockData.get(1).data[i] && Number(stockData.get(1).data[i].high)) ? Number(stockData.get(1).data[i].high) : Number(symbolObj.high,symbolObj.high));
                             }
-                        }
+                            count++;   
+                            
+                        } */
+                       
+                        if(stockData && stockData.length > 0){
+                            //console.log('len  >   ' +stockData.length +" :: "+(stockData.length - (intervalNo * 4)));
+                            for(var i = stockData.length - (intervalNo * 4); i < stockData.length;i++)
+                            {
+                                if(stockData[i].timestamp >t)
+                                {
+                                    //console.log(' Stamp >   ' +i +":: "+intervalNo +" :: "+count +" :    "+new Date(Number(stockData[i].timestamp)));
+                                    if(count % intervalNo  == 0){
+                                        if(i + intervalNo - 1 < stockData.length - 1 && !isDuplicate(stockJSON,stockData[i + intervalNo - 1].timestamp)){
+                                            i = i + intervalNo - 1;
+                                            symbolObj = stockData[i];
+                                            stockJSON.push(stockData[i]);
+                                        }
+                                        count = 0;
+                                    } 
+                                    else{    
+                                        stockJSON[stockJSON.length - 1].close = Number(stockData[i].close);
+                                        stockJSON[stockJSON.length - 1].low = Math.min((stockData[i] && Number(stockData[i].low)) ? Number(stockData[i].low) : Number(symbolObj.low,symbolObj.low));
+                                        stockJSON[stockJSON.length - 1].high = Math.max((stockData[i] && Number(stockData[i].high)) ? Number(stockData[i].high) : Number(symbolObj.high,symbolObj.high));
+                                    }
+                                    count++;   
+                                }
+                            }
                     } 
                     symbolObj = lows = highs =  t = count =  null;
             }
