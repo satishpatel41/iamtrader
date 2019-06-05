@@ -129,8 +129,10 @@ function load1WeekData()
 function load1dayData()
 {
     interval = '1DAY';
-    if(accessToken)
-    syncLiveAllStockData(watchList,interval,start_date,end_date);  
+    if(accessToken){
+        syncLiveAllStockData(watchList,interval,start_date,end_date); 
+        syncLiveAllStockData(indices,interval,start_date,end_date);
+    }
 }
 
 
@@ -144,8 +146,10 @@ function load60minData()
     start_date = formatDate(india.date())+"-"+formatDate(india.month() + 1)+"-"+india.year();
 
     interval = '60MINUTE';
-    if(accessToken)
+    if(accessToken){
         syncLiveAllStockData(watchList,interval,start_date,end_date); 
+        syncLiveAllStockData(indices,interval,start_date,end_date);
+    }
 }
 
 function load30minData()
@@ -158,8 +162,10 @@ function load30minData()
     start_date = formatDate(india.date())+"-"+formatDate(india.month() + 1)+"-"+india.year();
 
     interval = '30MINUTE';
-    if(accessToken)
-            syncLiveAllStockData(watchList,interval,start_date,end_date);   
+    if(accessToken){
+        syncLiveAllStockData(watchList,interval,start_date,end_date); 
+        syncLiveAllStockData(indices,interval,start_date,end_date);
+    }  
 }
 
 function load10minData()
@@ -171,8 +177,10 @@ function load10minData()
     india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
     india.format(); 
     start_date = formatDate(india.date())+"-"+formatDate(india.month() + 1)+"-"+india.year();//india.date()+"-"+(india.month())+"-"+india.year();
-    if(accessToken)
-        syncLiveAllStockData(watchList,interval,start_date,end_date);   
+    if(accessToken){
+        syncLiveAllStockData(watchList,interval,start_date,end_date); 
+        syncLiveAllStockData(indices,interval,start_date,end_date);
+    } 
 }
 
 function load5minData()
@@ -188,7 +196,8 @@ function load5minData()
     let promise = new Promise(function(resolve, reject) {
         if(accessToken)
         syncLiveAllStockData(watchList,interval,start_date,end_date);
-        resolve(1);    
+        syncLiveAllStockData(indices,interval,start_date,end_date);
+        resolve(accessToken);    
     }).then(res=>{
         now = interval = india = start_date = null;
         getPercent_list(watchList);
@@ -208,9 +217,8 @@ function load3minData()
     let promise = new Promise(function(resolve, reject) {
         if(accessToken)
         syncLiveAllStockData(watchList,interval,start_date,end_date);
-        resolve(1);     
+        resolve(accessToken);     
     }).then(res=>{
-        return Number(res) + 1;
         getPercent_list(watchList);
         now = interval = india = start_date = null;
     });
@@ -231,12 +239,12 @@ function load1minData()
              syncLiveAllStockData(indices,interval,start_date,end_date);
              syncLiveAllStockData(watchList,interval,start_date,end_date);
              is15MinDataSync = false;
-             resolve(1);      
+             resolve(accessToken);      
     }).then(res=>{
         getPercent_list(watchList);
         getGapUpDown(watchList);
         now = interval = india = start_date = null;
-        return Number(res) + 1;
+        
     });
 }
 
@@ -252,20 +260,33 @@ function load15minData()
     india.format(); 
     start_date = formatDate(india.date())+"-"+formatDate(india.month() + 1)+"-"+india.year();
     let promise = new Promise(function(resolve, reject) {
-        if(accessToken)
-            syncLiveAllStockData(watchList,interval,start_date,end_date);
+        if(accessToken){
+            syncLiveAllStockData(watchList,interval,start_date,end_date); 
+            syncLiveAllStockData(indices,interval,start_date,end_date);
+        }  
         
         setTimeout(function() {
             resolve(1);
             is15MinDataSync = true;
-        }, 10000);      
+        }, 4000);      
     }).then(res=>{
         //console.log("load15minData - Process p  " + res);
+
+        getPercent_list(watchList);
+        strategyList.map(strategy =>{
+            applyStrategy(watchList,'15MINUTE',strategy); 
+        });
+
+        rsiList.map(async(strategy)=>{
+            //console.log("\n rsiList > "+strategy);
+            applyStrategy(bankNifty_indices,'15MINUTE',strategy); 
+        });
+
         now = interval = india = start_date = null;
-        return Number(res) + 1;
+       
     });
 
-    promise.then(function(result)  {
+    /* promise.then(function(result)  {
         strategyList.map(strategy =>{
             applyStrategy(watchList,'15MINUTE',strategy); 
         });
@@ -274,7 +295,7 @@ function load15minData()
     });
 
     promise.then(function(result)  {
-        getPercent_list(watchList);
+        
         // console.log("load15minData  " + result);
     });
 
@@ -284,5 +305,5 @@ function load15minData()
             applyStrategy(bankNifty_indices,'15MINUTE',strategy); 
         });
         return Number(result) + 1;
-    });
+    }); */
 }

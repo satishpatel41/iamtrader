@@ -286,30 +286,22 @@ function getAllData(){
             syncAllUpstoxData(watchList);
         }, 300);
 
-        setTimeout(function() {
+        /* setTimeout(function() {
             resolve(1);
            // syncAllUpstoxData(indices);
-        }, 47000);
+        }, 47000); */
+        resolve(1);
           
     }).then(res=>{
         getGapUpDown(watchList);
-        result += 1;
-    });
-
-    promise.then(function(result)  {
         strategyStrongList.map(async(strategy)=>{
             applyStrategy(watchList,'1DAY',strategy); 
         });
-        result += 1;
-    });
-
-  
-    promise.then(function(result)  {
         rsiList.map(async(strategy)=>{
             applyStrategy(bankNifty_indices,'15MINUTE',strategy); 
         });
-        result += 1;
     });
+
     
 }
 

@@ -150,21 +150,7 @@ var queue = async.queue(function(task, callback) {
                             //console.log('UPDATE   ' +task.interval+"> "+ task.symbol +" :: "+ database);
                             database.clear();
                             database.insert(stockData);  
-                            //lokiJson.saveDatabase();       
-
-                            /* if(task.interval == "1MINUTE"){
-                                var intervalNo = parseInt(task.interval);
-                                allIntervalsArr.map(async (allIntervalsArrObj) =>  {
-                                    await updateCollection(lokiJson,allIntervalsArrObj,stockData.data)
-                                }); 
-                            } */
-                           /*  else if(task.interval == "15MINUTE"){
-                                var intervalNo = parseInt(task.interval);
-                                ['1DAY'].map(async (intervalsArrObj) =>  {
-                                    await updateCollection(lokiJson,intervalsArrObj,stockData.data)
-                                }); 
-                                //console.log('UPDATE   ' +task.interval+"> "+ task.symbol);
-                            } */
+                          
                         }
                         else{
                             lokiJson.close();    
@@ -179,7 +165,7 @@ var queue = async.queue(function(task, callback) {
                         callback();     
                     }
                     
-                    lokiJson   = database = symbolfile = task = stockData = response = null;
+                    lokiJson = database = symbolfile = task = stockData = response = null;
 
                 } catch (err) {
                     lokiJson.close();    
@@ -203,22 +189,6 @@ function updateCollection(lokiJson,interval,stockData)
                 }
                 else if(database && database.get(1) && database.get(1).data){
 
-                    /* for(var i = 0; i < database.get(1).data.length;i++)
-                    {
-                        var d = Number(database.get(1).data[i].timestamp);
- 
-                        var india = moment.tz(d, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
-                        india.format(); 
-                        
-                        if(india.minute() % intervalNo != 0)
-                        {
-                               console.log("Problem " + india.minute() +":: "+i) ;
-                               var op = database.get(1).data.slice(0, i);  //**********  dont't change **********  
-                               lokiJson.saveDatabase();   
-                               break;
-                        }
-                    } */
-                    
                     var symbolObj= {};
                     var count = 0;
                     var t = (database.get(1).data && database.get(1).data[database.get(1).data.length - 1] && database.get(1).data[database.get(1).data.length - 1].timestamp) ? database.get(1).data[database.get(1).data.length - 1].timestamp : 0;
@@ -277,40 +247,14 @@ function backFill(lokiJson,stockData,interval)
                     var count = 0;
                    // console.log(' stockJSON   ' +stockJSON.length);
                     //stockJSON = stockJSON.slice(0, stockJSON.length - 3);
-                  //  console.log(' Sec stockJSON   ' +stockJSON.length);
+                 
                     var t = (stockJSON[stockJSON.length - 1] && stockJSON[stockJSON.length - 1].timestamp) ? stockJSON[stockJSON.length - 1].timestamp : 0;
                     var lows = [];
                     var highs = [];
                     var d1 = new Date(Number(t));
-                    /* if(stockData){
-                        stockJSON.data = stockJSON.slice(0, stockJSON.length - 3);
-                        console.log(' database :  ' +stockData.get(1).data.length +" :: "+stockJSON.length);
-                        var arr = stockData.find({timestamp: {'$gt': t}});
-                        //stockData.chain().find({timestamp: {'$gt': t}}).data();
-
-                        console.log(' stockData   ' +stockData.get(1).data.length +" : "+ arr.length);
-                        for(var i = 0; i < stockData.get(1).data.length;i++)
-                        {
-                            //console.log(' timestamp   ' +d1 +" > "+ stockData.get(1).data[i].timestamp + " >>"+new Date(Number(stockData.get(1).data[i].timestamp));
-                            if(count % intervalNo  == 0){
-                                if(i + intervalNo - 1 < stockData.get(1).data.length - 1 && !isDuplicate(stockJSON,stockData.get(1).data[i + intervalNo - 1].timestamp)){
-                                    i = i + intervalNo - 1;
-                                    symbolObj = stockData.get(1).data[i];
-                                    stockJSON.push(stockData.get(1).data[i]);
-                                    count = 0;
-                                }
-                            } 
-                            else{    
-                                stockJSON[stockJSON.length - 1].close = Number(stockData.get(1).data[i].close);
-                                stockJSON[stockJSON.length - 1].low = Math.min((stockData.get(1).data[i] && Number(stockData.get(1).data[i].low)) ? Number(stockData.get(1).data[i].low) : Number(symbolObj.low,symbolObj.low));
-                                stockJSON[stockJSON.length - 1].high = Math.max((stockData.get(1).data[i] && Number(stockData.get(1).data[i].high)) ? Number(stockData.get(1).data[i].high) : Number(symbolObj.high,symbolObj.high));
-                            }
-                            count++;   
-                            
-                        } */
-                       
+               
                         if(stockData && stockData.length > 0){
-                            //console.log('len  >   ' +stockData.length +" :: "+(stockData.length - (intervalNo * 4)));
+                            
                             for(var i = stockData.length - (intervalNo * 4); i < stockData.length;i++)
                             {
                                 if(stockData[i].timestamp >t)

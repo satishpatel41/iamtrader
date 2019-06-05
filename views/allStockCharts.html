@@ -17,6 +17,26 @@
 <script src="https://moment.github.io/luxon/global/luxon.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.25/moment-timezone-with-data.js"></script>
 
+
+
+
+<script src="https://d3js.org/d3.v4.min.js"></script>	
+
+<script src="https://unpkg.com/lodash@4.17.4"></script>
+<script src="https://unpkg.com/d3-scale-chromatic@1.1.1"></script>
+
+<!-- include polyfills for custom event, Symbol and Custom Elements -->
+<script src="//unpkg.com/babel-polyfill@6.26.0/dist/polyfill.js"></script>
+<script src="//unpkg.com/custom-event-polyfill@0.3.0/custom-event-polyfill.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/document-register-element/1.8.0/document-register-element.js"></script>
+
+<!-- use babel so that we can use arrow functions and other goodness in this block! -->
+<script src="//unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+<script src="//unpkg.com/d3@5.5.0"></script>
+<script src="//unpkg.com/d3fc@14.0.41"></script>
+
+
 <style>
     .loader {
       border: 10px solid #f3f3f3;
@@ -58,29 +78,150 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
+
+
+
+
+  .upGreenArrow{
+   width: 0;
+   height: 0;
+   border-style: solid;
+   border-width: 0 4.5px 12px 4.5px;
+   border-color: transparent transparent #00ff00 transparent;
+}
+  
+.downRedArrow{
+   width: 0;
+   height: 0;
+   border-style: solid;
+   border-width: 12px 4.5px 0 4.5px;
+   border-color: #ff0000 transparent transparent transparent;
+}
+
+.upArrow{
+  position: relative;
+  top: -15px;
+  left: -10px;
+  width:0;
+  height:0;
+  border: 6px solid transparent;
+  border-bottom-color: #00ff00;
+}
+.upArrow:after{
+  position: absolute;
+  content: '';
+  top: 20px;
+  left: -3px;
+  width: 6px;
+  height: 10px;
+  background: #00ff00;
+}
+
+.downArrow{
+  position: relative;
+  top: 18px;
+  left: -10px;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-top-color: #ff0000;
+}
+.downArrow:after{
+  position: absolute;
+  content: '';
+  top: -15px;
+  left: -3px;
+  width: 6px;
+  height: 10px;
+  background: #ff0000;
+}
+
+
+/* d3 candle stick start */
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 11px;
+    fill: black;
+}
+
+/* d3 candle stick end */
+
+body {
+  background-color: white;
+}
 </style>
 
 <script type="text/javascript">
 $(document).ready( function () {
+        var stockData = [];
         var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
         $('#userTxt').text(localStorage.getItem('user'));
         var interval = "15MINUTE";
         var symbol = 'sbin';
+        var chunkSize = 0;
 
         $( "#intervalDropDown" ).change(function() {
           interval = $("#intervalDropDown").val();
 
+          if(interval == "5MINUTE"){
+            chunkSize = 75;
+          }
+          if(interval == "10MINUTE"){
+            chunkSize = 36;
+          }
+          else if(interval == "15MINUTE"){
+            chunkSize = 25;
+          }
+          else if(interval == "30MINUTE"){
+            chunkSize = 13;
+          }
+          else if(interval == "60MINUTE"){
+            chunkSize = 7;
+          }
+          else{
+            chunkSize = 5;
+          }
+
+          $( "#symbol_txt" ).html(symbol);
           loadSymbolData(symbol,interval);
         });
 
         $( "#symbolTxt" ).change(function() {
           symbol = $("#symbolTxt").val();
+          $( "#symbol_txt" ).html(symbol);
           loadSymbolData(symbol,interval);
           $( "#symbolTxt" ).val("");
         });
 
+
+        $('#myForm input').on('change', function() {
+            //alert($('input[name=chart]:checked', '#myForm').val()); 
+
+            if($('input[name=chart]:checked', '#myForm').val() === "marketprofile"){
+              $("#candlestickChartDiv").hide();
+              $("#marketChartDiv").show();
+              marketProfileChart(stockData);
+            }
+            else{
+              $("#marketChartDiv").hide();
+              $("#candlestickChartDiv").show();
+              candleStickChart(stockData,symbol);
+            }
+
+            
+        });
+
+
         $(".loader").show();
-        $("#chartDiv").empty();
+        $("#candlestickChartDiv").empty();
         $.ajax({
         type: "get",
         url: server + '/getListOfAllSymbol',success: function(data){
@@ -119,13 +260,7 @@ $(document).ready( function () {
                 });
                 $(".loader").hide();       
                 dataSet.filter((obj) => obj );
-                $("#chartDiv").empty();
-                var canvas = document.createElement('canvas');
-                canvas.id  = "myChart";
-                $( "#chartDiv" ).append(canvas);
-                ctx = document.getElementById("myChart").getContext('2d');
-                ctx.canvas.width = 550;
-                ctx.canvas.height = 250;
+               
                 
                 var now = new Date(Number(dataSet[0].timestamp));
                 var india = moment.tz(now, "Asia/Kolkata");
@@ -133,8 +268,9 @@ $(document).ready( function () {
                 var start_date =india.date()+"-"+(india.month())+"-"+india.year() +"  "+india.hour()+":"+india.minute();
                 $("#date_txt").html(start_date);
 
-                var stockData = dataSet.map(obj =>{ 
-                  var rObj = {};
+             
+                stockData = dataSet.map(obj =>{ 
+                  var rObj = obj;//{};
 
                   var india = moment.tz(new Date(Number(obj.timestamp)), "Asia/Kolkata");
                   india.format(); 
@@ -145,37 +281,278 @@ $(document).ready( function () {
                   d.setFullYear(india.year());
                   d.setHours(india.hour());
                   d.setMinutes(india.minute());
-
+                  rObj.timestamp= d;//.getTime();
+                  rObj.date= d;//.getTime();
                   rObj.t= d.getTime();
                   rObj.o= Number(obj.open);
                   rObj.h= Number(obj.high);
                   rObj.l= Number(obj.low);
                   rObj.c= Number(obj.close);
                   return rObj;
-                }); 
-                
-                
-                stockData = stockData.slice(0, 25);
-                var chart = new Chart(ctx, 
-                {
-                  type: 'candlestick',
-                  data: {
-                    datasets: [{
-                      label: symbolName,
-                      data: stockData
-                    }]
-                  }
-                });    
-                var dataset = chart.config.data.datasets[0];
-                dataset.color = {
-                  up: '#01ff01',
-                  down: '#fe0000',
-                  unchanged: '#999',
-                };
-                chart.update();
+                });
+                stockData.reverse();
+                //stockData = stockData.slice(0, 25);
+               /*  $("#marketChartDiv").hide();
+                candleStickChart(stockData,symbol); */
+
+                if($('input[name=chart]:checked', '#myForm').val() === "marketprofile"){
+                  $("#candlestickChartDiv").hide();
+                  $("#marketChartDiv").show();
+                  marketProfileChart(stockData);
+                }
+                else{
+                  $("#marketChartDiv").hide();
+                  $("#candlestickChartDiv").show();
+                  candleStickChart(stockData,symbol);
+                }
 	            }
       });  
   }
+
+
+
+
+
+  function candleStickChart(stockData,symbolName){
+
+        $("#candlestickChartDiv").empty();
+        var canvas = document.createElement('canvas');
+        canvas.id  = "myChart";
+        $( "#candlestickChartDiv" ).append(canvas);
+        ctx = document.getElementById("myChart").getContext('2d');
+
+        const margin = {top: 15, right: 5, bottom: 50, left: 5},
+          w = 950 - margin.left - margin.right,
+          h = 600 - margin.top - margin.bottom;
+
+        ctx.canvas.width = w;
+        ctx.canvas.height = h;
+
+    
+        var chart = new Chart(ctx, 
+        {
+          type: 'candlestick',
+          data: {
+            datasets: [{
+              label: symbolName,
+              data: stockData
+            }]
+          },
+          options: {
+                  legend: {
+                    display: false,
+              }
+          }
+        });    
+        var dataset = chart.config.data.datasets[0];
+        dataset.color = {
+          up: '#01ff01',
+          down: '#fe0000',
+          unchanged: '#999',
+        };
+        chart.update();
+  }
+
+
+  function marketProfileChart(stockData){
+            $("#marketChart").empty();
+            const createMarketProfile = (data, priceBuckets) => {
+              // find the price bucket size
+              const priceStep = priceBuckets[1] - priceBuckets[0];
+
+              // determine whether a datapoint is within a bucket
+              const inBucket = (datum, priceBucket) =>
+                datum.low < priceBucket && datum.high > (priceBucket - priceStep);
+
+              // the volume contribution for this range
+              const volumeInBucket = (datum, priceBucket) =>
+                inBucket(datum, priceBucket) ? datum.volume / Math.ceil((datum.high - datum.low) / priceStep) : 0;
+
+              // map each point in our time series, to construct the market profile
+              const marketProfile = data.map(
+                                (datum, index) => priceBuckets.map(priceBucket => {
+                                  // determine how many points to the left are also within this time bucket
+                                  const base = d3.sum(data.slice(0, index)
+                                              .map(d => volumeInBucket(d, priceBucket)));
+                                  return {
+                                      base,
+                                      timestamp:datum.timestamp,
+                                      value: base + volumeInBucket(datum, priceBucket),
+                                      price: priceBucket
+                                      };
+                                })
+          );
+
+          // similar to d3-stack - cache the underlying data
+          marketProfile.data = data;
+          return marketProfile;
+          };
+
+          const seriesMarketProfile = () => {
+          let xScale, yScale;
+          let bandwidth = 20;
+          const join = fc.dataJoin('g', 'profile');
+
+          const barSeries = fc.autoBandwidth(fc.seriesSvgBar())
+              .orient('horizontal')
+              .crossValue(d => d.price)
+              .mainValue(d => d.value)
+              .baseValue(d => d.base);
+
+          const colorScale = d3.scaleSequential(d3.interpolateSpectral);
+
+
+         
+          const repeatSeries = fc.seriesSvgRepeat()
+              .series(barSeries)
+              .orient('horizontal')
+              .decorate((selection) => {
+                selection.enter()
+                .each((data, index, group) => {
+                  d3.select(group[index])
+                    .selectAll('g.bar')
+                    .attr('fill', () => {
+                        var color = '';
+
+                       /*  if(index == 0)
+                          color = "#00FF00";
+                       /*  else if(index == stockData.length - 1) 
+                          color = "#0000FF";
+                        else */
+                          color =  colorScale(index/stockData.length * 3);
+                        
+                        
+                        return color;
+                    });
+                });
+              });
+
+          const series = (selection) => {
+            selection.each((data, index, group) => {
+
+                const xDomain = d3.extent(_.flattenDeep(data).map(d => d.value));
+                colorScale.domain([0, data.length]);
+
+                join(d3.select(group[index]), data)
+                .each((marketProfile, index, group) => {
+
+                    // create a composite scale that applies the required offset
+                    const leftEdge = xScale(marketProfile.data[0].timestamp);
+                    const offset = d3.scaleLinear()
+                        .domain(xDomain)
+                        .range([leftEdge, leftEdge + bandwidth]);
+
+                    repeatSeries.yScale(yScale)
+                        .xScale(offset);
+
+                    d3.select(group[index])
+                      .call(repeatSeries);
+                    });
+                })
+              };
+
+          series.xScale = (...args) => {
+            if (!args.length) {
+              return xScale;
+            }
+            xScale = args[0];
+              return series;
+            };
+
+            series.bandwidth = (...args) => {
+              if (!args.length) {
+              return bandwidth;
+            }
+            bandwidth = args[0];
+              return series;
+            };
+
+            series.yScale = (...args) => {
+            if (!args.length) {
+            return yScale;
+            }
+            yScale = args[0];
+            return series;
+            };
+
+            return series;
+          }
+
+          const pointOfControl = (marketProfile) => 
+          _.maxBy(_.flatten(marketProfile), d => d.value).price;
+
+
+          const timeSeries = stockData;
+
+
+          // determine the price range
+          const extent = fc.extentLinear()
+          .accessors([d => d.high, d => d.low]);
+          const priceRange = extent(timeSeries);
+
+          // use a d3 scale to create a set of price buckets
+          const priceScale = d3.scaleLinear()
+          .domain(priceRange);
+          const priceBuckets = priceScale.ticks(40);
+
+          const series = _.chunk(timeSeries, chunkSize)
+          .map((data) => createMarketProfile(data, priceBuckets));
+
+          const marketProfileSeries = fc.autoBandwidth(seriesMarketProfile());
+
+          const pocSeries = fc.autoBandwidth(fc.seriesSvgErrorBar())
+            .crossValue(d => d.timestamp)
+            .lowValue(d => d.value)
+            .highValue(d => d.value)
+            .align('left');
+
+          const multiSeries = fc.seriesSvgMulti()
+            .series([marketProfileSeries, pocSeries])
+            .mapping((data, index, series) => {
+            switch(series[index]) {
+              case pocSeries:
+                return data.map(d => ({
+                  date: d.data[0].timestamp,
+                  value: pointOfControl(d)
+                }));
+              case marketProfileSeries:
+                return data;
+              }
+            });
+
+          const xExtent = fc.extentDate()
+            .accessors([d => d.data[0].timestamp]);
+
+          const profileChart = fc.chartSvgCartesian(
+              d3.scaleBand(),
+              d3.scaleBand()
+              )
+              .xDomain(series.map(s => s.data[0].timestamp))
+              .yDomain(priceBuckets)
+              .yTickValues(priceBuckets.filter((d, i) => i % 10 == 0))
+              .xTickFormat(d3.timeFormat('%Y-%m-%d'))// %H:%M
+              .yOrient('left')
+              .xPadding(0.3)
+              .plotArea(multiSeries);
+
+          const margin = {top: 15, right: 5, bottom: 50, left: 5},
+          w = 1000 - margin.left - margin.right,
+          h = 625 - margin.top - margin.bottom;
+
+          var svg = d3.select("#marketChart")
+          .attr("width", w + margin.left + margin.right)
+          .attr("height", h + margin.top + margin.bottom)
+          .append("g");
+          // .attr("transform", "translate(" +margin.left+ "," +margin.top+ ")");
+
+          d3.select('#marketChart')
+          .datum(series)
+          .call(profileChart);
+    }
+
+
+
+
 });
 </script>
 </head>
@@ -241,16 +618,32 @@ $(document).ready( function () {
                 <option value="1MONTH">1MONTH</option>
               </select>
           </div>
-          
           <div class="col-sm-4">
-            <label>Update till :</label>
-            <label id="date_txt"></label>
-          </div> 
-    </div> 
+            <form id="myForm">
+              <p>Chart type:</p>
+              <input type="radio" name="chart" value="candlestick" selected>Candlestick
+              <input type="radio" name="chart" value="marketprofile">Market Profile
+           </form>
+          </div>
+    </div>
     <div class="row">
-      <div class="col-sm" id="chartDiv" style="position: relative; height:80vh; width:100vw;max-width: 600px;">
+        <span id="symbol_txt" class="col-md-6"></span>
+        <span  class="col-md-6"> <span>Time :</span><span id="date_txt"></span></span>
+    </div>
+    <br/>
+    <div class="row">
+      <div id='candlestickChartDiv' class="col-md-6"  style="position: relative; height:100vh; width:90vw;">
           <canvas id="myChart"></canvas>
       </div>  
+
+     
+      <div id='marketChartDiv' class="col-md-6" style="position: relative; height:100vh; width:90vw;">
+          <div id='marketChart' style="position: relative; height:625px;">
+          </div>  
+      </div>
+        
+
+
     </div>
   </div>
   <div class="loader"></div>

@@ -68,7 +68,8 @@ $(document).ready( function () {
         var urlParams = new URLSearchParams(window.location.search);
 
         var symbol =  urlParams.get('symbol');
-        loadSymbolData(symbol,'5MINUTE');
+        $( "#symbol_txt" ).html(symbol);
+        loadSymbolData(symbol,'15MINUTE');
         
         var ctx;
 
@@ -77,7 +78,7 @@ $(document).ready( function () {
           $.get({
             url: server+'/getStockIndicators/'+symbolName+"/"+interval,
             success: function(response){
-              response = response.slice(0, 40);
+              response = response.slice(0, 28);
                 var dataSet = response.filter(function (el) {
                   return (el != null && el.close != null && el.close != undefined && el.close != "");
                 });
@@ -88,8 +89,8 @@ $(document).ready( function () {
                 canvas.id  = "myChart";
                 $( "#chartDiv" ).append(canvas);
                 ctx = document.getElementById("myChart").getContext('2d');
-                ctx.canvas.width = 550;
-                ctx.canvas.height = 250;
+                ctx.canvas.width = 700;
+                ctx.canvas.height = 400;
 
                
                 var now = new Date(Number(dataSet[0].timestamp));
@@ -128,7 +129,12 @@ $(document).ready( function () {
                       label: symbolName,
                       data: stockData
                     }]
-                  }
+                  },
+                  options: {
+                            legend: {
+                              display: false,
+                          }
+                   }
                 });    
                 var dataset = chart.config.data.datasets[0];
                 dataset.color = {
@@ -184,16 +190,14 @@ $(document).ready( function () {
     
     <br></br>
     <br></br>
-    
     <div class="row">
-      <div class="col-sm-4">
-        <label>Update till :</label>
-        <label id="date_txt"></label>
-      </div> 
+        <span id="symbol_txt" class="col-md-6"></span>
+        <span  class="col-md-6"> <span>Time :</span><span id="date_txt"></span></span>
     </div>
-    
+    <br/>
+
     <div class="row">
-      <div class="col-sm" id="chartDiv" style="position: absolute; height:70vh; width:90vw;max-width: 600px;"> 
+      <div class="col-md-6" id="chartDiv" style="position: absolute; height:80vh; width:100vw;max-width: 800px;"> 
           <canvas id="myChart"></canvas>
       </div>  
     </div>

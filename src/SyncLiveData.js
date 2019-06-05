@@ -45,11 +45,13 @@ async function syncAllUpstoxData(list){
                 now.setDate(now.getDate() - 22 * 7);
             else if(interval == '1DAY')
                 now.setDate(now.getDate() - 202);    
-            else if(interval == '30MINUTE' || interval == '60MINUTE')
+            else if(interval == '30MINUTE')
                 now.setDate(now.getDate() - 6);
+                else if(interval == '60MINUTE')
+                now.setDate(now.getDate() - 15);    
             else if(interval == '15MINUTE')
-                now.setDate(now.getDate() - 3);
-            else if(interval == '5MINUTE' || interval == '3MINUTE' || interval == '1MINUTE')
+                now.setDate(now.getDate() - 4);
+            else if(interval == '5MINUTE' || interval == '3MINUTE')
                 now.setDate(now.getDate() - 1);
             else if(interval == '1MINUTE')
                  now.setDate(now.getDate());
@@ -82,7 +84,7 @@ async function getPercent_list(list){
             Promise.all(list.map(async (x) =>  {
                 return getStockDataFromDb(x.symbol ? x.symbol:x,interval);          
             })).then(stockData => {
-                //console.log("stockData : " + interval +"::"+stockData.length);
+                //console.log("percentage : " + interval +"::"+stockData.length);
                 resolved(stockData);
             })
             .catch(error => { 
@@ -110,7 +112,7 @@ async function getPercent_list(list){
                                 }
                             }
                             catch(error){ 
-                                console.log("percentage error  : " + error);
+                                //console.log("percentage error  : " + error);
                             }
                         } 
                         var stock1 = [];
@@ -155,7 +157,7 @@ async function getPercent_list(list){
                     }
                 }
                 catch(error){ 
-                    console.log("getPercent_list Parsing error " +dataObj1.symbol +" : "+ error);
+                    //console.log("getPercent_list Parsing error " +dataObj1.symbol +" : "+ error);
                     
                 }
             }
