@@ -1,5 +1,4 @@
 var express = require('express');
-
 var compression = require('compression')
 var moment = require('moment-timezone');
 var bodyParser = require('body-parser');
@@ -13,21 +12,21 @@ var Store = require('data-store');
 var async = require('async');
 const querystring = require('querystring');
 var store = new Store({ path: 'store.json' });
-var Upstox = require("upstox");
-var api = "8gtPZrzCsNayGnraaxVc792UuksNxV2q3Niif4U9";
-var upstox = new Upstox(api);
 const PORT = process.env.PORT || 3000;
-var redirect_uri = "http://localhost:"+PORT;
+var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+var date = new Date();
+var __dirname = "views"
+var exchanges =  [ 'MCX_FO', 'BSE_EQ', 'NSE_EQ', 'NSE_FO', 'NCD_FO'];
+var today = date.getDate() +"-"+(date.getMonth() + 1) +"-"+date.getFullYear();
+var time = date +":"+date.getHours() +":"+date.getMinutes();   
+var fs = require('fs');
+var events = require('events');
+var eventEmitter = new events.EventEmitter();
+var is15MinDataSync = false;
+var nseSymbolList = [];
 
-if(process.env.NODE_ENV=="production")
-{
-    api = "8gtPZrzCsNayGnraaxVc792UuksNxV2q3Niif4U9";
-    redirect_uri = "https://robo-trader.herokuapp.com/";
-}
 
-
-
-var numReqs = 0; 
+/* var numReqs = 0; 
 if (cluster.isMaster) {
   // Fork workers.
   let cpus = 1;//require('os').cpus().length;
@@ -36,70 +35,52 @@ if (cluster.isMaster) {
     var worker = cluster.fork();
  
     worker.on('message', function(msg) {
-     /*  if (msg.cmd && msg.cmd == 'notifyRequest') {
-        numReqs++;
-      } */
+    
     });
   }
  
   cluster.on('death', function(worker) {
     console.log(chalk.red('worker ' + worker.pid + ' died'));
   });
-} else {
-        var app = express();
-        app.use(express.static('public'));
-        // compress all responses
-        app.use(compression());
-        app.use(bodyParser.json()); // support json encoded bodies
-        app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
-        app.use(session(
-            {
-                store: new FileStore({
-
-                    path: './session-store'
-            
-                }),
-                name: '_fs_cookie', // cookie will show up as foo site
-                resave: false,
-                saveUninitialized: false,
-                secret: "00777",
-                cookie: {
-                    maxAge: 1000 * 60 * 60 * 10 * 15                }
-            }    
-        ));
-    
-        app.use(function(req, res, next) {
-            res.header("Access-Control-Allow-Origin", "*");
-            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-            next();
-        });
-
-        var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-        var date = new Date();
-        var today = date.getDate() +"-"+(date.getMonth() + 1) +"-"+date.getFullYear();
-        var time = date +":"+date.getHours() +":"+date.getMinutes();   
-        
-       
-       // app.use(express.static('views'))
-       // app.use('/views', express.static('views'))
-        app.get('/', function (req, res) {
-            var q = url.parse(req.url, true).query;
-            code = q.code;
-
-            console.log("******* code > " + code);
-            getAcceToken(code);        
-            res.sendFile("index.html", {"root": __dirname});
-            //checkBankNiftyExpiry();
-
-            /* if(code)
-            {
-                getAcceToken(code);        
-                res.sendFile("index.html", {"root": __dirname});
+} else { */
+    var app = express();
+    app.use(express.static('public'));
+    // compress all responses
+    app.use(compression());
+    app.use(bodyParser.json()); // support json encoded bodies
+    app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+    app.use(session(
+        {
+            store: new FileStore({
+                path: './session-store'
+            }),
+            name: '_fs_cookie', // cookie will show up as foo site
+            resave: false,
+            saveUninitialized: false,
+            secret: "00777",
+            cookie: {
+                maxAge: 1000 * 60 * 60 * 10 * 15  
             }
-            else{
-                res.sendFile("index.html", {"root": __dirname});
-            } */
-            q = null;
+        }    
+    ));
+
+    app.use(function(req, res, next) {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        next();
+    });
+
+  
+    var callBackCount = -1;
+    app.get('/callback', function (req, res) {
+        callBackCount++;
+        var q = url.parse(req.url, true).query;
+        var code = q.code;
+        //console.log("******* code > " +callBackCount +" - "+ code + " :: " + JSON.stringify(upstoxObjList));
+        upstoxObjList[callBackCount]['traderObject'].getUpstoxAccessToken(code);
+        getAllData();
+        q = null;
+        
     });
 
     app.get('/welcome', checkSignIn,function (req, res) {
@@ -135,25 +116,15 @@ if (cluster.isMaster) {
         var query = "select * from User where email=? and password=?";
         var param = [email,psw];
         getFirst(query,param).then(user => {
-                console.log("result > " + JSON.stringify(user));
+                //console.log("result > " + JSON.stringify(user));
                 if(user == undefined)
                 {
                     res.send("error")
                 }
                 else{
-                   // console.log(chalk.green("Login token > " + store.get('accessToken')));
-                    /* if(store.get('accessToken') && store.get('accessToken') != '')
-                    { */
                         req.session.user = user;
                         res.send(user);
-                   /*  }
-                    else{
-                        var loginUrl = upstox.getLoginUri(redirect_uri);
-                        res.status(200).header('Content-type', 'text/html');
-                        //code = req.params.code;
-                        //res.status(302).setHeader('Location', loginUrl);
-                        //res.end();
-                    } */
+                   
                 }
             });     
     }
@@ -256,7 +227,7 @@ if (cluster.isMaster) {
             var param = [email];
             var isMatchEmail = false;
             getFirst(query,param).then(user => {
-                    console.log("result > " + JSON.stringify(user));
+                    //console.log("result > " + JSON.stringify(user));
                     if(user == undefined)
                     {
                         //Do nothing
@@ -273,7 +244,7 @@ if (cluster.isMaster) {
                 
                 if(!isMatchEmail){  
                     insertDB(query,param).then(responses => {
-                        console.log("result > " + JSON.stringify(responses));
+                        //console.log("result > " + JSON.stringify(responses));
 
                         if(responses == 'success')
                         {
@@ -298,6 +269,12 @@ if (cluster.isMaster) {
         res.sendFile("allStockCharts.html", {"root": __dirname});
     });
 
+    app.get('/applyStrategy', checkSignIn,function (req, res) {
+        res.sendFile("applyStrategy.html", {"root": __dirname});
+    });
+
+    
+
     app.get('/chart', checkSignIn,function (req, res) {
          res.sendFile("chart.html", {"root": __dirname});      
     });
@@ -314,57 +291,102 @@ if (cluster.isMaster) {
         res.sendFile("gainerloser.html", {"root": __dirname});
     });
 
-    var  lastObject = {open:'',close:'',low:'',high:'',volume:'',timestamp:'',rsi:'',sma:'',bb:{upper:'',lower:'',isCrossed:'',middel:'',pb:''}};
+    var  lastObject = {open:'',close:'',low:'',high:'',volume:'',LASTTRADETIME:'',rsi:'',sma:'',bb:{upper:'',lower:'',isCrossed:'',middel:'',pb:''}};
     var stockData = [];
+
+
+    app.get('/deleteApplyStrategy/:id',checkSignIn, function (req, res) {
+        var id = req.params.id;  
+        var query = "DELETE FROM applyStrategy WHERE id = ?";
+        var param = [id];
+        
+        getAll(query,param).then(strategy => {
+                //console.log("result > " + JSON.stringify(strategy));
+                if(strategy == undefined)
+                {
+                    res.send("error")
+                }
+                else{
+                    //console.log("result > " + JSON.stringify(strategy));
+                    res.send(strategy);
+                }
+        });    
+    });
+
+    app.post('/applyStrategy',checkSignIn, function (req, res) {
+        var strategyObj = JSON.parse(req.body.data);
+        
+        var uid = strategyObj.uid;
+        var sid = strategyObj.sid;
+        var symbol = strategyObj.symbol;
+        var exchange = strategyObj.exchange;
+        var interval = strategyObj.interval;
+        var isIntraday = strategyObj.isIntraday;
+        var odrerType = strategyObj.odrerType;
+        var quantity = strategyObj.quantity;
+        var transaction_type = strategyObj.transaction_type;
+
+        var slSid = strategyObj.slSid;
+        var profitSid = strategyObj.profitSid;
+        var slPercent = strategyObj.slPercent;
+        var slPoints = strategyObj.slPoints;
+        var profitPercent = strategyObj.profitPercent;
+        var profitPoints = strategyObj.profitPoints;
+        var isLive = strategyObj.isLive;
+        
+        var query = "INSERT INTO applyStrategy (uid,sid,symbol,exchange,interval,isIntraday,odrerType,quantity,transaction_type,slSid,profitSid,slPercent,slPoints,profitPercent,profitPoints,isLive)VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        var param = [uid,sid,symbol,exchange,interval,isIntraday,odrerType,quantity,transaction_type,slSid,profitSid,slPercent,slPoints,profitPercent,profitPoints,isLive];
+        
+        insertDB(query,param).then(responses => {
+            if(responses == 'success')
+            {
+                res.send('success');
+            }
+            else{
+                res.send("error");
+            }
+        });
+    });
 
     app.post('/createStrategy',checkSignIn, function (req, res) {
         var strategyObj = JSON.parse(req.body.data);
-
+        //console.log("strategyObj > " + JSON.stringify(strategyObj));
         var uid = strategyObj.uid;
         var name = strategyObj.name;
-        var symbol= strategyObj.symbol;
-        var exchange = strategyObj.exchange;
-        var orderType = strategyObj.orderType;
-        var symbolToBuySell  = strategyObj.symbolToBuySell;
-        var interval = strategyObj.interval;
-        
-        var query = "INSERT INTO Strategy (uid,name,symbol,exchange,orderType,symbolToBuySell,interval)VALUES(?,?,?,?,?,?,?)";
-        var param = [uid,name,symbol,exchange,orderType,symbolToBuySell,interval];
+        var description = strategyObj.description;
+        var category = strategyObj.category;
+        var isPrivate = strategyObj.isPrivate;
+
+        var query = "INSERT INTO Strategy (uid,name,description,category,isPrivate)VALUES(?,?,?,?,?)";
+        var param = [uid,name,description,category,isPrivate];
         
         insertDB(query,param).then(responses => {
-          
             if(responses == 'success')
             {
-                var query1 = "select sid from Strategy where uid=?";
-                var param1 = [uid];
+                var query1 = 'select last_insert_rowid();';//"select sid from Strategy where uid=?";
+                var param1 =[];
 
-                getFirst(query1,param1).then(obj => {
-                    //console.log("result > " + obj.sid);
-                    if(obj.sid == undefined)
-                    {
+                getFirst(query1,param1).then(obj1 => {
+                    if(obj1 == undefined){
                         res.send("error")
                     }
                     else{
-                        console.log(obj.sid);
-                         var sid = obj.sid;
+                        var sid = obj1['last_insert_rowid()'];
                         strategyObj.indicators.map(async (obj) => {
-
-                            var indicator= obj.indicator;
-                            var settings = obj.settings;
+                            var indicator1= obj.indicator1;
+                            var indicator2= obj.indicator2;
+                            var indicator_config1= obj.indicator_config1;
+                            var indicator_config2= obj.indicator_config2;
                             var value = obj.value;
                             var op = obj.op;
+                            var q = "INSERT INTO Indicators (sid,indicator1,indicator2,value,op,indicator_config1,indicator_config2)VALUES(?,?,?,?,?,?,?)";
+                            var p = [sid,indicator1,indicator2,value,op,indicator_config1,indicator_config2];
                             
-                            var q = "INSERT INTO Indicators (sid,indicator,settings,value,op)VALUES(?,?,?,?,?)";
-                            var p = [sid,indicator,settings,value,op];
-                            //console.log(q +"> "+ JSON.stringify(p));
-
                             insertDB(q,p).then(responses => {
-                                console.log("result > " + JSON.stringify(responses));
+                                //console.log("Indicators result > " + JSON.stringify(responses));
                             }); 
                         });
-
                         res.send('success');
-                       
                     }
                 });  
             }
@@ -372,117 +394,128 @@ if (cluster.isMaster) {
                 res.send("error");
             }
         });
-
-        var now = new Date();
-        if(interval == "5MINUTE") 
-                now.setDate(now.getDate() - 2);
-        else if(interval == "3MINUTE")
-            now.setDate(now.getDate() - 1);
-        else if(interval == "15MINUTE")
-             now.setDate(now.getDate() - 2);
-        else if(interval == "10MINUTE")
-                now.setDate(now.getDate() - 3);
-        else if(interval == "30MINUTE")
-            now.setDate(now.getDate() - 4);
-        else if(interval == "60MINUTE")
-            now.setDate(now.getDate() - 4);
-        else if(interval == "1DAY")
-            now.setDate(now.getDate() - 20);
-        else if(interval == "1WEEK")
-            now.setDate(now.getDate() - 7*20);
-        else if(interval == "1MONTH")
-            now.setMonth(now.getMonth() - 20);   
-        
-        var start_date = now.getDate()+"-"+(now.getMonth() + 1)+"-"+now.getFullYear();
-
-        initiateIndicator();
-        stockData = [];
-        loadSymbol(strategyObj.symbol,strategyObj.exchange,interval,start_date).then(function (response) {
-            res.setHeader('Content-Type', 'application/json');
-            stockData =response.data;
-            
-            lastObject = {open:'',close:'',low:'',high:'',volume:'',timestamp:'',rsi:'',sma:'',bb:{upper:'',lower:'',isCrossed:'',middel:'',pb:''}};
-            stockData.map(row => {
-                var india = moment.tz(new Date(Number(row.timestamp)), "Asia/Kolkata");
-                india.format(); 
-                row.timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();//new Date(row.timestamp);
-                row.rsi = rsi.nextValue(Number(row.close));
-                row.sma = sma.nextValue(Number(row.close));
-                row.bb = bb.nextValue(Number(row.close)); 
-                
-                lastObject = row;
-                return row;
-            });
-            stockData.reverse();
-            var data = {
-                "symbol":strategyObj.symbol,
-                "close":stockData[0].close,
-                "volume":stockData[0].volume,
-                "rsi":stockData[0].rsi,
-                "timestamp":stockData[0].timestamp,
-                "sma":stockData[0].sma, 
-                "bb":stockData[0].bb
-            }; 
-
-            var isMatch = false;
-            
-            for(var i=0;i<strategyObj.indicators.length;i++)
-            {
-                var op = strategyObj.indicators[i]['op'];
-                var a = data[strategyObj.indicators[i]['indicator']];
-                var b = strategyObj.indicators[i]['value'];
-                var result = false;
-                if(op == '<')
-                    result = (a < b);
-                else if(op == '>')
-                    result = (a > b);   
-                else if(op == '<=')
-                    result = (a <= b);
-                else if(op == '>=')
-                    result = (a >= b);    
-                    else if(op == '==')
-                    result = (a == b);        
-                
-                if(result)
-                {
-                    isMatch = true;
-                }
-                console.log("isMatch :> " + isMatch);
-            }
-            
-            if(isMatch){
-                    var orderObject = {
-                        transaction_type:strategyObj.orderType,
-                        exchange:strategyObj.exchange,
-                        symbol: strategyObj.symbolToBuySell,
-                        quantity: 1,
-                        order_type:"m"
-                    };
-                
-                    upstox.placeOrder(orderObject).then(function(response) {
-                        // Order details received
-                        console.log(response);
-                    })
-                    .catch(function(err) {
-                        // Something went wrong.
-                        console.log(chalk.red(err));
-                        err = null;
-                    });
-            } 
-
-            console.log("Result " + JSON.stringify(data));
-            res.send(JSON.stringify(data));
-            stockData = null;
-            res.end();
-        })
-        .catch(function(error){
-            console.log("createStrategy error > " +  JSON.stringify(error));
-            error = null;
-        });
-
     });
 
+    app.post('/updateStrategy',checkSignIn, function (req, res) {
+        var strategyObj = JSON.parse(req.body.data);
+        //console.log("strategyObj > " + JSON.stringify(strategyObj));
+        var sid = strategyObj.sid;
+        var name = strategyObj.name;
+        var description = strategyObj.description;
+        var category = strategyObj.category;
+        var isPrivate = strategyObj.isPrivate;
+       
+        var query = "UPDATE Strategy SET name = ?,description = ?,category = ?,isPrivate = ? WHERE sid = ?";
+        var param = [name,description,category,isPrivate,sid];
+        
+        updateDB(query,param).then(response => {
+            if(response == 'success')
+            {
+                var query = "DELETE FROM Indicators WHERE sid = ?";
+                var p = [sid];
+                getAll(query,p).then(res => {
+                    //if(res == 'success')
+                    //{
+                        strategyObj.indicators.map(async (obj) => {
+                            var indicator1= obj.indicator1;
+                            var indicator2= obj.indicator2;
+                            var indicator_config1= obj.indicator_config1;
+                            var indicator_config2= obj.indicator_config2;
+                            
+                            var value = obj.value;
+                            var op = obj.op;
+                            //var q = "INSERT INTO Indicators (sid,indicator1,indicator2,value,op)VALUES(?,?,?,?,?)";
+                            //var p = [sid,indicator1,indicator2,value,op];
+                            var q = "INSERT INTO Indicators (sid,indicator1,indicator2,value,op,indicator_config1,indicator_config2)VALUES(?,?,?,?,?,?,?)";
+                            var p = [sid,indicator1,indicator2,value,op,indicator_config1,indicator_config2];
+                            
+                            insertDB(q,p).then(responses => {
+                                //console.log("Indicators result > " + JSON.stringify(responses));
+                            }); 
+                        });
+                    //}
+                });
+               
+                res.send('success');        
+            }
+            else{
+                res.send("error");
+            }
+        });
+    });
 
+    
+    app.get('/deleteStrategy/:sid',checkSignIn, function (req, res) {
+        var sid = req.params.sid;  
+        var query = "DELETE FROM Strategy WHERE sid =?";
+        var param = [sid];
+        getAll(query,param).then(strategy => {
+                //console.log("result > " + JSON.stringify(strategy));
+                if(strategy == undefined)
+                {
+                    res.send("error")
+                }
+                else{
+                    //console.log("result > " + JSON.stringify(strategy));
+                    res.send(strategy);
+                }
+        });    
+    });
+   
+    app.get('/getAppliedList/:uid',checkSignIn, function (req, res) {
+        var uid = req.params.uid;  
+        var query = "SELECT applyStrategy.id,applyStrategy.uid,applyStrategy.sid,applyStrategy.symbol,applyStrategy.exchange,applyStrategy.interval,applyStrategy.isIntraday,applyStrategy.odrerType,applyStrategy.quantity,applyStrategy.transaction_type,Strategy.name,Strategy.description,Strategy.category,Strategy.isPrivate FROM applyStrategy LEFT JOIN Strategy ON Strategy.sid = applyStrategy.sid WHERE applyStrategy.uid=?;";
+
+        //var query = "SELECT * FROM applyStrategy where uid=?";
+        var param = [uid];
+        getAll(query,param).then(strategy => {
+                //console.log("result > " + JSON.stringify(strategy));
+                if(strategy == undefined)
+                {
+                    res.send("error")
+                }
+                else{
+                    //console.log("result > " + JSON.stringify(strategy));
+                    res.send(strategy);
+                }
+        });    
+    });
+
+    app.get('/strategyList/:uid',checkSignIn, function (req, res) {
+        var uid = req.params.uid;  
+        var query = "SELECT sid,name,uid,description,category,isPrivate FROM Strategy where uid=?";
+        var param = [uid];
+        getAll(query,param).then(strategy => {
+                //console.log("result > " + JSON.stringify(strategy));
+                if(strategy == undefined)
+                {
+                    res.send("error")
+                }
+                else{
+                    //console.log("result > " + JSON.stringify(strategy));
+                    res.send(strategy);
+                }
+        });    
+    });
+
+    app.get('/indicatorList/:sid',checkSignIn, function (req, res) {
+        var sid = req.params.sid;  
+       // console.log("uid > " + uid);
+       
+        var query = "SELECT indicator_id,sid,indicator1,indicator2,value,indicator_config1,indicator_config2,op FROM Indicators where sid=?";
+        var param = [sid];
+        getAll(query,param).then(indicators => {
+                //console.log("result > " + JSON.stringify(indicators));
+                if(indicators == undefined)
+                {
+                    res.send("error")
+                }
+                else{
+                    //console.log("indicators result > " + JSON.stringify(indicators));
+                    res.send(indicators);
+                }
+        });    
+    });
 
     function initiateIndicator()
     {
@@ -510,49 +543,31 @@ if (cluster.isMaster) {
     }
 
     app.get('/getFutureContract/:exchange', checkSignIn,function (req, res) { 
-    var exchange = req.params.exchange;  
+        var exchange = req.params.exchange;  
 
-    //console.log("getMaster exchange > " +  JSON.stringify(exchange));
+        //console.log("getMaster exchange > " +  JSON.stringify(exchange));
 
-    fs.readFile('data/index/nse_fo.txt','utf8', function(err, response) {
-        
-        var obj = JSON.parse(response);
-       /*  var now = new Date();
-        var thisMonth = months[now.getMonth()].slice(0,3).toUpase();
-        var monthPattern = new RegExp(thisMonth, 'gi'); */
+        fs.readFile('data/index/nse_fo.txt','utf8', function(err, response) {
             
-        var data=csvTojs(obj.data);
-        //console.log(data);
-        var data = data.filter(x => (String(x.instrument_type) === exchange));
-        
-        //console.log(data);
-        var arr = data.map(x => x.symbol);
-        //console.log(arr);
+            var obj = JSON.parse(response);
+        /*  var now = new Date();
+            var thisMonth = months[now.getMonth()].slice(0,3).toUpase();
+            var monthPattern = new RegExp(thisMonth, 'gi'); */
+                
+            var data=csvTojs(obj.data);
+            //console.log(data);
+            var data = data.filter(x => (String(x.instrument_type) === exchange));
+            
+            //console.log(data);
+            var arr = data.map(x => x.symbol);
+            //console.log(arr);
 
-        //console.log(arr);
-        res.setHeader('Content-Type', 'application/json');
-        res.send(arr);
-        res.end();
-    });
-
-
-    /* getMaster(exchange).then(function (response) {
-
-        console.log("getMaster respone > " +  JSON.stringify(response));
-
-
-        var data = response.filter(function (el) {
-            return (el != null && el.close != null && el.close != undefined && el.close != "");
+            //console.log(arr);
+            res.setHeader('Content-Type', 'application/json');
+            res.send(arr);
+            res.end();
         });
 
-        res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify(response));
-        exchange =  data = null;
-        res.end();
-    })
-    .catch(function(error){
-        log("getMaster/ error > " +  JSON.stringify(error));
-    }); */
 
     });
     
@@ -585,10 +600,12 @@ if (cluster.isMaster) {
                 try{
                     if(stockData && stockData.data && stockData.data != null){
                         data = JSON.parse(stockData.data); 
+
+                        data.reverse();
                         data.map(row => {
-                            row.rsi = rsi.nextValue(Number(row.close));
-                            row.sma = sma.nextValue(Number(row.close));
-                            row.bb = bb.nextValue(Number(row.close));                
+                            row.rsi = rsi.nextValue(Number(row.CLOSE));
+                            row.sma = sma.nextValue(Number(row.CLOSE));
+                            row.bb = bb.nextValue(Number(row.CLOSE));                
                             
                             return row;
                         });
@@ -610,20 +627,21 @@ if (cluster.isMaster) {
         var exchange = req.params.exchange;  
 
         var list = [];
-        if(exchange == "nifty")
+      /*   if(exchange == "nifty")
             list =  nifty;
         else if(exchange == "fno")
             list = fno;
-        else
-            list = nse; 
+        else */
+            list = watchList; 
 
 
         Promise.all(list.map(async (x) =>  {
-            var symbol = x.symbol ? x.symbol:x;    
-            return getStockDataFromDb(symbol,interval);          
+            var symbol = x.symbol ? x.symbol:x; 
+            var ohlc = getStockDataFromDb(symbol,interval);    
+            return ohlc;         
             })).then(stockData => {
                
-
+                //stockData = stockData.reverse();    
                 var arr = stockData.map(async (dataObj) =>  {
                     try{
                         var data = JSON.parse(dataObj.data); 
@@ -649,27 +667,34 @@ if (cluster.isMaster) {
                         bb = new technicalindicators.BollingerBands(inputBB);
                         inputBB = inputRSI = inputSMA = null;
 
-                        data.map(row => {
-                            var india = moment.tz(new Date(Number(row.timestamp)), "Asia/Kolkata");
+                        //console.log("\n before " + JSON.stringify(data));
+                        data.reverse();
+                        //console.log("\n\n\n before " + JSON.stringify(data));
+                        await data.map(async(row) => {
+                            var india = moment.tz(new Date(Number(row.LASTTRADETIME)), "Asia/Kolkata");
                             india.format(); 
-                            row.timestamp = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();//new Date(row.timestamp);
-                            row.rsi = rsi.nextValue(Number(row.close));
-                            row.sma = sma.nextValue(Number(row.close));
-                            row.bb = bb.nextValue(Number(row.close));
+                            row.LASTTRADETIME = india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();//new Date(row.LASTTRADETIME);
                             
-                            if(row.bb && Number(row.close) > Number(row.open) && Number(row.close) >= Number(row.bb.upper) && Number(row.open) < Number(row.bb.upper))
+                            
+                            row.rsi = rsi.nextValue(Number(row.CLOSE));
+                            row.sma = sma.nextValue(Number(row.CLOSE));
+                            row.bb = bb.nextValue(Number(row.CLOSE));
+                            
+                           // console.log("symbol "+ dataObj.symbol +" > "+row.rsi); 
+
+                            if(row.bb && Number(row.CLOSE) > Number(row.OPEN) && Number(row.CLOSE) >= Number(row.bb.upper) && Number(row.OPEN) < Number(row.bb.upper))
                             {
                                 row.bb.isCrossed = 'Crossed Above';
                             }
-                            else if(row.bb && Number(row.close) < Number(row.open) && Number(row.close) <= Number(row.bb.lower)  && Number(row.open) > Number(row.bb.lower))
+                            else if(row.bb && Number(row.CLOSE) < Number(row.OPEN) && Number(row.CLOSE) <= Number(row.bb.LOWer)  && Number(row.OPEN) > Number(row.bb.LOWer))
                             {
                                 row.bb.isCrossed = 'Crossed Below';
                             }
-                            else if(row.bb && Number(row.close) < Number(row.open) && Number(row.close) <= Number(row.bb.upper)  && Number(row.open) > Number(row.bb.upper))
+                            else if(row.bb && Number(row.CLOSE) < Number(row.OPEN) && Number(row.CLOSE) <= Number(row.bb.upper)  && Number(row.OPEN) > Number(row.bb.upper))
                             {
                                 row.bb.isCrossed = 'Reversal Upper Band';
                             }
-                            else if(row.bb && Number(row.close) > Number(row.open) && Number(row.close) >= Number(row.bb.lower)  && Number(row.open) < Number(row.bb.lower))
+                            else if(row.bb && Number(row.CLOSE) > Number(row.OPEN) && Number(row.CLOSE) >= Number(row.bb.LOWer)  && Number(row.OPEN) < Number(row.bb.LOWer))
                             {
                                 row.bb.isCrossed = 'Reversal Lower Band';
                             }
@@ -678,15 +703,17 @@ if (cluster.isMaster) {
                             return row;
                         });
                         data.reverse();
+
                         var resonseData = {
                             "symbol":dataObj.symbol,
-                            "close":data[0].close,
-                            "volume":data[0].volume,
+                            "close":data[0].CLOSE,
+                            "volume":data[0].TRADEDQTY,
                             "rsi":data[0].rsi,
-                            "timestamp":data[0].timestamp,
+                            "LASTTRADETIME":data[0].LASTTRADETIME,
                             "sma":data[0].sma, 
                             "bb":data[0].bb
                         }; 
+                        //console.log("row "+ JSON.stringify(resonseData)); 
                         return resonseData;
                       
                     }
@@ -711,32 +738,112 @@ if (cluster.isMaster) {
 
     });
 
-
-
-    var result = [];
-    var map = new Map();
-
- 
-
-    app.get('/getListOfAllSymbol', checkSignIn,function (req, res) {   
+    app.get('/getListOfAllSymbol/:exchange/:instrumentType', checkSignIn,function (req, res) {   
         res.setHeader('Content-Type', 'application/json');
+        var exchange = req.params.exchange;  
+        var instrumentType = req.params.instrumentType;  
+        var data = {};
+        data.exchange = exchange;//"NFO";
+        data.instrumentType = instrumentType;//"NFO";
         
-        
-        res.send(watchList);
-        res.end();
+        getAllSymbol(data).then(list=>{
+            res.send(list);
+            res.end();
+        });
     });
 
+    
+    app.get('/getInstrumentsOnSearch/:exchange/:instrumentType/:search', checkSignIn,function (req, res) {   
+        res.setHeader('Content-Type', 'application/json');
+        var exchange = req.params.exchange;  
+        var search = req.params.search;  
+        var instrumentType = req.params.instrumentType;  
+        var data = {};
+        data.exchange = exchange;
+        data.search = search;
+        data.instrumentType = instrumentType;
+        
+        
+        GetInstrumentsOnSearch(data).then(list=>{
+            res.send(list);
+            res.end();
+        });
+    });
 
+    
+    app.get('/getStrikePrices/:exchange/:instrumentType/:product/:optionType/:expiry', checkSignIn,function (req, res) {   
+        res.setHeader('Content-Type', 'application/json');
+        var exchange = req.params.exchange;  
+        var instrumentType = req.params.instrumentType;  
+        var expiry = req.params.expiry;  
+        var product = req.params.product;  
+        var optionType = req.params.optionType;  
+        //ar exchange = req.params.exchange;  
+
+
+        var data = {};
+        data.exchange = exchange;
+        data.optionType = optionType;
+        data.product = product;
+        data.expiry = expiry;
+        data.instrumentType = instrumentType;
+        
+        GetStrikePrices(data).then(list=>{
+            console.log("GetStrikePrices  \n\n  "+list);
+            res.send(list);
+            res.end();
+        });
+    });
+
+    app.get('/getOptionType/:exchange', checkSignIn,function (req, res) {   
+        res.setHeader('Content-Type', 'application/json');
+        var exchange = req.params.exchange;  
+        var data = {};
+        data.exchange = exchange;
+        GetOptionType(data).then(list=>{
+            //console.log("GetOptionType  \n\n  "+list);
+            res.send(list);
+            res.end();
+        });
+    });
+
+    app.get('/getInstrumentTypes/:exchange', checkSignIn,function (req, res) {   
+        res.setHeader('Content-Type', 'application/json');
+        var exchange = req.params.exchange;  
+        var data = {};
+        data.exchange = exchange;//"NFO";
+        GetInstrumentTypes(data).then(list=>{
+            //console.log("GetInstrumentTypes  \n\n  "+list);
+            res.send(list);
+            res.end();
+        });
+    });
+
+    app.get('/getExpiryDates/:exchange/:instrumentType/:product', checkSignIn,function (req, res) {   
+        res.setHeader('Content-Type', 'application/json');
+        var exchange = req.params.exchange;  
+        var instrumentType = req.params.instrumentType;  
+        var product = req.params.product;  
+        var data = {};
+        data.exchange = exchange;//"NFO";
+        data.instrumentType= instrumentType;//"OPTSTK";
+        data.product = product;//"ACC";
+
+        GetExpiryDates(data).then(list=>{
+            console.log("getExpiryDates  \n\n  "+JSON.stringify(list));
+            res.send(list.EXPIRYDATES);
+            res.end();
+        });
+    });
 
     app.get('/getIndices', checkSignIn,function (req, res) {   
         res.setHeader('Content-Type', 'application/json');
         
-        
-        res.send(indices);
-        res.end();
+        GetExchanges().then(list=>{
+            res.send(list);
+            res.end();
+        });
     });
-
-    
 
     app.get('/getBalance', function (req, res) {   
         res.setHeader('Content-Type', 'application/json');
@@ -750,18 +857,21 @@ if (cluster.isMaster) {
         res.end();
     });
 
+    app.get('/authenticate', function (req, res) {  
+        res.sendFile("index.html", {"root": __dirname}); 
+        var your_api_key ="ukXaJKtebf3pfLnbrplan3mDi1yOtV4I2cyia4aO";
+        var api_secret="70rkwasp80";
+        var userObj = userObjList[index];
+        var up = new UpstoxBroker(your_api_key,api_secret,false);
+        currentUserObj= userObj.traderObject = up;
+        userObjList[index] = userObj;
+        //autoLogin();
+        
+    });
+
     app.post('/scan', function (req, res) {
 
     });
-
- /*    const requestLogs = [];
-    app.get('/heapdump', checkSignIn,function (req, res) {
-        heapdump.writeSnapshot((err, filename) => {
-            console.log('Heap dump written to', filename)
-        });
-        requestLogs.push({ url: req.url, date: new Date() });
-    res.end(JSON.stringify(requestLogs));
-    }); */
 
     app.get('/admin', checkSignIn,function (req, res) {
         var india = moment.tz(store.get('tokenValidity'),"Asia/Kolkata");
@@ -769,31 +879,19 @@ if (cluster.isMaster) {
         var now1 = moment.tz(d, 'YYYY-DD-MM HH:mm',"Asia/Kolkata");
         now1.format(); 
         console.log("tokenValidity "  +now1 +":"+india+":"+ india.isBefore(now1));
-        if(india.isBefore(now1))
-        {
-            //accessToken = '';
-           // store.set('accessToken',accessToken)
-        }
-
-        /* if(store.get('accessToken') && store.get('accessToken') != ''){
-             accessToken = store.get('accessToken');
-             upstox.setToken(accessToken);
-             getListOfAllSymbol();
-             res.sendFile("index.html", {"root": __dirname});
-        }
-        else{ */
-            var loginUrl = upstox.getLoginUri(redirect_uri);
-            console.log("*loginUri " + loginUrl);
-            res.status(200).header('Content-type', 'text/html');
-            code = req.params.code;
-            res.status(302).setHeader('Location', loginUrl);
-            res.end();
-        //}
+        
+       /*  var loginUrl = upstox.getLoginUri(redirect_uri);
+        console.log("*loginUri " + loginUrl);
+        res.status(200).header('Content-type', 'text/html');
+        code = req.params.code;
+        res.status(302).setHeader('Location', loginUrl);
+        res.end(); */
+        
     });
 
     // Change the 404 message modifing the middlewar
     app.use(function(req, res, next) {
-        res.status(404).send("Sorry, that route doesn't exist. Have a nice day :)");
+        res.status(404).send("<h1>404 ! This site can’t be reached</h1>");
     });
 
     // start the server in the port 3000 !
@@ -801,7 +899,7 @@ if (cluster.isMaster) {
     console.log('App listening on port '+PORT);
    // console.log(`Heapdump enabled. Run "kill -USR2 ${process.pid}" or send a request to "/heapdump" to generate a heapdump.`);
     });
-}
+/* }
 
 // Listen for dying workers
 cluster.on('exit', function (worker) {
@@ -811,4 +909,4 @@ cluster.on('exit', function (worker) {
     console.log('Worker %d died :(', worker.id);
     cluster.fork();
 
-});
+}); */

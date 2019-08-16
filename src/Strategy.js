@@ -27,13 +27,12 @@ var strategyObj = {
 
 
 
-
     
 
 //console.log("data  : " + x + " :: "+JSON.stringify(database.data));
 
 /*  var df =  dataForge.fromJSON(JSON.stringify(obj.data)) // Read CSV file (or JSON!)
-//.setIndex("timestamp")
+//.setIndex("LASTTRADETIME")
 .dropSeries(["cp"]) // Drop certain columns.
 .where(row => calculateIndicators(row)) // Filter rows.
 .select(row => transform(row)); // Transform the data. 
@@ -62,10 +61,10 @@ function backTesting(stockData,path){
   });
 
   var result = result.filter(function (item) {
-      return item.close >= item.sma;              
+      return item.CLOSE >= item.sma;              
   });
 
-  //console.log("\n \n stockData >> " + path +" >> "+result[0].timestamp);
+  //console.log("\n \n stockData >> " + path +" >> "+result[0].LASTTRADETIME);
 
 
   /* var stockData =response.data;
@@ -76,12 +75,12 @@ function backTesting(stockData,path){
   stockData= stockData.map(x => 
   {
       var obj = x;
-      obj.timestamp = new Date(obj.timestamp);
+      obj.LASTTRADETIME = new Date(obj.LASTTRADETIME);
 
-      //console.log("\n \n timestamp >> " +  obj.timestamp);
+      //console.log("\n \n LASTTRADETIME >> " +  obj.LASTTRADETIME);
       return obj;
   });  
-  var closeData = stockData.map(x => x.close);  
+  var closeData = stockData.map(x => x.CLOSE);  
   var inputRSI = {
       values : closeData,
       period : 14
@@ -119,7 +118,7 @@ function backTesting(stockData,path){
       obj.sma = index >= inputSMA.period?smaData[index - inputSMA.period]:0;
       obj.bb = index >= inputBB.period?bbData[index - inputBB.period]:null;
 
-      var date = new Date(obj.timestamp);;
+      var date = new Date(obj.LASTTRADETIME);;
 
       //console.log("date " + date);
 
@@ -130,35 +129,35 @@ function backTesting(stockData,path){
       if(obj.rsi >= 60 && stockData[index - 1].rsi < 60)
       {
           buyCall++;
-          buyprice = x.close;
+          buyprice = x.CLOSE;
           isBuySignalGenerated = true;
-          console.log("\n\n BUY *>> " + x.timestamp +" >> "+ buyprice);
+          console.log("\n\n BUY *>> " + x.LASTTRADETIME +" >> "+ buyprice);
       }
       else if(obj.rsi != 0 && obj.rsi <= 40 && stockData[index - 1].rsi > 40)
       {
           sellCall++;
-          sellprice = x.close;
+          sellprice = x.CLOSE;
           isSellSignalGenerated = true;
-          console.log("\n\n SELL *>> " + x.timestamp +" >> "+ sellprice);
+          console.log("\n\n SELL *>> " + x.LASTTRADETIME +" >> "+ sellprice);
       }
       
       if(isBuySignalGenerated)
       {
-          if(obj.rsi < 60 || x.close < obj.sma)
+          if(obj.rsi < 60 || x.CLOSE < obj.sma)
           {
               isBuySignalGenerated = false;  
-              profit = x.close - buyprice;
+              profit = x.CLOSE - buyprice;
               totalProfit += profit;
-              console.log("\n\n EXIT CALL *>> " + x.timestamp+" close >> "+x.close+" profit>> "+ profit+" totalProfit >> "+ totalProfit +">>"+ buyCall);
+              console.log("\n\n EXIT CALL *>> " + x.LASTTRADETIME+" close >> "+x.CLOSE+" profit>> "+ profit+" totalProfit >> "+ totalProfit +">>"+ buyCall);
           }
       }else if(isSellSignalGenerated)
       {
-          if(obj.rsi > 40 || x.close > obj.sma)
+          if(obj.rsi > 40 || x.CLOSE > obj.sma)
           {
               isSellSignalGenerated = false;  
-              profit = sellprice - x.close;
+              profit = sellprice - x.CLOSE;
               totalProfit += profit;
-              console.log("\n\n EXIT SELL *>> " + x.timestamp+" close >> "+x.close+" profit>> "+ profit+" totalProfit >> "+ totalProfit +">>"+ sellCall);
+              console.log("\n\n EXIT SELL *>> " + x.LASTTRADETIME+" close >> "+x.CLOSE+" profit>> "+ profit+" totalProfit >> "+ totalProfit +">>"+ sellCall);
           }
       } 
       index++;
@@ -243,40 +242,40 @@ var sellCall = 0;
 
 function calculateIndicators(row)
 {
-  row.rsi = rsi.nextValue(Number(row.close));
-  row.sma = sma.nextValue(Number(row.close));
-  row.bb = bb.nextValue(Number(row.close)); 
+  row.rsi = rsi.nextValue(Number(row.CLOSE));
+  row.sma = sma.nextValue(Number(row.CLOSE));
+  row.bb = bb.nextValue(Number(row.CLOSE)); 
 
-var d =new Date(Number(row.timestamp));
+var d =new Date(Number(row.LASTTRADETIME));
 var india = moment.tz(d, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
 india.format(); 
 row.date =india.date() +"/"+(india.month()+1) +"/"+india.year()+" "+india.hour()+":"+india.minute();
 
-    if(india.hour() == 9 && india.minute() == 25 && row.bb && row.close > row.bb.upper)
+    if(india.hour() == 9 && india.minute() == 25 && row.bb && row.CLOSE > row.bb.upper)
     {
         buyCall++;
-          buyprice = row.close;
+          buyprice = row.CLOSE;
           isBuySignalGenerated = true;
           console.log("\n\n BUY *>> " + row.date  +" >> "+ buyprice);
     }
 
     if(isBuySignalGenerated)
     {
-        if(row.bb && row.close <= row.bb.middle)
+        if(row.bb && row.CLOSE <= row.bb.middle)
         {
             isBuySignalGenerated = false;  
-            profit = row.close - buyprice;
+            profit = row.CLOSE - buyprice;
             totalProfit += profit;
-            console.log("\n\n EXIT CALL *>> " + row.date+" close >> "+row.close+" profit>> "+ profit+" totalProfit >> "+ totalProfit +">>"+ buyCall);
+            console.log("\n\n EXIT CALL *>> " + row.date+" close >> "+row.CLOSE+" profit>> "+ profit+" totalProfit >> "+ totalProfit +">>"+ buyCall);
         }
     }else if(isSellSignalGenerated)
     {
-        if(obj.rsi > 40 || row.close > obj.sma)
+        if(obj.rsi > 40 || row.CLOSE > obj.sma)
         {
             isSellSignalGenerated = false;  
-            profit = sellprice - row.close;
+            profit = sellprice - row.CLOSE;
             totalProfit += profit;
-            console.log("\n\n EXIT SELL *>> " + row.date+" close >> "+row.close+" profit>> "+ profit+" totalProfit >> "+ totalProfit +">>"+ sellCall);
+            console.log("\n\n EXIT SELL *>> " + row.date+" close >> "+row.CLOSE+" profit>> "+ profit+" totalProfit >> "+ totalProfit +">>"+ sellCall);
         }
     } 
     index++;
@@ -319,13 +318,13 @@ function addIndicators(response,path){
 
   for (let x of stockData) {
       var obj = x;
-      obj.timestamp = new Date(obj.timestamp);
+      obj.LASTTRADETIME = new Date(obj.LASTTRADETIME);
        return obj;
   }
 
-  var closeData =[];// stockData.map(x => x.close);  
+  var closeData =[];// stockData.map(x => x.CLOSE);  
   for (let x of stockData) {
-    closeData.push(x.close);
+    closeData.push(x.CLOSE);
   }
 
   var inputRSI = {

@@ -43,7 +43,7 @@ $(document).ready( function () {
             success: function(dataSet){
                   dataSet.filter((obj) => obj );
 
-                  $("#date_txt").html(dataSet[0].timestamp);
+                  $("#date_txt").html(dataSet[0].LASTTRADETIME);
 
                   var table = new Tabulator("#example-table", {
                     data:dataSet,
@@ -96,7 +96,8 @@ $(document).ready( function () {
         <!-- <li class="active"><a href="#">Home</a></li> -->
         <li><a href="#login">Login</a></li>
         <li><a href="#signup">SignUp</a></li>
-        <li><a href="#contactus">Contact Us</a></li>
+        <li><a href="/applyStrategy">Apply Strategy</a></li> 
+        <!-- <li><a href="#contactus">Contact Us</a></li> -->
       </ul>
     </div> 
   </div>

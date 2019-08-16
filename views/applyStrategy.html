@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Home Page</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://moment.github.io/luxon/global/luxon.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@0.1.1"></script>
+<script src="https://www.chartjs.org/chartjs-chart-financial/chartjs-chart-financial.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+<script src="https://moment.github.io/luxon/global/luxon.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.25/moment-timezone-with-data.js"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>	
+<script src="https://unpkg.com/lodash@4.17.4"></script>
+<script src="https://unpkg.com/d3-scale-chromatic@1.1.1"></script>
+<!-- include polyfills for custom event, Symbol and Custom Elements -->
+<script src="//unpkg.com/babel-polyfill@6.26.0/dist/polyfill.js"></script>
+<script src="//unpkg.com/custom-event-polyfill@0.3.0/custom-event-polyfill.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/document-register-element/1.8.0/document-register-element.js"></script>
+<!-- use babel so that we can use arrow functions and other goodness in this block! -->
+<script src="//unpkg.com/babel-standalone@6/babel.min.js"></script>
+<script src="//unpkg.com/d3@5.5.0"></script>
+<script src="//unpkg.com/d3fc@14.0.41"></script>
+<link href="https://unpkg.com/tabulator-tables@4.1.3/dist/css/tabulator.min.css" rel="stylesheet">
+<link href="https://unpkg.com/tabulator-tables@4.1.3/dist/css/semantic-ui/tabulator_semantic-ui.min.css" rel="stylesheet">
+<script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.1.3/dist/js/tabulator.min.js"></script>
+
+
+
+<style>
+    .loader {
+      border: 10px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 10px solid #3498db;
+      width: 50px;
+      height: 50px;
+      -webkit-animation: spin 2s linear infinite; /* Safari */
+      animation: spin 2s linear infinite;
+      position: fixed;
+      left: 45%;
+      top: 45%;
+      transform: translate(-50%, -50%);
+    }
+
+    * {
+      font-family: Sans-Serif;
+    }
+
+    h1 {
+      font-size: 1.5em;
+    }
+
+    h2 {
+      font-size: 1.25em;
+    }
+
+    body {
+      background-color: white;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 47px;
+        height: 25px;
+    }
+
+    hr {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      border: 0;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .switch input { 
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 17px;
+      width: 17px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+
+    input:focus + .slider {
+      box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slider:before {
+      -webkit-transform: translateX(22px);
+      -ms-transform: translateX(22px);
+      transform: translateX(22px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+      border-radius: 34px;
+    }
+
+    .slider.round:before {
+      border-radius: 50%;
+    }
+
+
+</style>
+
+<script type="text/javascript">
+$(document).ready( function () {
+        var stockData = [];
+        var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
+        $('#userTxt').text(localStorage.getItem('user'));
+        var interval = "15MINUTE";
+        var strategyListArr = [];
+        var appliedStrategyListArr = [];
+        var symbolListArr = [];
+        var symbol = '';
+        var selectedSid = -1;
+        var count = 0;
+        var exchange= '';
+        var instrumentType= '';
+        var product= '';
+        var expiry = '';
+        var optionType = '';
+        var strike = '';
+        var selctedStrategyIndex = -1;
+        var selctedSlStrategyIndex = -1;
+        var selctedProfitStrategyIndex = -1;
+
+        $( "#typeDropdown" ).change(function() {
+          optionType = $("#typeDropdown").val();
+        });
+
+        $( "#strikeDropdown" ).change(function() {
+          strike = $("#strikeDropdown").val();
+        });
+
+        $( "#instrumentDropdown" ).change(function() {
+          instrumentType = $("#instrumentDropdown").val();
+
+          /* $.ajax({
+            type: "get",
+            url: server + '/getListOfAllSymbol/'+exchange+'/'+instrumentType,success: function(data){
+                  symbolListArr = [];
+                  symbolListArr = data;
+                  //console.log(symbolListArr);
+                  helpers.buildDropdown(
+                      data,
+                      $('#symbolDropdown'),
+                      'Select an option'
+                  );
+                  $(".loader").hide();
+                  //loadSymbolData("sbin",interval);
+              }
+            }); */
+         
+        });
+        
+        $( "#strategyDropdown" ).change(function() {
+          selctedStrategyIndex =document.getElementById("strategyDropdown").selectedIndex - 1;
+        });
+
+        $( "#slStrategyDropdown" ).change(function() {
+          selctedSlStrategyIndex =document.getElementById("slStrategyDropdown").selectedIndex - 1;
+        });
+
+        $( "#profitStrategyDropdown" ).change(function() {
+          selctedProfitStrategyIndex =document.getElementById("profitStrategyDropdown").selectedIndex - 1;
+        });
+
+        $( "#expiryDropdown" ).change(function() {
+          expiry = $("#expiryDropdown").val();
+          $.ajax({
+            type: "get",
+            url: server + '/getStrikePrices/'+exchange+'/'+instrumentType+'/'+symbol+'/'+optionType+'/'+expiry,success: function(data){
+                  helpers.buildDropdown(data,$('#strikeDropdown'),'Select an option');
+                  $(".loader").hide();
+                  //loadSymbolData("sbin",interval);
+              }
+            });
+        });
+
+        $( "#exchangesDropdown" ).change(function() {
+          exchange = $("#exchangesDropdown").val();
+          $.ajax({
+          type: "get",
+          url: server + '/getInstrumentTypes/'+exchange,success: function(data){
+              helpers.buildDropdown(
+                  data,
+                  $('#instrumentDropdown'),
+                  'Select an option'
+              );
+              $(".loader").hide();
+          }
+          });
+          
+          $.ajax({
+          type: "get",
+          url: server + '/getOptionType/'+exchange,success: function(data){
+              helpers.buildDropdown(
+                  data,
+                  $('#typeDropdown'),
+                  'Select an option'
+              );
+              $(".loader").hide();
+          }
+          });
+        });
+
+        $( "#intervalDropDown" ).change(function() {
+          interval = $("#intervalDropDown").val();
+        });
+
+        $( "#symbolDropdown" ).change(function() {
+          symbol = $("#symbolDropdown").val();
+          //console.log(symbol);
+
+          $.ajax({
+            type: "get",
+            url: server + '/getExpiryDates/'+exchange+"/"+instrumentType+"/"+symbol,success: function(data){
+                helpers.buildDropdown(
+                    data,
+                    $('#expiryDropdown'),
+                    'Select an option'
+                );
+                $(".loader").hide();
+            }
+          });
+        });
+
+      
+        $(".loader").show();
+
+        $.ajax({
+        type: "get",
+        url: server + '/getIndices',success: function(data){
+              helpers.buildDropdown(
+                  data,
+                  $('#exchangesDropdown'),
+                  'Select an option'
+              );
+              $(".loader").hide();
+             
+          }
+        });
+
+        var helpers = {
+          buildDropdown: function(result, dropdown, emptyMessage,field){
+              dropdown.html('');
+              dropdown.append('<option value="">' + emptyMessage + '</option>');
+              if(result != ''){
+                if(field){
+                  $.each(result, function(k, v) {
+                      dropdown.append('<option value="' + v[field]+ '">' + v[field] + '</option>');
+                  });
+                }
+                else
+                {
+                  $.each(result, function(k, v) {
+                      dropdown.append('<option value="' + v+ '">' + v+ '</option>');
+                  });
+                }
+              }
+          },
+
+        }
+
+        getAllStrategy();
+        getAllAppliedStrategyList();
+      
+        $( "#symbolTxt" ).keypress(function() {
+          var search = $("#symbolTxt").val();
+          if(exchange && search.length >= 2){
+                  $.ajax({
+                  type: "get",
+                  url: server + '/getInstrumentsOnSearch/'+exchange+'/'+instrumentType+'/'+search,success: function(data){
+                    console.log("data " + data);
+                       helpers.buildDropdown(data,$('#intrumentDropdown'),'Select an option','IDENTIFIER');
+                    }
+                  });
+          }
+        });
+
+        function getAllStrategy()
+        {
+            strategyListArr = [];
+            selectedSid = -1;
+            var uid = localStorage.getItem('uid');
+            $(".loader").show();
+            $.get({
+              url: server+'/strategyList/'+uid,
+              success: function(list){
+                  $(".loader").hide();       
+                  strategyListArr = list.filter(function (el) {
+                    return (el != null && el.name != null && el.name != undefined && el.name != "");
+                  });
+
+                  helpers.buildDropdown(strategyListArr,$('#strategyDropdown'),'Select an option','name');
+                  helpers.buildDropdown(strategyListArr,$('#slStrategyDropdown'),'Select an option','name');
+                  helpers.buildDropdown(strategyListArr,$('#profitStrategyDropdown'),'Select an option','name');
+                }
+            });
+        }
+
+        function getAllAppliedStrategyList()
+        {
+            appliedStrategyListArr = [];
+            selectedSid = -1;
+            var uid = localStorage.getItem('uid');
+            $(".loader").show();
+            $.get({
+              url: server+'/getAppliedList/'+uid,
+              success: function(list){
+                  $(".loader").hide();    
+                  console.log("list" + JSON.stringify(list));   
+                  appliedStrategyListArr = list;
+                  createTable();
+                }
+            });
+        }
+
+        $('#saveBtn').on('click', function(event) {
+          event.preventDefault(); // To prevent following the link (optional)
+          //console.log(JSON.stringify(strategyListArr) +"\n"+selctedStrategyIndex);
+          var strategyObj = {
+                  uid:localStorage.getItem('uid'),
+                  sid:selctedStrategyIndex >= 0 ? strategyListArr[selctedStrategyIndex]['sid']:-1,//strategyListArr[selctedStrategyIndex]['sid'],
+                  exchange:exchange,
+                  interval:interval,
+                  symbol: $("#symbolTxt").val(),
+                  isIntraday:$("#is_intrady")[0].checked,
+                  odrerType:$("#odrerTypeDropDown").val(),
+                  quantity:$("#quantityTxt").val(),
+                  transaction_type:$("#transactionDropDown").val(),
+                  sid:strategyListArr[selctedStrategyIndex]['sid'],
+                  slSid:selctedSlStrategyIndex >= 0 ? strategyListArr[selctedSlStrategyIndex]['sid']:-1,//strategyListArr[selctedSlStrategyIndex]['sid'],
+                  profitSid:selctedProfitStrategyIndex >= 0 ? strategyListArr[selctedProfitStrategyIndex]['sid']:-1,
+                  slPercent: $("#slTxt").val(),
+                  slPoints: $("#slPointTxt").val(),
+                  profitPercent: $("#profitTxt").val(),
+                  profitPoints: $("#profitPointTxt").val()
+          };
+
+          //console.log(JSON.stringify(strategyObj));
+
+          var api = '/applyStrategy';
+          if(selectedSid >= 0)
+          api ='/updateStrategy';
+
+          $.ajax({
+                type: "post",
+                data: {data:JSON.stringify(strategyObj)},
+                url: server + api,
+                success: function(msg){
+
+                  $("#is_intrady")[0].checked = false;
+                  $("#odrerTypeDropDown").val('');
+                  $("#quantityTxt").val('');
+                  $("#transactionDropdown").val('');
+                  $("#odrerTypeDropDown").val('');
+                  $("#symbolTxt").val('');
+                  
+                  $("#target").empty();
+                  $('#strategyModal').modal('hide');
+                  getAllAppliedStrategyList();
+                }
+              });
+      });
+
+        $('#saveButton').on('click', function(event) {
+          event.preventDefault(); 
+          $('#strategyModal').modal('show');
+
+          /* var id = -1;
+          var count = 0;
+          strategyListArr.map(strategy=>{
+            if(strategy.sid == selectedSid)
+            {
+              id = count;
+            }
+            count ++;
+          });
+
+          if(id >= 0){
+            $("#nameTxt").val(strategyListArr[id]['name']);
+            $("#descriptionTxt").val(strategyListArr[id]['description']),
+            $("#category").val(strategyListArr[id]['category']),
+            $("#is_private")[0].checked =strategyListArr[id]['isPrivate'];
+          } */
+        });
+
+        function createTable()
+        {
+            //console.log("appliedStrategyListArr" + appliedStrategyListArr);
+            var table = new Tabulator("#strategyTable", {
+                  data:appliedStrategyListArr,
+                  ajaxLoader: true,
+                  ajaxLoaderLoading: 'updating data',
+                  placeholder:"No Data Set",
+                  height:"100%",
+                  width:"90%",
+                  layout:"fitDataFill",      //fit columns to width of table
+                  tooltips:true,            //show tool tips on cells
+                  history:true,             //allow undo and redo actions on the table
+                  pagination:"local",       //paginate the data
+                  paginationSize:20,         //allow 7 rows per page of data
+                  movableColumns:true,      //allow column order to be changed
+
+                  columns:[
+                      {title:"Symbol", field:"symbol",widthShrink:1,width:120},
+                      {title:"Exch.", field:"exchange",widthShrink:1,width:90},
+                      {title:"Strategy name", field:"name",widthShrink:1,width:120},
+                      {title:"Description", field:"description",widthShrink:1,width:120},
+                      {title:"Interval", field:"interval",widthShrink:1,width:100},
+                      {title:"Intra?", field:"isIntraday",widthShrink:1,width:95},
+                      {title:"Odrer", field:"odrerType",widthShrink:1,width:90},
+                      {title:"Qty", field:"quantity",widthShrink:1,width:60},
+                      {
+                        title:"Transaction", field:"transaction_type",widthShrink:1,width:100
+                      },
+                      {
+                        title:"",widthShrink:1,width:40,field:"id",formatter:function(cell, formatterParams)
+                        {
+                          return "<span class='btn-label'><i id='edit-"+cell.getValue()+"'class='glyphicon glyphicon-edit'></i></span>";
+                        } 
+                      },
+                      {
+                        title:"",widthShrink:1,field:"id",width:40,formatter:function(cell, formatterParams)
+                        {
+                          return "<span class='btn-label'><i id='"+cell.getValue()+"'class='glyphicon glyphicon-trash'></i></span>";
+                        } 
+                      },
+                      {
+                        title:"Live?",widthShrink:1,field:"id",width:70,formatter:function(cell, formatterParams)
+                        {
+                          return "<label class='switch'><input type='checkbox' checked><span class='slider round'></span></label>";                  
+                        }
+                      },
+                    ],
+                  rowClick:function(e, row){
+                      if(e.target.classList.contains("glyphicon-trash")){
+                        $(".loader").show()
+                        $.get({
+                            url: server+'/deleteApplyStrategy/'+e.target.id,
+                            success: function(list){
+                                $(".loader").hide();  
+                                getAllAppliedStrategyList();
+                              }
+                        }); 
+                      }
+                      else if(e.target.classList.contains("glyphicon-edit")){
+                        var sid = String(e.target.id).substr(5,5);
+                        $.get({
+                            url: server+'/indicatorList/'+sid,
+                            success: function(list){
+                                $(".loader").hide();  
+                                //console.log(list);
+                                // Select first tab
+                                $('.nav-tabs a:first').tab('show');
+                                selectedSid = sid;
+                                //createIndicators(list);
+                              }
+                        }); 
+                      }
+                  },
+                  rowContext:function(e, row){
+                      //alert("Row " + row.getIndex() + " Context Clicked!!!!")
+                  },
+              });
+        }
+      
+
+});
+</script>
+</head>
+<body>
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>                        
+          </button>
+        <a class="navbar-brand" href="/index">Scanner</a>
+      </div>
+      <div class="collapse navbar-collapse" id="myNavbar">
+        <ul class="nav navbar-nav">
+       
+          <!-- <li ><a href="/index">Home</a></li> -->
+          <li ><a href="/gainerloser">Top Gainer / Looser</a></li>
+          <li><a href="/gapupdown">Gap up/Down</a></li>
+          <li><a href="/allCharts">Stocks Charts</a></li>
+         
+          <li ><a href="/scanner">Scanner</a></li>
+          <li ><a href="/strategy">Strategy</a></li>
+          <li class="active"><a href="/applyStrategy">Apply Strategy</a></li>  
+
+        </ul>
+        <ul class="nav navbar-nav pull-right">
+          <li class="dropdown pull-right"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome, <span id="userTxt"></span> <span class="glyphicon glyphicon-user"></span><b class="caret"></b></a>
+            <ul class="dropdown-menu pull-right">
+                <li><a href="/profile"><i class="icon-cog"></i> Profile</a></li>
+                <li><a href="/preferences"><i class="icon-envelope"></i> Preferences</a></li>
+                <li class="divider"></li>
+                <li><a href="/logout"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
+            </ul>
+        </li>
+      </ul>
+      </div> 
+    </div>
+  </nav>
+          
+  <div class="container">
+    <div class="row"></div>
+    <br></br>
+    <br></br>
+    <!-- <div class="row">
+        <div class="col-sm-2">
+            <label>Exchanges</label>
+            <select id="exchangesDropdown" class="form-control"></select>
+          </div>
+
+        <div class="col-sm-2">
+          <label>InstrumentTypes</label>
+          <select id="instrumentDropdown" class="form-control"></select>
+        </div>
+
+        <div class="col-sm-2">
+            <label>Option Types</label>
+            <select id="typeDropdown" class="form-control"></select>
+          </div>
+
+        <div class="col-sm-2">
+            <label>Symbol</label>
+            <select id="symbolDropdown" class="form-control"></select>
+          </div>
+
+        <div class="col-sm-2">
+          <label>Expiry Dates</label>
+          <select id="expiryDropdown" class="form-control"></select>
+        </div>
+
+        <div class="col-sm-2">
+            <label>Strike</label>
+            <select id="strikeDropdown" class="form-control"></select>
+          </div>
+  
+          <div class="col-sm-2">
+            <label>Interval</label>
+            <select id="intervalDropDown" class="form-control" >
+               <option value="5MINUTE">5MINUTE</option>
+                <option value="15MINUTE" selected="selected">15MINUTE</option>
+                <option value="30MINUTE">30MINUTE</option>
+                <option value="60MINUTE">60MINUTE</option>
+                <option value="1DAY" >1DAY</option>
+                <option value="1WEEK">1WEEK</option>
+                <option value="1MONTH">1MONTH</option>
+              </select>
+          </div>
+    </div> -->
+
+   <!--  <div class="row">
+      <div class="col-sm-4">
+        <label>Strategy</label>
+        <select id="strategyDropdown" class="form-control"></select>
+      </div>
+      <div class="col-sm-4">
+        <label>Symbol</label>
+        <input type="text" id="symbolTxt" list="intrumentDropdown" class="form-control" placeholder="Search symbol" required autofocus>
+        <datalist id="intrumentDropdown"></datalist>
+      </div>    --> 
+      
+      <div class="row">
+        <div>
+          <button type="button" id="saveButton" class="btn btn-success" >Apply Strategy</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div id="strategyListPanel" class="tab-pane fade in active">
+          <br/>
+            <div class="alert alert-info">  
+                <p>All your live strategies are listed below!</p>
+            </div>
+            <div id="strategyTable">
+            </div>
+        </div>
+      </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="strategyModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Apply Strategy</h>
+          </div>
+            <div class="modal-body">
+              <form>
+                  <div class="row form-group">
+                    <div class="col-sm-3">
+                        <label>Exchanges</label>
+                        <select id="exchangesDropdown" class="form-control"></select>
+                    </div>
+                    <div class="col-sm-3">
+                      <label>InstrumentTypes</label>
+                      <select id="instrumentDropdown" class="form-control"></select>
+                    </div>
+                    <div class="col-sm-3">
+                        <label>Symbol</label>
+                        <input type="text" id="symbolTxt" list="intrumentDropdown" class="form-control" placeholder="Search symbol" required autofocus>
+                        <datalist id="intrumentDropdown"></datalist>
+                    </div>
+                    <div class="col-sm-3">
+                        <label>Interval</label>
+                        <select id="intervalDropDown" class="form-control" >
+                            <option value="5MINUTE">5MINUTE</option>
+                            <option value="15MINUTE" selected="selected">15MINUTE</option>
+                            <option value="30MINUTE">30MINUTE</option>
+                            <option value="60MINUTE">60MINUTE</option>
+                            <option value="1DAY" >1DAY</option>
+                            <option value="1WEEK">1WEEK</option>
+                            <option value="1MONTH">1MONTH</option>
+                          </select>
+                      </div>
+                </div>
+                <div class="form-group">
+                 
+                </div>
+
+                <div class="form-group">
+                    <label>Strategy</label>
+                    <select id="strategyDropdown" class="form-control"></select>
+                </div>
+
+                <hr/>
+                
+                <div class="row form-group">
+                    <div class="col-sm-3">
+                      <label>Order type</label>
+                      <select id="odrerTypeDropDown" class="form-control" >
+                          <option value="mis" selected="selected">MIS</option>
+                          <option value="bo">BO</option>
+                          <option value="normal">Normal</option>
+                        </select>
+                     </div> 
+                     <div class="col-sm-3">
+                        <label>Transaction type</label>
+                        <select id="transactionDropDown" class="form-control" >
+                            <option value="buy" selected="selected">Buy</option>
+                            <option value="sell">Sell</option>
+                          </select>
+                     </div>
+                     <div class="col-sm-3">
+                        <label>Quantity</label>
+                        <input id="quantityTxt" class="form-control" >
+                     </div>
+                     <div class="col-sm-3">
+                        </br>
+                        <label>
+                            <input type="checkbox" id="is_intrady"> Is Intrady?
+                          </label>
+                     </div>
+                </div> 
+                <hr/>
+                <div class="row form-group alert alert-danger">
+                    <div class="col-sm-6">
+                      <label>Stop loss Strategy</label>
+                      <select id="slStrategyDropdown" class="form-control"></select>
+                    </div>
+                    <div class="col-sm-3">
+                        <label>Sl in %</label>
+                        <input id="slTxt" class="form-control" >
+                   </div>
+                   <div class="col-sm-3">
+                      <label>Sl in point</label>
+                      <input id="slPointTxt" class="form-control" >
+                 </div>
+                </div>
+
+                <hr/>
+                <div class="row form-group alert alert-success">
+                    <div class="col-sm-6">
+                      <label>Profit Strategy</label>
+                      <select id="profitStrategyDropdown" class="form-control"></select>
+                    </div>
+                    <div class="col-sm-3">
+                        <label>Profit in %</label>
+                        <input id="profitTxt" class="form-control" >
+                   </div>
+                   <div class="col-sm-3">
+                      <label>Profit in point</label>
+                      <input id="profitPointTxt" class="form-control" >
+                 </div>
+                </div>
+
+            </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Discard</button>
+              <button type="button" id="saveBtn" class="btn btn-primary">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  </div>
+ 
+
+
+  </div>
+  <div class="loader"></div>
+</body>
+</html>

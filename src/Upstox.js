@@ -1,307 +1,165 @@
 var Upstox = require("upstox");
-var moment = require('moment-timezone');
+var events = require('events');
 
-
-var api = "8gtPZrzCsNayGnraaxVc792UuksNxV2q3Niif4U9";
-var upstox = new Upstox(api);
-var fs = require('fs');
-var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-var code = '';
-var __dirname = "views"
-var exchanges =  [ 'MCX_FO', 'BSE_EQ', 'NSE_EQ', 'NSE_FO', 'NCD_FO'];
-var api_secret = "697b2whx04";
-var client_id="";
-
-var accessToken;
-var is15MinDataSync = false;
-
-function getAcceToken(code)
+var redirect_uri = "http://localhost:"+PORT+"/callback/";
+if(process.env.NODE_ENV=="production")
 {
-    var params = {
-        "apiSecret": api_secret,
-        "code": code,
-        "grant_type": "authorization_code",
-        "redirect_uri": redirect_uri
-    };
-    
-    upstox.getAccessToken(params)
+    redirect_uri = "https://robo-trader.herokuapp.com/callback/";
+}
+
+class UpstoxBroker {  
+    constructor(api,api_secret,isAutomated) {
+        this.api = api;
+        this.upstox = new Upstox(this.api);
+        this.accessToken = "";
+        this.api_secret = api_secret;
+        this.client_id="";
+        this.profile;
+        this.balance;
+        var that = this;
+        
+        if(!isAutomated){
+            var loginUrl = this.upstox.getLoginUri(redirect_uri);
+            console.log("loginUri ***" + loginUrl);
+        }
+        eventEmitter.on('placeOrder', onPlaceOrder);
+
+       
+        function onPlaceOrder(data){
+            console.log('\nEvent -> onPlaceOrder ' + data.strategy.name +"::"+data.symbol);
+            //that.upstox.setToken(that.accessToken);
+            var orderObject = {
+                transaction_type:data.strategy.isBuyOrSell,
+                exchange:"NSE_EQ",
+                symbol: data.symbol,
+                quantity: 1,
+                order_type:"m",
+                product: "I"
+            };
+
+            if(that.accessToken){
+                    that.upstox.placeOrder(orderObject)
+                        .then(function(response) {
+                            // Order details received
+                            console.log(response);
+                        })
+                        .catch(function(err) {
+                            // Something went wrong.
+                            console.log(err);
+                        });
+                }
+            }
+    }
+
+    getUpstoxAccessToken(c)
+    {
+       var params = {
+            "apiSecret": this.api_secret,
+            "code": c,
+            "grant_type": "authorization_code",
+            "redirect_uri": redirect_uri
+        };
+        var that = this;
+        that.upstox.getAccessToken(params)
+            .then(function (response) {
+                try{
+                    var accessToken = response.access_token;
+                    console.log("accessToken > " + accessToken);
+                    //store.set('accessToken', accessToken); 
+                    that.accessToken = accessToken;
+                    that.upstox.setToken(accessToken);
+                    that.start();
+                }
+                catch(e){
+                    console.log( "Error > " + JSON.stringify(e));
+                }
+            })
+            .catch(function (err) {
+                console.log( "getAccessToken Error > " + JSON.stringify(err));
+            });
+    }
+
+    start() {
+        var that = this;
+        that.getProfile();
+        that.getBalance();
+
+        that.upstox.connectSocket()
+        .then(function(){
+            that.upstox.on("orderUpdate", function(message) {
+               // console.log("\n orderUpdate"+ JSON.stringify(message));
+            });
+
+            that.upstox.on("positionUpdate", function(message) {
+                //message for position conversion
+                console.log("\n positionUpdate"+ JSON.stringify(message));
+            });
+            
+            that.upstox.on("tradeUpdate", function(message) {
+                //message for trade updates
+                console.log("\n tradeUpdate"+ JSON.stringify(message));
+            });
+
+            var niftyStr = [];//fno.join();
+
+            that.upstox.subscribeFeed({
+                "exchange": "NSE_FO",
+                "symbol": niftyStr,
+                "type": "ltp"
+            })
+            .then(function (response) {
+                console.log('\n subscribeFeed response ', JSON.stringify(response));
+            })
+            .catch(function (error) {
+                //res.send({ error: error });
+                console.log('Error in subscribe feed ', error);
+            });  
+
+            that.upstox.on("liveFeed", function(message) {
+                //message for live feed
+                console.log("liveFeed"+ JSON.stringify(message));
+            });
+            that.upstox.on("disconnected", function(message) {
+                //listener after socket connection is disconnected
+                console.log("UPSTOX disconnected > "+ message);
+            });
+            that.upstox.on("error", function(error) {
+                //error listener
+                console.log("upstox.on error"+ error);
+            });
+        }).catch(function(error) {
+                console.log( "connectSocket #" + error);
+        });
+    }
+
+    // Get Balance
+    getBalance()
+    {
+        var that = this;
+        that.upstox.getBalance({ type: "security" })  // type can be security or commodity
         .then(function (response) {
-            params = code = null;
-                
-            accessToken = response.access_token;
-            //store.set('accessToken', accessToken); 
-            var d  = new Date();
-            
-            var india = moment.tz(d, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
-            india.format(); 
-            
-            india = india.set({
-                'year' : india.year(),
-                'date' : india.date() + 1,
-                'hour' : 9,
-                'minute'  : 05, 
-                'second' : 05
-             });
-     
-            store.set('tokenValidity', india); 
-            console.log("accessToken : " +accessToken);
-            upstox.setToken(accessToken);
-            start();
-            //res.sendFile("index.html", {"root": __dirname});
+            that.balance = JSON.stringify(response);
+            //console.log( '\n balance' + that.balance);
+           // getListOfAllSymbol();
         })
         .catch(function (err) {
-            console.log( "getAccessToken Error > " + JSON.stringify(err));
+            console.log(err);
+            //getListOfAllSymbol();
         });
-}
+    }
 
-
-function start() {
-    //console.log( 'start');
-    // an example using an object instead of an array
-   //queue.empty();
-
-    async.parallel({
-        getProfile,
-        getBalance,
-        //getListOfAllSymbol,
-        getAllData
-    }, function(err, results) {
-        console.log( 'start finish');
-    });
-
-   
-
-    upstox.connectSocket()
-    .then(function(){
-        upstox.on("orderUpdate", function(message) {
-            console.log("orderUpdate"+ message);
-        });
-        upstox.on("positionUpdate", function(message) {
-            //message for position conversion
-            console.log("positionUpdate"+ message);
-        });
-        upstox.on("tradeUpdate", function(message) {
-            //message for trade updates
-            console.log("tradeUpdate"+ message);
-        });
-
-        //console.log("niftyList" + niftyList);
-        var niftyStr = nifty.join();
-        //console.log(" niftyStr join    " + niftyStr);
-
-        upstox.subscribeFeed({
-            "exchange": "NSE_EQ",
-            "symbol": niftyStr,//'BANKNIFTY27DECFUT',//NIFTY29NOVFUT NIFTY18NOVFUT,BANKNIFTY18NOVFUT
-            "type": "ltp"
-        })
+    getProfile()
+    {
+        var that = this;
+        that.upstox.getProfile()
         .then(function (response) {
-            console.log('feedsymbols subscribeFeed response ', response);
+            
+            that.client_id = response.data.client_id;
+            that.profile = JSON.stringify(response.data);
+            console.log("\n getProfile - "+ that.client_id);// +" : "+  that.profile);
         })
         .catch(function (error) {
-            //res.send({ error: error });
-            console.log('Error in subscribe feed ', error);
-        });  
-
-        upstox.on("liveFeed", function(message) {
-            //message for live feed
-            console.log("liveFeed"+ message);
-        });
-        upstox.on("disconnected", function(message) {
-            //listener after socket connection is disconnected
-            console.log("disconnected > "+ message);
-        });
-        upstox.on("error", function(error) {
-            //error listener
-            console.log("upstox.on error"+ error);
-        });
-    }).catch(function(error) {
-        console.log( "connectSocket #" + error);
-});
-       
-    var bankNiftyCall;
-          
-    upstox.getMasterContract({exchange: "nse_fo"})
-    .then(function(response) {
-        //console.log("NSE FO " + JSON.stringify(response));
-        
-        /* bankNiftyCall = new Object();
-
-      //  var response = JSON.parse(response);
-        //console.log('\n 1.1' + response);
-        var  data=csvTojs(response.data);
-
-        //console.log("NSE FO " + JSON.stringify(data));
-
-        var now = new Date();
-        var thisMonth = months[now.getMonth()].slice(0,3).toUpperCase();
-        var monthPattern = new RegExp(thisMonth, 'gi');
-        
-       var transformedData = JSON.parse(JSON.stringify(transformedData));
-        //console.log(' >  ' + transformedData);
-
-        var dataFrame = dataForge.fromJSON(transformedData)
-        .where(row => {
-     
-           //console.log('\n row > ' + JSON.stringify(row));
-            row = JSON.stringify(row);
-           // console.log('\n row > ' + JSON.stringify(row));
-           // console.log('\n symbol > ' + row.symbol);
-            var isMatchingMonth  = String(row.symbol).search(monthPattern);
-            var isFuture = String(row.symbol).search("FUT");
-
-            if(isMatchingMonth >= 0 && isFuture >=0){
-                console.log("\n \n MATCH  >> > " + row.symbol );
-                bankNiftyCall.FUTURE = row.symbol;
-                return row;
-            }
-        });  */
-        
-        console.log("FNO data >> \n \n" + transformedData);
-
-        fs.writeFile("data/index/nse_fo.txt", JSON.stringify(response), function (err) {
-            if (err) throw err;
-            console.log('nse_fo File is created successfully.');
-        }); 
-
-        //checkBankNiftyExpiry();
-    })
-    .catch(function(err) {
-        console.log("nse fo error " + JSON.stringify(err));
-    });
-
-    // Get Master Contract
-   /*  upstox.getMasterContract({ exchange: "NSE_INDEX",format:"json"})
-    .then(function (response) {
-        fs.writeFile("data/index/index.txt", JSON.stringify(response), function (err) {
-            if (err) throw err;
-            console.log('index File is created successfully.');
-        }); 
-    })
-    .catch(function (err) {
-        console.log(err);
-    }); */
-
-    // PlaceOrder Note : default product = I i.e intra day order will be placed.
-    /*var orderObject = {
-        transaction_type:"b",
-        exchange:"NSE_EQ",
-        symbol: "RELIANCE",
-        quantity: 1,
-        order_type:"m"
-    };
-
-    upstox.placeOrder(orderObject)
-        .then(function(response) {
-            // Order details received
-            console.log(response);
-        })
-        .catch(function(err) {
-            // Something went wrong.
-            console.log(err);
-        });
-    */
-}
-
-
-var nseSymbolList = [];
-function getListOfAllSymbol()
-{
-    return store.get('niftyList'); 
-}
-
-// Get Balance
-var balance;
-function getBalance()
-{
-    //console.log( 'getBalance');
-    upstox.getBalance({ type: "security" })  // type can be security or commodity
-    .then(function (response) {
-        balance = JSON.stringify(response);
-        
-        getListOfAllSymbol();
-    })
-    .catch(function (err) {
-        console.log(err);
-        getListOfAllSymbol();
-    });
-}
-
-
-var profile;
-function getProfile()
-{
-   // console.log( 'getProfile');
-    upstox.getProfile()
-    .then(function (response) {
-        //console.log("getProfile "+ JSON.stringify(response));
-        client_id = response.data.client_id;
-        profile = JSON.stringify(response.data);
-    })
-    .catch(function (error) {
-        console.log("getProfile Error"+ JSON.stringify(error));
-    });
-}
-/* 
-function getMaster(ex = "nse_fo"){ 
-    if(store.get('accessToken')){
-        return upstox.getMasterContract({exchange: ex});
-    }    
-} */
-
-async function loadSymbol(symbol,exchange,interval='1day',start_date='',end_date=''){ 
-    //console.log("loadSymbol > " + symbol + " > "+accessToken +" :: "+ interval +" > "+exchange +" > "+ start_date +" > "+ end_date);
-   
-    if(accessToken){
-        upstox.setToken(accessToken);
-        return new Promise(function(resolved, rejected) {   
-            upstox.getOHLC({"exchange": exchange,
-                "symbol": symbol,
-                "start_date": start_date,
-                "end_date": end_date,
-                "format" : "json",
-                "interval" : interval
-            }).then(result =>{
-                resolved(result);
-                })
-            .catch(error =>{
-                rejected(error);
-            }); 
+            console.log("getProfile Error"+ JSON.stringify(error));
         });
     }
 }
-
-function getAllData(){
-    queue.empty();
-    var result = 0;
-    let promise = new Promise(function(resolve, reject) {
-        syncAllUpstoxData(indices);
-    
-        setTimeout(function() {
-            var interval = '15MINUTE';
-            getBankNifty(bankNiftySymbol,interval,'');
-        }, 100);
-
-       
-        setTimeout(function() {
-            syncAllUpstoxData(watchList);
-        }, 300);
-
-        /* setTimeout(function() {
-            resolve(1);
-           // syncAllUpstoxData(indices);
-        }, 47000); */
-        resolve(1);
-          
-    }).then(res=>{
-        getGapUpDown(watchList);
-        strategyStrongList.map(async(strategy)=>{
-            applyStrategy(watchList,'1DAY',strategy); 
-        });
-        rsiList.map(async(strategy)=>{
-            applyStrategy(bankNifty_indices,'15MINUTE',strategy); 
-        });
-    });
-
-    
-}
-

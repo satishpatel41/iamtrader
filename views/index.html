@@ -230,7 +230,7 @@ $(document).ready( function () {
               dropdown.append('<option value="">' + emptyMessage + '</option>');
               if(result != ''){
                   $.each(result, function(k, v) {
-                      dropdown.append('<option value="' + v.symbol + '">' + v.symbol + '</option>');
+                      dropdown.append('<option value="' + v + '">' + v + '</option>');
                   });
               }
           }
@@ -246,7 +246,7 @@ $(document).ready( function () {
             success: function(response){
            
                 var dataSet = response.filter(function (el) {
-                  return (el != null && el.close != null && el.close != undefined && el.close != "");
+                  return (el != null && el.CLOSE != null && el.CLOSE != undefined && el.CLOSE != "");
                 });
                 $(".loader").hide();       
                 dataSet.filter((obj) => obj );
@@ -260,7 +260,7 @@ $(document).ready( function () {
                 ctx.canvas.width = 1100;
                 ctx.canvas.height = 650;
 
-                var now = new Date(Number(dataSet[0].timestamp));
+                var now = new Date(Number(dataSet[0].LASTTRADETIME));
                 var india = moment.tz(now, "Asia/Kolkata");
                 india.format(); 
                 var start_date =india.date()+"-"+(india.month())+"-"+india.year() +"  "+india.hour()+":"+india.minute();
@@ -270,7 +270,7 @@ $(document).ready( function () {
                 var stockData = dataSet.map(obj =>{ 
                 var rObj = obj;//{};
 
-                  var india = moment.tz(new Date(Number(obj.timestamp)), "Asia/Kolkata");
+                  var india = moment.tz(new Date(Number(obj.LASTTRADETIME)), "Asia/Kolkata");
                   india.format(); 
 
                   var d = new Date();
@@ -279,13 +279,13 @@ $(document).ready( function () {
                   d.setFullYear(india.year());
                   d.setHours(india.hour());
                   d.setMinutes(india.minute());
-                  rObj.timestamp= d;//.getTime();
+                  rObj.LASTTRADETIME= d;//.getTime();
                   rObj.date= d;//.getTime();
                  rObj.t= d.getTime();
-                  rObj.o= Number(obj.open);
-                  rObj.h= Number(obj.high);
-                  rObj.l= Number(obj.low);
-                  rObj.c= Number(obj.close);
+                  rObj.o= Number(obj.OPEN);
+                  rObj.h= Number(obj.HIGH);
+                  rObj.l= Number(obj.LOW);
+                  rObj.c= Number(obj.CLOSE);
                   return rObj;
                 }); 
                 
@@ -334,11 +334,11 @@ $(document).ready( function () {
 
                 // determine whether a datapoint is within a bucket
                 const inBucket = (datum, priceBucket) =>
-                  datum.low < priceBucket && datum.high > (priceBucket - priceStep);
+                  datum.LOW < priceBucket && datum.HIGH > (priceBucket - priceStep);
 
                 // the volume contribution for this range
                 const volumeInBucket = (datum, priceBucket) =>
-                  inBucket(datum, priceBucket) ? datum.volume / Math.ceil((datum.high - datum.low) / priceStep) : 0;
+                  inBucket(datum, priceBucket) ? datum.volume / Math.ceil((datum.HIGH - datum.LOW) / priceStep) : 0;
 
                 // map each point in our time series, to construct the market profile
                 const marketProfile = data.map(
@@ -394,7 +394,7 @@ $(document).ready( function () {
                   .each((marketProfile, index, group) => {
 
                       // create a composite scale that applies the required offset
-                      const leftEdge = xScale(marketProfile.data[0].timestamp);
+                      const leftEdge = xScale(marketProfile.data[0].LASTTRADETIME);
                       const offset = d3.scaleLinear()
                           .domain(xDomain)
                           .range([leftEdge, leftEdge + bandwidth]);
@@ -444,7 +444,7 @@ $(document).ready( function () {
 
             // determine the price range
             const extent = fc.extentLinear()
-            .accessors([d => d.high, d => d.low]);
+            .accessors([d => d.HIGH, d => d.LOW]);
             const priceRange = extent(timeSeries);
 
             // use a d3 scale to create a set of price buckets
@@ -458,9 +458,9 @@ $(document).ready( function () {
             const marketProfileSeries = fc.autoBandwidth(seriesMarketProfile());
 
             const pocSeries = fc.autoBandwidth(fc.seriesSvgErrorBar())
-              .crossValue(d => d.timestamp)
-              .lowValue(d => d.value)
-              .highValue(d => d.value)
+              .crossValue(d => d.LASTTRADETIME)
+              .LOWValue(d => d.value)
+              .HIGHValue(d => d.value)
               .align('left');
 
             const multiSeries = fc.seriesSvgMulti()
@@ -469,7 +469,7 @@ $(document).ready( function () {
               switch(series[index]) {
                 case pocSeries:
                   return data.map(d => ({
-                    date: d.data[0].timestamp,
+                    date: d.data[0].LASTTRADETIME,
                     value: pointOfControl(d)
                   }));
                 case marketProfileSeries:
@@ -478,13 +478,13 @@ $(document).ready( function () {
               });
 
             const xExtent = fc.extentDate()
-              .accessors([d => d.data[0].timestamp]);
+              .accessors([d => d.data[0].LASTTRADETIME]);
 
             const profileChart = fc.chartSvgCartesian(
                 d3.scaleBand(),
                 d3.scaleBand()
                 )
-                .xDomain(series.map(s => s.data[0].timestamp))
+                .xDomain(series.map(s => s.data[0].LASTTRADETIME))
                 .yDomain(priceBuckets)
                 .yTickValues(priceBuckets.filter((d, i) => i % 10 == 0))
                 .xTickFormat(d3.timeFormat('%Y-%m-%d'))// %H:%M
@@ -560,8 +560,8 @@ $(document).ready( function () {
             gX.selectAll(".tick text")
             .call(wrap, xBand.bandwidth())
 
-            var ymin = d3.min(prices.map(r => r.low));
-            var ymax = d3.max(prices.map(r => r.high));
+            var ymin = d3.min(prices.map(r => r.LOW));
+            var ymax = d3.max(prices.map(r => r.HIGH));
             var yScale = d3.scaleLinear().domain([ymin, ymax]).range([h, 0]).nice();
             var yAxis = d3.axisLeft()
                   .scale(yScale)
@@ -581,10 +581,10 @@ $(document).ready( function () {
               .append("rect")
               .attr('x', (d, i) => xScale(i) - xBand.bandwidth())
               .attr("class", "candle")
-              .attr('y', d => yScale(Math.max(d.open, d.close)))
+              .attr('y', d => yScale(Math.max(d.OPEN, d.CLOSE)))
               .attr('width', xBand.bandwidth())
-              .attr('height', d => (d.open === d.close) ? 1 : yScale(Math.min(d.open, d.close))-yScale(Math.max(d.open, d.close)))
-              .attr("fill", d => (d.open === d.close) ? "silver" : (d.open > d.close) ? "red" : "green")
+              .attr('height', d => (d.OPEN === d.CLOSE) ? 1 : yScale(Math.min(d.OPEN, d.CLOSE))-yScale(Math.max(d.OPEN, d.CLOSE)))
+              .attr("fill", d => (d.OPEN === d.CLOSE) ? "silver" : (d.OPEN > d.CLOSE) ? "red" : "green")
 
             // draw high and low
             let stems = chartBody.selectAll("g.line")
@@ -594,9 +594,9 @@ $(document).ready( function () {
               .attr("class", "stem")
               .attr("x1", (d, i) => xScale(i) - xBand.bandwidth()/2)
               .attr("x2", (d, i) => xScale(i) - xBand.bandwidth()/2)
-              .attr("y1", d => yScale(d.high))
-              .attr("y2", d => yScale(d.low))
-              .attr("stroke", d => (d.open === d.close) ? "white" : (d.open > d.close) ? "red" : "green");
+              .attr("y1", d => yScale(d.HIGH))
+              .attr("y2", d => yScale(d.LOW))
+              .attr("stroke", d => (d.OPEN === d.CLOSE) ? "white" : (d.OPEN > d.CLOSE) ? "red" : "green");
 
             svg.append("defs")
               .append("clipPath")
@@ -617,19 +617,19 @@ $(document).ready( function () {
               var xmin = new Date(xDateScale(Math.floor(xScaleZ.domain()[0])))
                 xmax = new Date(xDateScale(Math.floor(xScaleZ.domain()[1])))
                 filtered = _.filter(prices, d => ((d.Date >= xmin) && (d.Date <= xmax)))
-                minP = +d3.min(filtered, d => d.low)
-                maxP = +d3.max(filtered, d => d.high)
+                minP = +d3.min(filtered, d => d.LOW)
+                maxP = +d3.max(filtered, d => d.HIGH)
                 buffer = Math.floor((maxP - minP) * 0.1)
 
               yScale.domain([minP - buffer, maxP + buffer])
               candles.transition()
                     .duration(800)
-                    .attr("y", (d) => yScale(Math.max(d.open, d.close)))
-                    .attr("height",  d => (d.open === d.close) ? 1 : yScale(Math.min(d.open, d.close))-yScale(Math.max(d.open, d.close)));
+                    .attr("y", (d) => yScale(Math.max(d.OPEN, d.CLOSE)))
+                    .attr("height",  d => (d.OPEN === d.CLOSE) ? 1 : yScale(Math.min(d.OPEN, d.CLOSE))-yScale(Math.max(d.OPEN, d.CLOSE)));
                     
               stems.transition().duration(800)
-                  .attr("y1", (d) => yScale(d.high))
-                  .attr("y2", (d) => yScale(d.low))
+                  .attr("y1", (d) => yScale(d.HIGH))
+                  .attr("y2", (d) => yScale(d.LOW))
 
               gY.transition().duration(800).call(d3.axisLeft().scale(yScale));
 
@@ -725,15 +725,15 @@ $(document).ready( function () {
                 .accessors([d => d.date]);
 
               const yExtent = fc.extentLinear()
-                .accessors([d => d.high, d => d.low]);
+                .accessors([d => d.HIGH, d => d.LOW]);
 
               const parseDate = d3.timeParse("%d-%b-%y");
               
                 var data =  stockData.map(row => ({
-                    open: Number(row.open),
-                    close: Number(row.close),
-                    high: Number(row.high),
-                    low: Number(row.low),
+                    open: Number(row.OPEN),
+                    close: Number(row.CLOSE),
+                    high: Number(row.HIGH),
+                    low: Number(row.LOW),
                     date: row.date
 
                    
@@ -777,12 +777,14 @@ $(document).ready( function () {
           <li><a href="/allCharts">Stocks Charts</a></li>
           <li ><a href="/scanner">Scanner</a></li>
           <li><a href="/strategy">Strategy</a></li>
-          <li><a href="/contactus">Contact Us</a></li>  
+          <li><a href="/applyStrategy">Apply Strategy</a></li> 
+          <!-- <li><a href="/contactus">Contact Us</a></li>   -->
         </ul>
         <ul class="nav navbar-nav pull-right">
           <li class="dropdown pull-right"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome, <span id="userTxt"></span> <span class="glyphicon glyphicon-user"></span><b class="caret"></b></a>
             <ul class="dropdown-menu pull-right">
                 <li><a href="/profile"><i class="icon-cog"></i> Profile</a></li>
+                <li><a href="/authenticate"><i class="icon-cog"></i> Upstox Login</a></li>
                 <li><a href="/preferences"><i class="icon-envelope"></i> Preferences</a></li>
                 <li class="divider"></li>
                 <li><a href="/logout"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
@@ -826,12 +828,15 @@ $(document).ready( function () {
  
     <div class="row">
       <div class="col-md-6" style="position: relative; height:100vh; width:90vw;">
-          <div id='marketChart' style="position: relative; width:100vw;max-width: 1000px;height:80vh;">
-           <!--  <svg id="container" style="position: relative;width:100vw;max-width: 1000px;"></svg> -->
-          </div>  
-          <div id='chartDiv' style="position: relative; width:100vw;max-width: 1000px;height:80vh;"> 
+          
+        <div id='chartDiv' style="position: relative; width:100vw;max-width: 1000px;height:80vh;"> 
          
           <div>
+            
+        <div id='marketChart' style="position: relative; width:100vw;max-width: 1000px;height:80vh;">
+           <!--  <svg id="container" style="position: relative;width:100vw;max-width: 1000px;"></svg> -->
+          </div>  
+          
                 
           </div>
       </div>  

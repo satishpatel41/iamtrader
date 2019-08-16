@@ -69,3 +69,37 @@ function formatDate(str)
     }
     return str;
 }
+
+Array.prototype.groupBy = function(prop) {
+  return this.reduce(function(groups, item) {
+    const val = item[prop]
+    groups[val] = groups[val] || []
+    groups[val].push(item)
+    return groups
+  }, {})
+}
+
+function getBankNifity(str)
+{
+  var bnf = "BANKNIFTY";//BANKNIFTY19MAYFUT
+  var now = new Date();
+  var y = now.getFullYear();
+  var y = now.getMonth();
+  y = String(y).slice(2,4);
+  m =  String(months[now.getMonth()]).slice(0,3);
+
+  return bnf = bnf + y + m +"FUT";
+}
+
+function getAllBankNifityOption(str)
+{
+  var bnf = "BANKNIFTY";//BANKNIFTY19MAYFUT
+  var now = new Date();
+  var y = now.getFullYear();
+  var y = now.getMonth();
+  y = String(y).slice(2,4);
+  m =  String(months[now.getMonth()]).slice(0,3);
+
+  return bnf = bnf + y + m +"FUT";
+}
+

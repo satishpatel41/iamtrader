@@ -13,17 +13,17 @@ async function startBackTesting(symbol,stockData,strategyList,isBackTesting){
     var opens = [];
     var highs = [];
     var lows = [];
-    var timestamps = [];
+    var LASTTRADETIMEs = [];
     var values = stockData.map(async (obj) =>  {
-        closes.push(Number(obj.close));       
-        opens.push(Number(obj.open));       
-        highs.push(Number(obj.high));       
-        lows.push(Number(obj.low));       
-        timestamps.push(Number(obj.timestamp));       
+        closes.push(Number(obj.CLOSE));       
+        opens.push(Number(obj.OPEN));       
+        highs.push(Number(obj.HIGH));       
+        lows.push(Number(obj.LOW));       
+        LASTTRADETIMEs.push(Number(obj.LASTTRADETIME));       
     });  
     var result = [];
     var output = new Array();
-    timestamps = timestamps.reverse();//**********  dont't change **********  
+    LASTTRADETIMEs = LASTTRADETIMEs.reverse();//**********  dont't change **********  
     return Promise.all(strategyList.strategy.map(async (strategyObj) => {  
         return new Promise(function(resolved, rejected) {   
             Promise.all(strategyObj.indicators.map(async (indicatorObj) => {
@@ -64,7 +64,7 @@ async function startBackTesting(symbol,stockData,strategyList,isBackTesting){
                     }
                     var flag = eval(strategyObj.strategy);   
                     
-                    var india = moment.tz(new Date(Number(timestamps[i])), "Asia/Kolkata");
+                    var india = moment.tz(new Date(Number(LASTTRADETIMEs[i])), "Asia/Kolkata");
                     india.format(); 
                     var d = india.date() +"/"+(india.month() + 1) +"/"+india.year()+" "+india.hour()+":"+india.minute();
                     result[i].push({date:d, flag : flag}); 

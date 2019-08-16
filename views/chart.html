@@ -80,7 +80,7 @@ $(document).ready( function () {
             success: function(response){
               response = response.slice(0, 28);
                 var dataSet = response.filter(function (el) {
-                  return (el != null && el.close != null && el.close != undefined && el.close != "");
+                  return (el != null && el.CLOSE != null && el.CLOSE != undefined && el.CLOSE != "");
                 });
                 $(".loader").hide();       
                 dataSet.filter((obj) => obj );
@@ -93,7 +93,7 @@ $(document).ready( function () {
                 ctx.canvas.height = 400;
 
                
-                var now = new Date(Number(dataSet[0].timestamp));
+                var now = new Date(Number(dataSet[0].LASTTRADETIME));
                 var india = moment.tz(now, "Asia/Kolkata");
                 india.format(); 
                 var start_date =india.date()+"-"+(india.month())+"-"+india.year() +"  "+india.hour()+":"+india.minute();
@@ -102,7 +102,7 @@ $(document).ready( function () {
                 var stockData = dataSet.map(obj =>{ 
                   var rObj = {};
 
-                  var india = moment.tz(new Date(Number(obj.timestamp)), "Asia/Kolkata");
+                  var india = moment.tz(new Date(Number(obj.LASTTRADETIME)), "Asia/Kolkata");
                   india.format(); 
 
                   var d = new Date();
@@ -113,10 +113,10 @@ $(document).ready( function () {
                   d.setMinutes(india.minute());
 
                   rObj.t= d.getTime();
-                  rObj.o= Number(obj.open);
-                  rObj.h= Number(obj.high);
-                  rObj.l= Number(obj.low);
-                  rObj.c= Number(obj.close);
+                  rObj.o= Number(obj.OPEN);
+                  rObj.h= Number(obj.HIGH);
+                  rObj.l= Number(obj.LOW);
+                  rObj.c= Number(obj.CLOSE);
                   return rObj;
                 }); 
                 
@@ -169,13 +169,15 @@ $(document).ready( function () {
           <li ><a href="/allCharts">Stocks Charts</a></li>
           <li ><a href="/scanner">Scanner</a></li>
           <li ><a href="/strategy">Strategy</a></li>
-          <li><a href="/contactus">Contact Us</a></li>  
+          <li><a href="/applyStrategy">Apply Strategy</a></li> 
+         <!--  <li><a href="/contactus">Contact Us</a></li>   -->
 
         </ul>
         <ul class="nav navbar-nav pull-right">
           <li class="dropdown pull-right"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome, <span id="userTxt"></span> <span class="glyphicon glyphicon-user"></span><b class="caret"></b></a>
             <ul class="dropdown-menu pull-right">
                 <li><a href="/profile"><i class="icon-cog"></i> Profile</a></li>
+                <li><a href="/authenticate"><i class="icon-cog"></i> Upstox Login</a></li>
                 <li><a href="/preferences"><i class="icon-envelope"></i> Preferences</a></li>
                 <li class="divider"></li>
                 <li><a href="/logout"><span class="glyphicon glyphicon-off"></span> Logout</a></li>

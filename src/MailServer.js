@@ -58,7 +58,7 @@ function sendingMail(toEmail, strategy, symbolsList){
    
     var india = moment.tz(new Date(), "Asia/Kolkata");
     india.format(); 
-    var now = india.date() +"/"+(india.month() + 1) +"/"+india.year()+" "+india.hour()+":"+india.minute();//new Date(row.timestamp);
+    var now = india.date() +"/"+(india.month() + 1) +"/"+india.year()+" "+india.hour()+":"+india.minute();//new Date(row.LASTTRADETIME);
     
 
     mailOptions.subject = 'Scan alert ' + strategy, // Subject line
@@ -119,7 +119,7 @@ async  function sendingMail(toEmail, strategy, symbolsList){
  
   var india = moment.tz(new Date(), "Asia/Kolkata");
   india.format(); 
-  var now = india.date() +"/"+(india.month() + 1) +"/"+india.year()+" "+india.hour()+":"+india.minute();//new Date(row.timestamp);
+  var now = india.date() +"/"+(india.month() + 1) +"/"+india.year()+" "+india.hour()+":"+india.minute();//new Date(row.LASTTRADETIME);
   
 
   mailOptions.subject = 'Scan alert ' + strategy, // Subject line

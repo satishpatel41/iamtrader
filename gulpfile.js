@@ -22,6 +22,12 @@ var gulpSequence = require('gulp-sequence').use(gulp);
     .pipe(gulp.dest("./dist"))
 );
 
+gulp.task("driver", () =>
+    gulp.src("src/*.exe")
+    .on('error', function (err) { console.log(err.toString()); })
+    .pipe(gulp.dest("./dist"))
+);
+
 gulp.task("html", function () {
     var tsResult = gulp.src("views/*.html")
     .pipe(gulp.dest('./dist/views/'));
@@ -36,7 +42,7 @@ gulp.task('server', function () {
         gulp.run('styles:css');
         server.notify(event);
     });
-    gulp.watch(['app/scripts/**/*.js'], ['jshint']);
+    gulp.watch(['app/src/**/*.js'], ['jshint']);
     gulp.watch(['app/images/**/*'], server.notify);
     gulp.watch(['app.min.js', 'routes/**/*.js'], [server.run]);
 });

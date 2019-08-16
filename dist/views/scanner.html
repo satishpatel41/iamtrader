@@ -24,6 +24,11 @@
       transform: translate(-50%, -50%);
     }
     
+    /* 
+    .nav>li>a {
+        padding: 15px 7px;
+    } */
+    
     /* Safari */
     @-webkit-keyframes spin {
       0% { -webkit-transform: rotate(0deg); }
@@ -44,6 +49,7 @@ $(document).ready( function () {
         var exchange = "nifty";
         $('#userTxt').text(localStorage.getItem('user'));
 
+        
         var nseSymbols = [];
 
         $( "#intervalDropDown" ).change(function() {
@@ -76,7 +82,7 @@ $(document).ready( function () {
                     return (el != null && el.close != null && el.close != undefined && el.close != "");
                   });
 
-                  $("#date_txt").html(dataSet[0].timestamp);
+                  $("#date_txt").html(dataSet[0].LASTTRADETIME);
                   var table = new Tabulator("#example-table", {
                     data:dataSet,
                     ajaxLoader: true,
@@ -134,13 +140,15 @@ $(document).ready( function () {
         <li><a href="/allCharts">Stocks Charts</a></li>
         <li class="active"><a href="/scanner">Scanner</a></li>
         <li><a href="/strategy">Strategy</a></li>
-        <li><a href="/contactus">Contact Us</a></li>  
+        <li><a href="/applyStrategy">Apply Strategy</a></li> 
+        <!-- <li><a href="/contactus">Contact Us</a></li>   -->
 
       </ul>
       <ul class="nav navbar-nav pull-right">
         <li class="dropdown pull-right"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome, <span id="userTxt"></span> <span class="glyphicon glyphicon-user"></span><b class="caret"></b></a>
           <ul class="dropdown-menu pull-right">
               <li><a href="/profile"><i class="icon-cog"></i> Profile</a></li>
+              <li><a href="/authenticate"><i class="icon-cog"></i> Upstox Login</a></li>
               <li><a href="/preferences"><i class="icon-envelope"></i> Preferences</a></li>
               <li class="divider"></li>
               <li><a href="/logout"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
@@ -153,8 +161,7 @@ $(document).ready( function () {
 </nav>
   
 <div class="container">
-  <div class="row"></div>
-  <div class="row"></div>
+ 
   <br></br>
   <br></br>
   <div class="row">

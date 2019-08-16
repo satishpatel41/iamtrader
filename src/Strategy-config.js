@@ -246,7 +246,7 @@ var bbUpper_band_reversal ={
 ]
 }; 
     
-var strategyList = [strategy_rsi60_crossed,bbUpper_band_crossed,bbLower_band_crossed];
+//var strategyList = [strategy_rsi60_crossed,bbUpper_band_crossed,bbLower_band_crossed,power_play_buy];
 
 var bollinger_open_List = [bbUpper_band_crossed,bbLower_band_crossed,bbUpper_band_reversal,bbLower_band_reversal];
 
@@ -349,4 +349,61 @@ var open_high = {
     ]
 }; 
 
+
+var power_play_buy = {
+    name:"power_play_buy",
+    description : "close Crossed above 5-ema with RSI 60",
+    isLive:false,
+    isBuyOrSell:"b",
+    strategy : [
+    {
+        indicators:
+        [
+            {indicator:'EMA',period : 5,values:"closes"}
+        ],output:[],strategy:"closes[0] >= output[0][0]"
+    },
+    {
+        indicators:
+        [
+            {indicator:'RSI',period : 14,values:"closes"}
+        ],output:[],strategy:"output[0][i] > 60"
+    },
+    {
+        indicators:
+        [
+            {indicator:''}
+        ],output:[],strategy:"((closes[0] - opens[0]) / (highs[0] - lows[0])) >= 0.5"
+    }
+]
+}; 
+
 var open_low_high_List = [open_high,open_low];
+
+/* [
+{"indicator_id":64,"sid":"21","indicator1":"close","indicator2":"sma","value":"200","op":">="},
+{"indicator_id":65,"sid":"21","indicator1":"close","indicator2":"ubb","value":"60","op":"Crossed Above"},
+{"indicator_id":66,"sid":"21","indicator1":"rsi","indicator2":"number","value":"50","op":">"}]
+
+
+{"indicator1":"rsi","indicator2":"number","value":"50","op":">"}
+{indicator:'EMA',period : 5,values:"closes",output:[],strategy:"closes[0] >= output[0][0]"}
+strategy : [{
+        indicators:
+        [
+            {indicator:'EMA',period : 5,values:"closes"}
+        ],output:[],strategy:"closes[0] >= output[0][0]"
+    },
+    {
+        indicators:
+        [
+            {indicator:'RSI',period : 14,values:"closes"}
+        ],output:[],strategy:"output[0][i] > 60"
+    },
+    {
+        indicators:
+        [
+            {indicator:''}
+        ],output:[],strategy:"((closes[0] - opens[0]) / (highs[0] - lows[0])) >= 0.5"
+    } */
+
+   // closes[0] >= RSI.calculate({values : closes,period : 14})[0]

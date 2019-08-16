@@ -24,6 +24,12 @@
       transform: translate(-50%, -50%);
     }
     
+    
+    /* .nav>li>a {
+        padding: 15px 7px;
+    }
+ */
+
     /* Safari */
     @-webkit-keyframes spin {
       0% { -webkit-transform: rotate(0deg); }
@@ -81,7 +87,7 @@ $(document).ready( function () {
                  $(".loader").hide();
                  
 
-                  $("#date_txt").html(response[0].timestamp);
+                  $("#date_txt").html(response[0].LASTTRADETIME);
                   var table = new Tabulator("#example-table", {
                     data:response,
                     ajaxLoader: true,
@@ -97,9 +103,9 @@ $(document).ready( function () {
                     movableColumns:true,      //allow column order to be changed
                     rowFormatter:function(row){
                             var data = row.getData();
-                            if(data.open == data.low){
+                            if(data.OPEN == data.LOW){
                               row.getElement().style.backgroundColor='#79f183';
-                            }else if(data.open == data.high){
+                            }else if(data.OPEN == data.HIGH){
                               row.getElement().style.backgroundColor='#ff8585';
                             }
                     },
@@ -153,12 +159,14 @@ $(document).ready( function () {
         <li><a href="/allCharts">Stocks Charts</a></li>
         <li><a href="/scanner">Scanner</a></li>
         <li><a href="/strategy">Strategy</a></li>
-        <li><a href="/contactus">Contact Us</a></li>  
+        <li><a href="/applyStrategy">Apply Strategy</a></li> 
+        <!-- <li><a href="/contactus">Contact Us</a></li>   -->
       </ul>
       <ul class="nav navbar-nav pull-right">
         <li class="dropdown pull-right"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome, <span id="userTxt"></span> <span class="glyphicon glyphicon-user"></span><b class="caret"></b></a>
           <ul class="dropdown-menu pull-right">
               <li><a href="/profile"><i class="icon-cog"></i> Profile</a></li>
+              <li><a href="/authenticate"><i class="icon-cog"></i> Upstox Login</a></li>
               <li><a href="/preferences"><i class="icon-envelope"></i> Preferences</a></li>
               <li class="divider"></li>
               <li><a href="/logout"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
