@@ -1,7 +1,7 @@
 var Upstox = require("upstox");
 var events = require('events');
-const PORT = process.env.PORT || 3000;
-var redirect_uri = "http://localhost:"+PORT+"/callback/";
+var port = process.env.PORT || 3000;
+var redirect_uri = "http://localhost:"+port+"/callback/";
 if(process.env.NODE_ENV=="production")
 {
     redirect_uri = "https://robo-trader.herokuapp.com/callback/";
