@@ -1,6 +1,6 @@
 var Upstox = require("upstox");
 var events = require('events');
-
+const PORT = process.env.PORT || 3000;
 var redirect_uri = "http://localhost:"+PORT+"/callback/";
 if(process.env.NODE_ENV=="production")
 {
