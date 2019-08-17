@@ -321,7 +321,7 @@ var strategyQueue = async.queue(function(task, callback) {
                     //console.log("@ Strategy RESULT  > " + finalResult +"::"+ strategyObj.symbol);
                     matchSymbols.map(async (symbol) =>  {
                         console.log("Place Order  : " +strategyObj.name +" : "+ strategyObj.interval +" : "+ strategyObj.symbol);
-                        eventEmitter.emit('placeOrder',{'strategy':strategyObj.name,"symbol":strategyObj.symbol,'interval':interval});
+                        eventEmitter.emit('placeOrder',{'strategy':strategyObj,"symbol":strategyObj.symbol,'interval':interval});
                     });
 
                     if(process.env.NODE_ENV=="production")
