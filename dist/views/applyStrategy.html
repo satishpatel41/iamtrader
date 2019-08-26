@@ -275,6 +275,27 @@ $(document).ready( function () {
           interval = $("#intervalDropDown").val();
         });
 
+
+        $("#symbolTxt").on('input', function () {
+          if(symbolListArr && symbolListArr.length > 0)
+              $('#quantityTxt').val(symbolListArr[0]['QUOTATIONLOT']);
+
+
+          var search = $("#symbolTxt").val();
+          if(exchange && search.length >= 2){
+          $.ajax({
+            type: "get",
+            url: server + '/getInstrumentsOnSearch/'+exchange+'/'+instrumentType+'/'+search,success: function(data){
+              //console.log("data " + data);
+                  symbolListArr = [];
+                  symbolListArr = data;
+
+                  helpers.buildDropdown(data,$('#intrumentDropdown'),'Select an option','IDENTIFIER');
+              }
+          });
+          }
+        });
+
         $( "#symbolDropdown" ).change(function() {
           symbol = $("#symbolDropdown").val();
           //console.log(symbol);
@@ -332,18 +353,21 @@ $(document).ready( function () {
         getAllStrategy();
         getAllAppliedStrategyList();
       
-        $( "#symbolTxt" ).keypress(function() {
+       /*  $( "#symbolTxt" ).keypress(function() {
           var search = $("#symbolTxt").val();
           if(exchange && search.length >= 2){
-                  $.ajax({
-                  type: "get",
-                  url: server + '/getInstrumentsOnSearch/'+exchange+'/'+instrumentType+'/'+search,success: function(data){
-                    //console.log("data " + data);
-                       helpers.buildDropdown(data,$('#intrumentDropdown'),'Select an option','IDENTIFIER');
-                    }
-                  });
+              $.ajax({
+                type: "get",
+                url: server + '/getInstrumentsOnSearch/'+exchange+'/'+instrumentType+'/'+search,success: function(data){
+                  //console.log("data " + data);
+                      symbolListArr = [];
+                      symbolListArr = data;
+
+                      helpers.buildDropdown(data,$('#intrumentDropdown'),'Select an option','IDENTIFIER');
+                  }
+              });
           }
-        });
+        }); */
 
         function getAllStrategy()
         {
@@ -723,11 +747,6 @@ $(document).ready( function () {
                         <input id="quantityTxt" class="form-control" >
                      </div>
                      <div class="col-sm-3">
-                        <!-- </br>
-                        <label>
-                            <input type="checkbox" id="is_intrady"> Is Intrady?
-                          </label>
- -->
                           <label>Position</label>
                           <select id="positionDropDown" class="form-control" >
                             <option value="Intraday" selected="selected">Intraday</option>

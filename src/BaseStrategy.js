@@ -320,8 +320,8 @@ var strategyQueue = async.queue(function(task, callback) {
                     matchSymbols.push(strategyObj.symbol);
                     //console.log("@ Strategy RESULT  > " + finalResult +"::"+ strategyObj.symbol);
                     matchSymbols.map(async (symbol) =>  {
-                        console.log("Place Order  : " +strategyObj.name +" : "+ strategyObj.interval +" : "+ strategyObj.symbol);
-                        eventEmitter.emit('placeOrder',{'strategy':strategyObj,"symbol":strategyObj.symbol,'interval':interval});
+                        //console.log("Place Order  : " +strategyObj.name +" : "+ strategyObj.interval +" : "+ strategyObj.symbol);
+                        //eventEmitter.emit('placeOrder',{'strategy':strategyObj,"symbol":strategyObj.symbol,'interval':interval});
                     });
 
                     if(process.env.NODE_ENV=="production")
@@ -366,8 +366,10 @@ async function executeLiveStrategy(list)
                     //console.log("finalResult  : " +JSON.stringify(finalResult));
                     //var result = finalResult.result.every(x => x == true);  
                     if(finalResult.result){
-                        console.log("Place Order  : " +strategy.name +" : "+ strategy.interval +" : "+ strategy.symbol);
-                        eventEmitter.emit('placeOrder',{'strategy':strategy,"symbol":strategy.symbol,'interval':interval});
+                        price = data[0]['CLOSE'];
+                        console.log("Place Order  --> " +strategy.name +" : "+ strategy.interval +" : "+ strategy.symbol +" : "+ price);
+                        eventEmitter.emit('placeOrder',{'strategy':strategy,"symbol":strategy.symbol,'interval':interval,'price':price});
+                        eventEmitter.emit('sendNotification',{'strategy':strategy,"symbol":strategy.symbol,'interval':interval,'price':price});
                     
                         if(process.env.NODE_ENV=="production")
                         {

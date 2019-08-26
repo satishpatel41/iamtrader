@@ -261,6 +261,6 @@ async function GetInstrumentsOnSearch(data)
         xml: false
     };
     let ex = await GET(url, urlParameters);
-    //console.log(ex);
+    //console.log(JSON.stringify(ex.INSTRUMENTS));
     return ex.INSTRUMENTS;
 }

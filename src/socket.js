@@ -7,4 +7,12 @@ wss.on('connection', ws => {
    // console.log(`Received message => ${message}`)
   })
   //ws.send('Hello! Message From Server!!')
+
+  eventEmitter.on('sendNotification', onSendNotification);
+
+  function onSendNotification(data){
+      console.log('Received message => ' + data.strategy.symbol);
+      webSocket.send(JSON.stringify({data}));
+  }
 })
+

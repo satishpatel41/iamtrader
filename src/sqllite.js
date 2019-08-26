@@ -4,6 +4,7 @@ if (err) {
     return console.error(err.message);
 }
 console.log(chalk.green('Connected SQlite database'));
+getAllUsers();
 });
 
 async function closeDb(){

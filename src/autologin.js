@@ -11,9 +11,7 @@ var upstoxObjList = [];
         isFullyAutomated:true
     }
 ] */
-
-
-setTimeout(getAllUsers, 1000);
+//setTimeout(getAllUsers, 1000);
 
 async function getAllUsers()
 {

@@ -34,7 +34,7 @@ class UpstoxBroker {
             });
 
             if(isValidUser){
-                webSocket.send(JSON.stringify({data}));
+                //webSocket.send(JSON.stringify({data}));
                
                 //Validate my orders with db
                 console.log('\nEvent -> onPlaceOrder ' + data.strategy.name +":"+data.symbol+":"+data.strategy.transaction_type+":"+data.strategy.exchange+":"+data.strategy.odrerType+":"+data.strategy.isIntraday);
@@ -43,6 +43,7 @@ class UpstoxBroker {
                     transaction_type:getTransactionType(data.strategy.transaction_type),
                     exchange:getExchange(data.strategy.exchange),
                     symbol: getSymbol(data.symbol),
+                    price:data.price,
                     quantity: data.strategy.quantity,
                     order_type:getOrderType(data.strategy.odrerType),
                     product: getProduct(data.strategy.isIntraday),
