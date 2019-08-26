@@ -16,7 +16,7 @@ let cnt=0;
            
             return getData (url);
         } catch (e) {
-            //console.error(e)
+            console.error(e)
             return e;
         }
     }
@@ -44,6 +44,6 @@ const getData = async url => {
     //console.log(json);
     return json;
   } catch (error) {
-    //console.log(error);
+    console.log(error);
   }
 };

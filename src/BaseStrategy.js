@@ -113,7 +113,7 @@ class BaseStrategy {
            
             var result = [];
             var output = {};
-            
+            //console.log("Strategy 1: " + strategyObj.symbol+" : "+strategyObj.id +" : "+strategyObj.name+" : "+strategyObj.interval);
             if(strategyObj && strategyObj.indicators && strategyObj.indicators.length > 0){
                 //console.log("Strategy : " + strategyObj.symbol+" : "+strategyObj.id +" : "+strategyObj.name+" : "+strategyObj.interval);
                 Promise.all(strategyObj.indicators.map(async (indicatorObj) => {
@@ -245,7 +245,7 @@ class BaseStrategy {
                    // candle.low = candle.low.reverse(); //**********  dont't change **********  
                    // candle.open = candle.open.reverse(); //**********  dont't change **********  
                     var d =new Date(Number(candle.timeStamp[0])); 
-                    //console.log("result " + symbol +" : " + result);
+                   //console.log("result " + symbol +" : " + result);
                     var strategyRes = result.every(x => x == true);  
                     candle = output = result = d = null;
                     strategyObj.result = strategyRes;
@@ -307,7 +307,7 @@ var strategyQueue = async.queue(function(task, callback) {
     var interval = strategyObj.interval;    
     //console.log("\n");
     getStockDataFromDb(symbol,interval).then(stockData => {
-       //console.log("Symbol > " +symbol +":"+stockData.data.length);
+        //console.log("Symbol > " +symbol +":"+stockData.data.length);
         try{
             var data = JSON.parse(stockData.data); 
             //console.log("data > " +data.length +"::"+JSON.stringify(strategyObj));
@@ -315,8 +315,8 @@ var strategyQueue = async.queue(function(task, callback) {
            
             base.executeStrategy(strategyObj.symbol,data,strategyObj).then(finalResult => { 
                 //console.log("finalResult > " + JSON.stringify(finalResult));
-                
-                if(finalResult.result){
+                var result = finalResult.result.every(x => x == true);  
+                if(result){
                     matchSymbols.push(strategyObj.symbol);
                     //console.log("@ Strategy RESULT  > " + finalResult +"::"+ strategyObj.symbol);
                     matchSymbols.map(async (symbol) =>  {
@@ -350,3 +350,41 @@ var strategyQueue = async.queue(function(task, callback) {
 strategyQueue.drain = function() {
  // console.log('all items have been processed');
 };
+
+
+async function executeLiveStrategy(list)
+{  
+    //console.log('list - ' +list.length);
+    list.map(async(strategy)=>{
+        await fetchLiveCandle(strategy.symbol,strategy.exchange,interval,start_date,end_date).then(response=>{
+            //console.log('fetchLiveCandle - ' +response.OHLC); //applyStrategy([strategy],'15MINUTE'); 
+            try{
+                var data = response.OHLC; 
+                //console.log('fetchLiveCandle - ' +data.length +" : "+ JSON.stringify(strategy)); 
+                var base = new BaseStrategy();
+                base.executeStrategy(strategy.symbol,data,strategy).then(finalResult => { 
+                    //console.log("finalResult  : " +JSON.stringify(finalResult));
+                    //var result = finalResult.result.every(x => x == true);  
+                    if(finalResult.result){
+                        console.log("Place Order  : " +strategy.name +" : "+ strategy.interval +" : "+ strategy.symbol);
+                        eventEmitter.emit('placeOrder',{'strategy':strategy,"symbol":strategy.symbol,'interval':interval});
+                    
+                        if(process.env.NODE_ENV=="production")
+                        {
+                            sendingMail("satish.patel41@gmail.com",strategy.name,matchSymbols).catch(console.error);
+                        }
+                    }
+                    finalResult= strategy =base = null;     
+                }).catch(error => 
+                {
+                    console.error("executeLiveStrategy -> base.executeStrategy -> " + strategy.name +" : "+strategy.symbol +" : " + error);
+                    error = base = null;
+                });
+            }
+            catch(e){
+                console.error("executeLiveStrategy try catch: " + strategy.name +" : "+strategy.symbol +" : "+JSON.stringify(e));
+                e = base = null;
+            }
+        });
+    });
+}

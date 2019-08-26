@@ -4,7 +4,7 @@ var fno = require('../db/list//fno.json').list.sort();
 
 var data = new Object();
 data.exchange = "NFO";
-var fno = getAllSymbol(data);
+//var fno = getAllSymbol(data);
 //require('../db/list//fno.json').list.sort();
 
 

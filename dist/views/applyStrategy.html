@@ -27,10 +27,46 @@
 <script src="//unpkg.com/d3@5.5.0"></script>
 <script src="//unpkg.com/d3fc@14.0.41"></script>
 <link href="https://unpkg.com/tabulator-tables@4.1.3/dist/css/tabulator.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
 <link href="https://unpkg.com/tabulator-tables@4.1.3/dist/css/semantic-ui/tabulator_semantic-ui.min.css" rel="stylesheet">
 <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.1.3/dist/js/tabulator.min.js"></script>
-
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/web-socket-js/1.0.0/web_socket.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+<script>
+var ws = new WebSocket('ws://localhost:8080');
+  ws.onopen = function() {
+    //ws.send("Hello"); 
+  };
+  ws.onmessage = function(e) {
+    var strategy = JSON.parse(e.data);
+    //console.log(localStorage.getItem('uid') +"==" +strategy.data.strategy.uid);
+    if(localStorage.getItem('uid') == strategy.data.strategy.uid){
+      console.log(strategy.data.strategy.symbol);
+        Command: toastr["info"](strategy.data.strategy.symbol)
+        
+        toastr.options = {
+            "closeButton": false,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": false,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
+      }
+  };
+  ws.onclose = function() {
+    console.log("closed");
+  };
+</script> 
 
 <style>
     .loader {
@@ -302,7 +338,7 @@ $(document).ready( function () {
                   $.ajax({
                   type: "get",
                   url: server + '/getInstrumentsOnSearch/'+exchange+'/'+instrumentType+'/'+search,success: function(data){
-                    console.log("data " + data);
+                    //console.log("data " + data);
                        helpers.buildDropdown(data,$('#intrumentDropdown'),'Select an option','IDENTIFIER');
                     }
                   });
@@ -340,7 +376,7 @@ $(document).ready( function () {
               url: server+'/getAppliedList/'+uid,
               success: function(list){
                   $(".loader").hide();    
-                  console.log("list" + JSON.stringify(list));   
+                  //console.log("list" + JSON.stringify(list));   
                   appliedStrategyListArr = list;
                   createTable();
                 }
@@ -356,7 +392,7 @@ $(document).ready( function () {
                   exchange:exchange,
                   interval:interval,
                   symbol: $("#symbolTxt").val(),
-                  isIntraday:$("#is_intrady")[0].checked,
+                  isIntraday:$("#positionDropDown").val(),
                   odrerType:$("#odrerTypeDropDown").val(),
                   quantity:$("#quantityTxt").val(),
                   transaction_type:$("#transactionDropDown").val(),
@@ -381,7 +417,7 @@ $(document).ready( function () {
                 url: server + api,
                 success: function(msg){
 
-                  $("#is_intrady")[0].checked = false;
+                  $("#positionDropDown").val('');
                   $("#odrerTypeDropDown").val('');
                   $("#quantityTxt").val('');
                   $("#transactionDropdown").val('');
@@ -642,7 +678,9 @@ $(document).ready( function () {
                     <div class="col-sm-3">
                         <label>Interval</label>
                         <select id="intervalDropDown" class="form-control" >
+                            <option value="3MINUTE">3MINUTE</option>
                             <option value="5MINUTE">5MINUTE</option>
+                            <option value="10MINUTE">10MINUTE</option>
                             <option value="15MINUTE" selected="selected">15MINUTE</option>
                             <option value="30MINUTE">30MINUTE</option>
                             <option value="60MINUTE">60MINUTE</option>
@@ -667,9 +705,10 @@ $(document).ready( function () {
                     <div class="col-sm-3">
                       <label>Order type</label>
                       <select id="odrerTypeDropDown" class="form-control" >
-                          <option value="mis" selected="selected">MIS</option>
-                          <option value="bo">BO</option>
-                          <option value="normal">Normal</option>
+                          <option value="market" selected="selected">Market</option>
+                          <option value="limit">Limit</option>
+                          <option value="stopLossLimit">Stop Loss Limit</option>
+                          <option value="stopLossMarket">Stop Loss Market</option>
                         </select>
                      </div> 
                      <div class="col-sm-3">
@@ -684,10 +723,18 @@ $(document).ready( function () {
                         <input id="quantityTxt" class="form-control" >
                      </div>
                      <div class="col-sm-3">
-                        </br>
+                        <!-- </br>
                         <label>
                             <input type="checkbox" id="is_intrady"> Is Intrady?
                           </label>
+ -->
+                          <label>Position</label>
+                          <select id="positionDropDown" class="form-control" >
+                            <option value="Intraday" selected="selected">Intraday</option>
+                            <option value="Delivery">Delivery</option>
+                            <option value="CO">CO</option>
+                            <option value="OCO">OCO</option>
+                          </select>
                      </div>
                 </div> 
                 <hr/>

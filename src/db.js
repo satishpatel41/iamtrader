@@ -1,68 +1,7 @@
 var chalk = require('chalk');
 var async = require("async");
 require('technicalindicators');
-//import { CandleData, CandleList } from '../StockData';
-const sqlite3 = require('sqlite3').verbose();
-let db = new sqlite3.Database('db/upstox.db', (err) => {
-if (err) {
-    return console.error(err.message);
-}
-console.log(chalk.green('Connected to tSuccessfully insertedhe in-memory SQlite database.'));
-});
 
-function closeDb(){
-    db.close();
-}
-
-function insertDB(query,param){
-    return new Promise(function(resolve, reject) {
-        db.run(query, param,function(err){
-            if(err)
-                console.log(chalk.red("Insert error > " + err +" \n "+ query));
-            else{
-                //console.log(chalk.blue("Successfully inserted"));
-                resolve("success");
-            }               
-        });
-    })        
-}
-
-function updateDB(query,param){
-    return new Promise(function(resolve, reject) {
-       // console.log(chalk.red("Update  > " + query +" \n "+ param));
-        db.run(query, param,function(err){
-            if(err)
-                console.log(chalk.red("Update error > " + err +" \n "+ query));
-            else{
-                //console.log(chalk.blue("Successfully Updated"));
-                resolve("success");
-            }               
-        });
-    })        
-}
-
-async function getFirst(query,params){
-    return new Promise(function(resolve, reject) {
-        db.get(query, params, function(err, row){  
-            if(err) reject("Read error: " + err.message);
-            else {
-                resolve(row);
-            }
-        })    
-    })    
-}
-
-async function getAll(query,params){
-    return new Promise(function(resolve, reject) {
-        //console.log(query +" : "+params);
-        db.all(query, params, function(err, row){  
-            if(err) reject("Read error: " + err.message);
-            else {
-                resolve(row);
-            }
-        })    
-    })    
-}
 
 function getStockDataFromDb(symbol,interval)
 {
@@ -178,7 +117,6 @@ var queue = async.queue(function(task, callback) {
                         stockData = response;//JSON.parse(response);
                         //console.log('\n UPDATE   ' +task.interval+"> "+ task.symbol +" :: "+ JSON.stringify(response));
 
-
                         if(response && response.error){
                             lokiJson.close(); 
                         }
@@ -226,6 +164,97 @@ var queue = async.queue(function(task, callback) {
         }  
     } 
 },20);
+
+function fetchLiveCandle(symbol,ex,interval,start_date,end_date){
+    
+    return new Promise(function(resolve, reject) {
+        var allIntervalsArr = ['15MINUTE','5MINUTE','60MINUTE','30MINUTE'];
+         //console.log("task " +task.symbol);
+
+        if(symbol){
+            var symbolfile;
+            try{      
+                symbolfile = path.resolve(path.join(__dirname, '..', 'db/stock/'+symbol+'.json'));
+            }
+            catch(e){
+                console.log("symbolfile Error > " + e);
+            }
+
+            var lokiJson = new loki(symbolfile, 
+            {
+                autoload: true,
+                autoloadCallback : loadHandler,
+                autosave: true, 
+                unique: 'name',
+                autosaveInterval: 10000
+            }); 
+            
+            function loadHandler() {
+                var database = lokiJson.getCollection(interval);
+                if(!database){
+                    database = lokiJson.addCollection(interval,{unique: ['LASTTRADETIME']});
+                }  
+                var stockData = {};
+
+                if(ex == null || ex == undefined || ex == '')
+                    ex = "NSE_EQ";
+                //console.log('\n loadSymbol   ' +task.interval+"> "+ task.symbol +" :: "+ task.ex);
+
+                loadSymbol(symbol,ex,interval,start_date,end_date).then(function (response) {
+                    try {
+                        //console.log('\n loadSymbol   ' +interval+"> "+ symbol +" :: "+ JSON.stringify(response));
+                        if(response != '' && response != undefined && response != null){
+                            stockData = response;//JSON.parse(response);
+                            
+
+                            if(response && response.error){
+                                lokiJson.close(); 
+                            }
+                            else if(database != null && database.get(1) && database.get(1).data && database.get(1).data.LASTTRADETIME && database.get(1).data.LASTTRADETIME == response.LASTTRADETIME){
+                                console.log('Skip ! Do nothing   ' +interval+"> "+ symbol);
+                            }
+                            else if(database != null && response && response.code == 400) {
+                                console.log(interval+" - "+ symbol + " > "+response.status + " : "+response.message);
+                                lokiJson.close();    
+                            }
+                            else if(database != null && response) // && response.code == 200
+                            {
+                                //console.log(JSON.stringify(stockData))
+                                database.clear();
+                                /*var OHLC = [];
+                                OHLC = Array(stockData.OHLC);
+                                OHLC= OHLC.reverse(); 
+                                stockData.OHLC = OHLC; */
+                                database.insert(stockData);
+                                //OHLC = null;  
+                            
+                            }
+                            else{
+                                lokiJson.close();    
+                            }
+                            lokiJson.saveDatabase();   
+                            lokiJson.close(); 
+                            
+                            resolve(stockData);
+                        } 
+                        else{
+                            lokiJson.close();    
+                            resolve([]); 
+                        }
+                        
+                        lokiJson = database = symbolfile =  stockData = response = null;
+
+                    } catch (err) {
+                        lokiJson.close();    
+                        resolve([]); 
+                        console.log("loadHandler queue : err   > " + err);
+                        symbolfile = err = null;
+                    }
+                });
+            }  
+        }
+    });
+}
 
 function updateCollection(lokiJson,interval,stockData)
 {
@@ -346,83 +375,4 @@ function isDuplicate(arr,value)
 {
     var flag = arr.find(a=>a.LASTTRADETIME == value);
     return flag;
-}
-getLiveSymbol();
-getAllLiveStrategy();
-
-
-function getLiveSymbol()
-{
-    var query = "SELECT * from applyStrategy";
-    var param = [];
-    getAll(query,param).then(list => {
-        //console.log("result > " + JSON.stringify(list));
-        if(list == undefined)
-        {
-            console.log("\n Error to getLiveSymbol");
-        }
-        else{
-            //console.log("\n getLiveSymbol result > " + JSON.stringify(list));
-            watchList = list;
-        }
-    });  
-}
-
-var strategyList = [];
-async function getAllLiveStrategy()
-{
-    strategyList = [];
-
-    var query = "SELECT * from applyStrategy";
-    var param = [];
-    getAll(query,param).then(list => {
-        //console.log("\n getAllLiveStrategy > " + list.length);
-        if(list == undefined)
-        {
-            console.log("\n Error to getLiveSymbol");
-        }
-        else{
-            var i = 0;
-            list.map(async(obj)=>{
-                //strategyList.push(obj);
-                var query = "SELECT * from Indicators where sid=?;";
-                var param = [obj.sid];
-                getAll(query,param).then(indicators => {
-                    if(indicators == undefined)
-                    {
-                        console.log("\n Error to getAllLiveStrategy");
-                    }
-                    else{
-                        //console.log("\n\n  > " + JSON.stringify(strategyList[i]['indicators']));
-                        //strategyList[i]['indicators'] = indicators;   
-                        obj['indicators'] = indicators;                          
-                    }
-                });
-
-                var query = "SELECT name,description,category,isPrivate FROM Strategy where sid=?";
-                var param = [obj.sid];
-                getAll(query,param).then(strategy => {
-                    if(strategy == undefined)
-                    {
-                        console.log("\n Error to Strategy");
-                    }
-                    else{
-                        //console.log("\n\n strategy > " + JSON.stringify(strategy));
-                        for (let [key, value] of Object.entries(strategy[0])) {
-                            //console.log(`${key}: ${value}`);
-                            //strategyList[i][key] = value; 
-                            obj[key] = value;     
-                        } 
-                        // strategyList[i]['indicators'] = indicators;
-                    }
-                    //i++;
-                    strategyList.push(obj);
-                    // console.log("\n\n Final result > " + JSON.stringify(strategyList));
-                });
-            });  
-            //console.log("\nstrategyList > " + strategyList.length);
-        }
-
-        
-    });  
 }

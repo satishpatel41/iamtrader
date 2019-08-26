@@ -8,7 +8,7 @@ var allIntervalsArr = ['15MINUTE','5MINUTE','1DAY','60MINUTE','30MINUTE','1MONTH
 var database;
 
 async function syncLiveAllStockData(list,interval,start_date,end_date){ 
-    //console.log('syncLiveAllStockData  - ' + list.length);
+    console.log('syncLiveAllStockData  - ' + interval +" : "+list.length);
     list.map(async (x) =>  {
         var symbol = x.symbol ? x.symbol:x;        
         var ex = x.exchange;      
@@ -417,7 +417,7 @@ async function loadSymbol(symbol,exchange,interval='1day',start_date='',end_date
         candle_data = await GetHistory1Day(data);
    
     if(candle_data && candle_data.type =='invalid-json'){
-        console.log("\n &&&&&&&&&&&&& > " + symbol + " > "+JSON.stringify(candle_data));
+        console.log("\n adding queue again > " + symbol + " > "+JSON.stringify(candle_data));
         queue.push({symbol:symbol,ex:exchange,interval:interval}, function (err) {
             //console.log('syncLiveStockDataByInterval : Finished Queue' + interval);
          });  
@@ -436,7 +436,6 @@ function getAllData(){
             getBankNifty(bankNiftySymbol,interval,'');
         }, 1300); */
 
-    
         setTimeout(function() {
             resolve(1);
             syncAllUpstoxData(watchList);

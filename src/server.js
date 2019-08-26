@@ -78,7 +78,7 @@ if (cluster.isMaster) {
         var code = q.code;
         //console.log("******* code > " +callBackCount +" - "+ code + " :: " + JSON.stringify(upstoxObjList));
         upstoxObjList[callBackCount]['traderObject'].getUpstoxAccessToken(code);
-        getAllData();
+       // getAllData();
         q = null;
         
     });
@@ -131,9 +131,34 @@ if (cluster.isMaster) {
     else
         res.sendFile("login.html", {"root": __dirname});
     });
+    app.get('/api/getProfile/:id', checkSignIn,function (req, res) { 
+        var id = req.params.id;  
+         if(id){
+            var query = "select * from User where uid=?";
+            var param = [id];
+            getFirst(query,param).then(user => {
+                //console.log("result > " + JSON.stringify(user));
+                if(user == undefined)
+                {
+                    res.send("error")
+                }
+                else{
+                        req.session.user = user;
+                        res.send(user);
+                    
+                }
+            });     
+        }
+        else
+            res.sendFile("login.html", {"root": __dirname});
+    });
 
     app.get('/signup', function (req, res) {
         res.sendFile("signup.html", {"root": __dirname});
+    });
+
+    app.get('/profile', function (req, res) {
+        res.sendFile("profile.html", {"root": __dirname});
     });
 
     app.get('/gainerLoser', function (req, res) {
@@ -308,6 +333,7 @@ if (cluster.isMaster) {
                 }
                 else{
                     //console.log("result > " + JSON.stringify(strategy));
+                    getAllLiveStrategy();
                     res.send(strategy);
                 }
         });    
@@ -340,6 +366,7 @@ if (cluster.isMaster) {
         insertDB(query,param).then(responses => {
             if(responses == 'success')
             {
+                getAllLiveStrategy();
                 res.send('success');
             }
             else{
@@ -889,6 +916,7 @@ if (cluster.isMaster) {
         
     });
 
+   
     // Change the 404 message modifing the middlewar
     app.use(function(req, res, next) {
         res.status(404).send("<h1>404 ! This site can’t be reached</h1>");
