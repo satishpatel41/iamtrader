@@ -104,6 +104,22 @@ scheduled: true,
 timezone: "Asia/Kolkata"
 });
 
+// At 9:15 /trading Hours
+cron.schedule('14 9 * * *', () => {
+    isTradingHours = getTradingHours();
+}, {
+scheduled: true,
+timezone: "Asia/Kolkata"
+});
+
+// At 3:15 /trading Hours
+cron.schedule('30 15 * * *', () => {
+    isTradingHours = getTradingHours();
+ }, {
+ scheduled: true,
+ timezone: "Asia/Kolkata"
+ });
+
 
 // At 9:30
 cron.schedule('31 9 * * *', () => {
@@ -221,6 +237,9 @@ function load3minData()
     india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
     india.format();     
     start_date = formatDate(india.date())+"-"+formatDate(india.month() + 1) +"-"+india.year();
+
+    isTradingHours = getTradingHours();
+    
     //console.log("load3minData StrategyList > " + strategyList.length);   
     const list = strategyList.filter(strategy => strategy.interval == '3MINUTE');
     if(list.length > 0)

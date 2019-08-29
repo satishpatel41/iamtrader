@@ -92,8 +92,77 @@
 
     .alert {
       padding: 20px;
-      background-color: #f44336;
+     
       color: white;
+    }
+
+    .alert-success{
+      background-color: #74ffa2;
+    }
+
+    .alert-danger{
+      background-color: #f44336;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 47px;
+        height: 25px;
+    }
+
+
+    .switch input { 
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 17px;
+      width: 17px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+
+    input:focus + .slider {
+      box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slider:before {
+      -webkit-transform: translateX(22px);
+      -ms-transform: translateX(22px);
+      transform: translateX(22px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+      border-radius: 34px;
+    }
+
+    .slider.round:before {
+      border-radius: 50%;
     }
    
 </style>
@@ -163,35 +232,99 @@ $(document).ready( function () {
                 $('#passwordField').val(userProfile.broker_password);
                 $('#password2fField').val(userProfile.password2f);
                 $('#apiSecretField').val(userProfile.api_secret);
+                //$("#isAutomatedBox").val(userProfile.isFullyAutomated);
+                $("#isAutomatedBox").prop('checked', userProfile.isFullyAutomated);
+
+                if($("#isAutomatedBox").prop('checked')){
+                  $('.collapse').collapse('show');
+                  $('#upstoxLoginButton').hide();
+                }
+                else {
+                  $('.collapse').collapse('hide');
+                  $('#upstoxLoginButton').show();
+                }
+                  
             }
           }); 
 
           
+        $('#isAutomatedBox').on('change', function(event) {
+          if($("#isAutomatedBox").prop('checked')){
+            $('.collapse').collapse('show');
+            $('#upstoxLoginButton').hide();
+          }
+          else {
+            $('.collapse').collapse('hide');
+            $('#upstoxLoginButton').show();
+          }
+        });
+
+        $('#yourApiKeyField').val(userProfile.your_api_key);
+               
+                $('#apiSecretField').val(userProfile.api_secret);
+        $('#upstoxLoginButton').on('click', function(event) {
+            $.get({
+              url: server+'/manualLogin/'+userProfile.your_api_key+"/"+userProfile.api_secret,
+              success: function(response){
+                   
+
+              }
+            });
+       });
+
         $('#okButton').on('click', function(event) {
             $(".alert-danger").hide();
 
-            var isValid = validate();    
+            var isValid = true;//validate();    
             event.preventDefault(); // To prevent following the link (optional)
             if(isValid){
                 var userObj = {
-                    email:$("#emailField").val(),
-                    psw:$("#psw").val(),
+                    name : $('#nameField').val(),
                     mobile:$("#mobileField").val(),
-                    name:$("#nameField").val(),
-                    pswRepeat:$("#psw-repeat").val()
+                    email:$("#emailField").val(),
+                    your_api_key:$("#yourApiKeyField").val(),
+                    your_redirect_uri:$("#yourRedirectUriField").val(),
+                    user:$("#userField").val(),
+                    broker_password:$("#passwordField").val(),
+                    password2f:$("#password2fField").val(),
+                    api_secret:$("#apiSecretField").val(),
+                    isFullyAutomated:$("#isAutomatedBox").prop('checked'),
+                    uid:localStorage.getItem('uid')
                 };
+
+                //console.log(JSON.stringify(userObj));
+
 
                 $.ajax({
                     type: "post",
+                    data: {data:JSON.stringify(userObj)},
+                    url: server + '/api/updateProfile',
+                    success: function(msg){
+                      if(msg == "success")
+                      { 
+                          $(".alert-success").show();
+                              $("#message_txt").text("Successfully updated");
+                      }
+                      else{
+                              $(".alert-danger").show();
+                              $("#error_txt").text("There is some issue with service!");
+                      }
+                      //getAllStrategy();
+                    }
+                  });
+               // });
+
+               /*  $.ajax({
+                    type: "post",
                     data: JSON.stringify(userObj),
-                    url: server + '/signup',
+                    url: server + '/api/updateProfile',
                     contentType: 'application/json',
                     success: function(msg){
                         //alert(msg);
                         if(msg == "success")
                         { 
                             $(".alert-success").show();
-                                $("#message_txt").text("Success ! Please verify your email !");
+                                $("#message_txt").text("Successfully updated");
                         }
                         else{
                                 $(".alert-danger").show();
@@ -199,7 +332,7 @@ $(document).ready( function () {
                         }
                        
                     }
-                });
+                }); */
             } 
             else{
                 $(".alert-danger").show();
@@ -284,31 +417,51 @@ $(document).ready( function () {
         <form >
           <h1>Upstox Details</h1>
           <hr>
-          <label for="user"><b>Upstox user name</b></label>
-          <input placeholder="Upstox user name" name="user" type="text" id="userField" required autocomplete="off" autofocus>
 
-          <label for="broker_password"><b>Upstox password</b></label>
-          <input placeholder="Enter Upstox password" name="broker_password" type="text" id="passwordField" required  >
+          <label for="user"><b>Manual trading / Automatic</b></label>
 
-          <label for="password2f"><b>Upstox password 2fa</b></label>
-          <input placeholder="password 2fa" name="password2f" type="text" id="password2fField" required autocomplete="off" autofocus>
-
-          <label for="your_api_key"><b>Upstox api key</b></label>
-          <input placeholder="Upstox api key" name="your_api_key" type="text" id="yourApiKeyField" required autocomplete="off" autofocus>
-
-          <label for="api_secret"><b>Upstox api secret</b></label>
-          <input placeholder="Upstox api secret" name="api_secret" type="text" id="apiSecretField" required autocomplete="off" autofocus>
+          <label class='switch'>
+            <input type='checkbox' id="isAutomatedBox" ><span class='slider round'></span>
+          </label>
           
-          <label for="your_redirect_uri"><b>Upstox redirect uri</b></label>
-          <input placeholder="Upstox redirect uri" name="your_redirect_uri" type="text" id="yourRedirectUriField" required autocomplete="off" autofocus>
+            <hr>
+            <div id="upstoxDiv" class="collapse" >
+                <label for="user"><b>Upstox user name</b></label>
+                <input placeholder="Upstox user name" name="user" type="text" id="userField" required autocomplete="off" autofocus>
+
+                <label for="broker_password"><b>Upstox password</b></label>
+                <input placeholder="Enter Upstox password" name="broker_password" type="password" id="passwordField" required  >
+
+                <label for="password2f"><b>Upstox password 2fa</b></label>
+                <input placeholder="password 2fa" name="password2f" type="password" id="password2fField" required autocomplete="off" autofocus>
+            </div>
+
+            <label for="your_api_key"><b>Upstox api key</b></label>
+            <input placeholder="Upstox api key" name="your_api_key" type="text" id="yourApiKeyField" required autocomplete="off" autofocus>
+
+            <label for="api_secret"><b>Upstox api secret</b></label>
+            <input placeholder="Upstox api secret" name="api_secret" type="text" id="apiSecretField" required autocomplete="off" autofocus>
+            
+            <label for="your_redirect_uri"><b>Upstox redirect uri</b></label>
+            <input placeholder="Upstox redirect uri" name="your_redirect_uri" type="text" id="yourRedirectUriField" required autocomplete="off" autofocus>
+            <div class="col-md-4">
+              <button id="upstoxLoginButton" type="button"class="btn btn-primary">Upstox Login</button>
+            </div>
+            <!-- <div class="checkbox">
+              <label>
+                <input type="checkbox" value="" id="isAutomatedBox">Is Fully Automated</label>
+              </div>
+            </div> -->
+        
         </form>
-      </div>  
   </div>  
 
   <div class="row">
-      <div class="col-md-3">
-          <button  id="okButton" class="registerbtn">Update</button>
+      <div class="col-md-4">
+          <button  id="okButton" type="button"class="btn btn-success">Save</button>
       </div>
+      
+
   </div>
 </div>
 

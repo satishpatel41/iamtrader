@@ -354,39 +354,41 @@ strategyQueue.drain = function() {
 
 async function executeLiveStrategy(list)
 {  
-    //console.log('list - ' +list.length);
-    list.map(async(strategy)=>{
-        await fetchLiveCandle(strategy.symbol,strategy.exchange,interval,start_date,end_date).then(response=>{
-            //console.log('fetchLiveCandle - ' +response.OHLC); //applyStrategy([strategy],'15MINUTE'); 
-            try{
-                var data = response.OHLC; 
-                //console.log('fetchLiveCandle - ' +data.length +" : "+ JSON.stringify(strategy)); 
-                var base = new BaseStrategy();
-                base.executeStrategy(strategy.symbol,data,strategy).then(finalResult => { 
-                    //console.log("finalResult  : " +JSON.stringify(finalResult));
-                    //var result = finalResult.result.every(x => x == true);  
-                    if(finalResult.result){
-                        price = data[0]['CLOSE'];
-                        console.log("Place Order  --> " +strategy.name +" : "+ strategy.interval +" : "+ strategy.symbol +" : "+ price);
-                        eventEmitter.emit('placeOrder',{'strategy':strategy,"symbol":strategy.symbol,'interval':interval,'price':price});
-                        eventEmitter.emit('sendNotification',{'strategy':strategy,"symbol":strategy.symbol,'interval':interval,'price':price});
-                    
-                        if(process.env.NODE_ENV=="production")
-                        {
-                            sendingMail("satish.patel41@gmail.com",strategy.name,matchSymbols).catch(console.error);
+    console.log('list - ' +list.length +" :: "+ isTradingHours);
+    if(isTradingHours){
+        list.map(async(strategy)=>{
+            await fetchLiveCandle(strategy.symbol,strategy.exchange,interval,start_date,end_date).then(response=>{
+                //console.log('fetchLiveCandle - ' +response.OHLC); //applyStrategy([strategy],'15MINUTE'); 
+                try{
+                    var data = response.OHLC; 
+                    //console.log('fetchLiveCandle - ' +data.length +" : "+ JSON.stringify(strategy)); 
+                    var base = new BaseStrategy();
+                    base.executeStrategy(strategy.symbol,data,strategy).then(finalResult => { 
+                        //console.log("finalResult  : " +JSON.stringify(finalResult));
+                        //var result = finalResult.result.every(x => x == true);  
+                        if(finalResult.result){
+                            price = data[0]['CLOSE'];
+                            console.log("Place Order  --> " +strategy.name +" : "+ strategy.interval +" : "+ strategy.symbol +" : "+ price);
+                            eventEmitter.emit('placeOrder',{'strategy':strategy,"symbol":strategy.symbol,'interval':interval,'price':price});
+                            //eventEmitter.emit('sendNotification',{'strategy':strategy,"symbol":strategy.symbol,'interval':interval,'price':price});
+                        
+                            if(process.env.NODE_ENV=="production")
+                            {
+                                sendingMail("satish.patel41@gmail.com",strategy.name,matchSymbols).catch(console.error);
+                            }
                         }
-                    }
-                    finalResult= strategy =base = null;     
-                }).catch(error => 
-                {
-                    console.error("executeLiveStrategy -> base.executeStrategy -> " + strategy.name +" : "+strategy.symbol +" : " + error);
-                    error = base = null;
-                });
-            }
-            catch(e){
-                console.error("executeLiveStrategy try catch: " + strategy.name +" : "+strategy.symbol +" : "+JSON.stringify(e));
-                e = base = null;
-            }
+                        finalResult= strategy =base = null;     
+                    }).catch(error => 
+                    {
+                        console.error("executeLiveStrategy -> base.executeStrategy -> " + strategy.name +" : "+strategy.symbol +" : " + error);
+                        error = base = null;
+                    });
+                }
+                catch(e){
+                    console.error("executeLiveStrategy try catch: " + strategy.name +" : "+strategy.symbol +" : "+JSON.stringify(e));
+                    e = base = null;
+                }
+            });
         });
-    });
+    }
 }

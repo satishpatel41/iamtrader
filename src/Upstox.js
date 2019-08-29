@@ -17,12 +17,17 @@ class UpstoxBroker {
         this.profile;
         this.balance;
         var that = this;
-        
+       // console.log("loginUri ***" + api +" > "+ api_secret +" > "+ isAutomated);
+       // console.log("loginUri ***" + api +" > "+);
         if(!isAutomated){
-            var loginUrl = this.upstox.getLoginUri(redirect_uri);
-            console.log("loginUri ***" + loginUrl);
+            this.loginUrl = this.upstox.getLoginUri(redirect_uri);
+            //console.log("loginUri ***" + this.loginUrl);
         }
         eventEmitter.on('placeOrder', onPlaceOrder);
+
+        function getLoginURL(){
+            return this.loginUrl;
+        }
 
         function onPlaceOrder(data){
             var isValidUser = false;
