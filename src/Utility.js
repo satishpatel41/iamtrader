@@ -70,6 +70,35 @@ function formatDate(str)
     return str;
 }
 
+function getTradingHours()
+{
+  var flag = false;
+
+  var now = new Date();
+  now.setDate(now.getDate() - 2);
+  var india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
+  india.format();  
+  var hour= india.hour();
+  var min = india.minute();
+  //console.log(hour+" : "+min);
+  if(hour >= 9 && hour <= 16)
+  {
+      flag = true;
+      if(hour == 9 && min < 15){
+        flag = false;
+      }
+      else if(hour == 15 && min > 15){
+        flag = false;
+      }
+  }
+  else{
+    flag = false;
+  }
+
+  return flag;
+}
+
+
 Array.prototype.groupBy = function(prop) {
   return this.reduce(function(groups, item) {
     const val = item[prop]

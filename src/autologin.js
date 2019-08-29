@@ -43,9 +43,10 @@ async function autoLogin(){
         }
 
         (async function init() {
-            let driver = await new Builder().forBrowser('chrome').build();
+            let driver;
             try {
-                if(userObj.user && userObj.your_api_key){
+                if(userObj.isFullyAutomated > 0 && userObj.user && userObj.your_api_key){
+                    driver = await new Builder().forBrowser('chrome').build();
                     var up = new UpstoxBroker(userObj.your_api_key,userObj.api_secret,true);
                     var currentUserObj= userObj;
                     currentUserObj.traderObject = up;
@@ -62,7 +63,7 @@ async function autoLogin(){
                 console.log("\n **autoLogin Error " + e);
             }
             finally {
-                if(userObj.user){
+                if(userObj.user && driver){
                     console.log("Login successfully at: " + new Date() +" : "+userObj.user )
                     await driver.quit();
                 }

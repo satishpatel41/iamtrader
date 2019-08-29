@@ -24,7 +24,7 @@ var events = require('events');
 var eventEmitter = new events.EventEmitter();
 var is15MinDataSync = false;
 var nseSymbolList = [];
-
+var isTradingHours = getTradingHours();
 
 /* var numReqs = 0; 
 if (cluster.isMaster) {
@@ -82,6 +82,39 @@ if (cluster.isMaster) {
         q = null;
         
     });
+  
+    app.get('/manualLogin/:your_api_key/:api_secret', function (req, res) {
+        /* callBackCount++;
+        var q = url.parse(req.url, true).query;
+        var code = q.code;
+        //console.log("******* code > " +callBackCount +" - "+ code + " :: " + JSON.stringify(upstoxObjList));
+        upstoxObjList[callBackCount]['traderObject'].getUpstoxAccessToken(code);
+       // getAllData();
+        q = null; */
+        var your_api_key = req.params.your_api_key;  
+        var api_secret = req.params.api_secret;  
+        //var userObj = url.parse(req.url, true).query;
+       
+
+        var up = new UpstoxBroker(your_api_key,api_secret,false);
+        //return up.getLoginURL();
+       /*  res.writeHead(302, {
+            'Location': up.loginUrl
+          });
+          res.end(); */
+
+          var loginUrl = up.loginUrl;
+        console.log("*loginUri " + loginUrl);
+        res.status(200).header('Content-type', 'text/html');
+        code = req.params.code;
+        res.status(302).setHeader('Location', loginUrl);
+        res.end();
+
+        //var currentUserObj= userObj;
+        //currentUserObj.traderObject = up;
+        //upstoxObjList.push(currentUserObj);
+        
+    });
 
     app.get('/welcome', checkSignIn,function (req, res) {
         res.send('<b>Hello</b> welcome to my http server made with express');
@@ -131,6 +164,40 @@ if (cluster.isMaster) {
     else
         res.sendFile("login.html", {"root": __dirname});
     });
+
+    app.post('/api/updateProfile',checkSignIn, function (req, res) {
+        var profileObj = JSON.parse(req.body.data);
+        
+        //console.log("profileObj > " + JSON.stringify(profileObj));
+        var name = profileObj.name;
+        var mobile = profileObj.mobile;
+        var email = profileObj.email;
+        var your_api_key = profileObj.your_api_key;
+        var your_redirect_uri = profileObj.your_redirect_uri;
+        var user = profileObj.user;
+        var broker_password = profileObj.broker_password;
+        var password2f = profileObj.password2f;
+        var api_secret = profileObj.api_secret;
+        var isFullyAutomated = profileObj.isFullyAutomated;
+        var uid = profileObj.uid;
+        
+       
+        var query = "UPDATE User SET name = ?,mobile = ?,email = ?,your_api_key = ?,your_redirect_uri =?,user = ?,broker_password = ?,password2f = ?,api_secret = ?,isFullyAutomated = ? WHERE uid = ?";
+        var param = [name,mobile,email,your_api_key,your_redirect_uri,user,broker_password,password2f,api_secret,isFullyAutomated,uid];
+        
+        updateDB(query,param).then(response => {
+            if(response == 'success')
+            {
+                res.send('success');        
+            }
+            else{
+                res.send("error");
+            }
+        });
+    });
+
+
+
     app.get('/api/getProfile/:id', checkSignIn,function (req, res) { 
         var id = req.params.id;  
          if(id){
