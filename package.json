@@ -17,6 +17,7 @@
     }
   },
   "dependencies": {
+    "@beyonk/promise-retry": "^0.1.1",
     "@wing386/loki-indexed-adapter": "^1.0.0",
     "PubSub": "^3.6.0",
     "async": "^2.6.1",

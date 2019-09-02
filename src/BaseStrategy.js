@@ -7,6 +7,9 @@ var ADX = require('technicalindicators').ADX;
 var ATR = require('technicalindicators').ATR
 var MACD = require('technicalindicators').MACD;
 var bullish = require('technicalindicators').bullish;
+var Lowest  = require('technicalindicators').Lowest;
+var Highest = require('technicalindicators').Highest;
+
 var async = require("async");
 var allIndicators= [
     {
@@ -73,6 +76,14 @@ var allIndicators= [
         "name":"ADX",
         "input":'close,high,low,14',
         "config":'close,high,low,period'
+    },{
+        "name":"Lowest",
+        "input":'close,14',
+        "config":'values,period'
+    },{
+        "name":"Highest",
+        "input":'close,14',
+        "config":'values,period'
     }
 ];
 
@@ -117,7 +128,7 @@ class BaseStrategy {
             if(strategyObj && strategyObj.indicators && strategyObj.indicators.length > 0){
                 //console.log("Strategy : " + strategyObj.symbol+" : "+strategyObj.id +" : "+strategyObj.name+" : "+strategyObj.interval);
                 Promise.all(strategyObj.indicators.map(async (indicatorObj) => {
-                    //console.log("\n strategyObj : " + JSON.stringify(strategyObj));
+                    //console.log("\n indicatorObj : " + JSON.stringify(indicatorObj));
                     return new Promise(function(resolve, reject) {
                         try{
                             if(indicatorObj.indicator1 && indicatorObj.indicator1 != "" 
@@ -175,26 +186,28 @@ class BaseStrategy {
                                 }
                                 else{
                                     var str2 = indicatorObj.indicator2+".calculate("+JSON.stringify(that.getInputObject(candle,indicatorObj.indicator2,indicatorObj.indicator_config2))+")";
-                                    var res2 = eval(str2); 
+                                    //console.log("\n indicators str:  " +str2);  
+                                    var res2 = eval(str2);    
                                     var op2 = res2.reverse().slice(0, 3);  ////**********  dont't change **********  
                                     output.op2 = op2;
                                 }
                                                                 
-                                //console.log("\n indicators " +strategyObj.name +": "+symbol +" > " +JSON.stringify(output));
+                                //console.log("\n indicators :  " +strategyObj.name +": "+symbol +" > " +JSON.stringify(output));
                                 res1 = indicatorObj = null;
                                 //result.push(output);
                                 resolve(output);   
                             }     
                             else{
+                                console.error("First - " + e);
                                 reject(e);
                             }                
                         }
                         catch(e){
+                            console.error("Second  - " + e);
                             reject(e);
                         }
                     });        
-                }))
-                .then(obj => { 
+                })).then(obj => { 
                     //candle.close = candle.close.reverse(); //**********  dont't change **********  
                     //candle.high = candle.high.reverse(); //**********  dont't change **********  
                     //candle.low = candle.low.reverse(); //**********  dont't change **********  
@@ -205,17 +218,16 @@ class BaseStrategy {
                     if(obj[0].op == "Crossed Above"){
                         //if(obj[0].op1[0].length > 0 && obj[0].op2[0].length > 0){
                             var strategyStr1 = obj[0].op1[0]+">="+obj[0].op2[0]; 
+                            //console.log("Result :" + strategyStr1);
                             var strategy1 = eval(strategyStr1);
                             result.push(strategy1);  
 
                             var strategyStr2 = obj[0].op1[1]+"<"+obj[0].op2[1]; 
                             var strategy2 = eval(strategyStr2);
 
-                            //console.log("Result :" + strategyStr1 +"   :   " + strategyStr2);
+                            //console.log("Result :"  + strategyStr2);
                             result.push(strategy2);   
-                        /* }else{
-                            result.push(false);
-                        }  */ 
+                       
                     }
                     else if(obj[0].op == "Crossed Below"){
                         //if(obj[0].op1[0].length > 0 && obj[0].op2[0].length > 0){
@@ -226,9 +238,7 @@ class BaseStrategy {
                             var strategyStr2 = obj[0].op1[1]+">"+obj[0].op2[1]; 
                             var strategy2 = eval(strategyStr2);
                             result.push(strategy2);  
-                       /*  }else{
-                            result.push(false);
-                        }  */ 
+                      
                     }
                     else{
                         //console.log("obj " + symbol +" > "+JSON.stringify(obj));
@@ -236,16 +246,14 @@ class BaseStrategy {
                             var strategyStr = obj[0].op1[0]+obj[0].op+obj[0].op2[0]; 
                             var strategy = eval(strategyStr);
                             result.push(strategy);   
-                        /* }else{
-                            result.push(false);
-                        } */
+                       
                     }
                    // candle.close = candle.close.reverse(); //**********  dont't change **********  
                    // candle.high = candle.high.reverse(); //**********  dont't change **********  
                    // candle.low = candle.low.reverse(); //**********  dont't change **********  
                    // candle.open = candle.open.reverse(); //**********  dont't change **********  
                     var d =new Date(Number(candle.timeStamp[0])); 
-                   //console.log("result " + symbol +" : " + result);
+                   // console.log("result " + symbol +" : " + result);
                     var strategyRes = result.every(x => x == true);  
                     candle = output = result = d = null;
                     strategyObj.result = strategyRes;
@@ -355,6 +363,7 @@ strategyQueue.drain = function() {
 async function executeLiveStrategy(list)
 {  
     console.log('list - ' +list.length +" :: "+ isTradingHours);
+    //isTradingHours = true;
     if(isTradingHours){
         list.map(async(strategy)=>{
             await fetchLiveCandle(strategy.symbol,strategy.exchange,interval,start_date,end_date).then(response=>{

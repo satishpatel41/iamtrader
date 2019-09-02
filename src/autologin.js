@@ -1,5 +1,6 @@
 const {Builder, By, Key, until} = require('selenium-webdriver');
 var upstoxObjList = [];
+var userObjList =[];
 /* var userObjList =[
     {
         your_api_key :"ukXaJKtebf3pfLnbrplan3mDi1yOtV4I2cyia4aO",

@@ -11,10 +11,7 @@ let cnt=0;
             if (params){
                 url = generateUrl(url, params);
             }
-            // cnt++
-            //console.log("Global data request",cnt);
-           
-            return getData (url);
+            return retry(getData,5,1000, url);// return getData (url);
         } catch (e) {
             console.error(e)
             return e;
@@ -36,14 +33,30 @@ let cnt=0;
 //} 
 
 
+const retry = (fn, ms=1000,maxRetries=5,url) =>
+     new Promise((resolve,reject) => { 
+        var retries=0;
+        fn(url)
+        .then(resolve)
+        .catch(() => {
+            setTimeout(() => {
+                console.log('retrying ...' + url);
+                ++retries;
+                if(retries==maxRetries) {
+                    return reject('maximum retries exceeded');
+                }
+                retry(fn, ms,maxRetries,url).then(resolve);
+            }, ms);
+        })
+});
+
+
 const getData = async url => {
-  try {
     //console.log(url);
-    const response = await fetch(url);
+    var response = await fetch(url);
+    if(response.size == 0){
+        //reject('');
+    }
     const json = await response.json();
-    //console.log(json);
-    return json;
-  } catch (error) {
-    console.log(error);
-  }
+    return json;  
 };

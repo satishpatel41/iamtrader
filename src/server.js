@@ -71,49 +71,31 @@ if (cluster.isMaster) {
     });
 
   
-    var callBackCount = -1;
+    var callBackCount = 0;
     app.get('/callback', function (req, res) {
-        callBackCount++;
         var q = url.parse(req.url, true).query;
         var code = q.code;
-        //console.log("******* code > " +callBackCount +" - "+ code + " :: " + JSON.stringify(upstoxObjList));
+        console.log("** code > " +callBackCount +" > "+ code + " > " + upstoxObjList);
         upstoxObjList[callBackCount]['traderObject'].getUpstoxAccessToken(code);
        // getAllData();
         q = null;
-        
+        callBackCount++;
     });
   
     app.get('/manualLogin/:your_api_key/:api_secret', function (req, res) {
-        /* callBackCount++;
-        var q = url.parse(req.url, true).query;
-        var code = q.code;
-        //console.log("******* code > " +callBackCount +" - "+ code + " :: " + JSON.stringify(upstoxObjList));
-        upstoxObjList[callBackCount]['traderObject'].getUpstoxAccessToken(code);
-       // getAllData();
-        q = null; */
         var your_api_key = req.params.your_api_key;  
         var api_secret = req.params.api_secret;  
-        //var userObj = url.parse(req.url, true).query;
-       
+        var userObj = {};
+        userObj.your_api_key = your_api_key;
+        userObj.api_secret = api_secret;
+        userObj.traderObject = {};
 
         var up = new UpstoxBroker(your_api_key,api_secret,false);
-        //return up.getLoginURL();
-       /*  res.writeHead(302, {
-            'Location': up.loginUrl
-          });
-          res.end(); */
-
-          var loginUrl = up.loginUrl;
-        console.log("*loginUri " + loginUrl);
-        res.status(200).header('Content-type', 'text/html');
-        code = req.params.code;
-        res.status(302).setHeader('Location', loginUrl);
-        res.end();
-
-        //var currentUserObj= userObj;
-        //currentUserObj.traderObject = up;
-        //upstoxObjList.push(currentUserObj);
-        
+        currentUserObj= userObj.traderObject = up;
+        userObjList[index] = userObj;
+        currentUserObj.traderObject = up;
+        upstoxObjList.push(currentUserObj);
+        res.send(up.loginUrl);
     });
 
     app.get('/welcome', checkSignIn,function (req, res) {
@@ -146,7 +128,8 @@ if (cluster.isMaster) {
     var psw = req.body.password;
 
     if(email){
-        var query = "select * from User where email=? and password=?";
+        
+        var query = "select uid,name,isSuperAdmin,isVerified from User where email=? and password=?";
         var param = [email,psw];
         getFirst(query,param).then(user => {
                 //console.log("result > " + JSON.stringify(user));
@@ -201,7 +184,7 @@ if (cluster.isMaster) {
     app.get('/api/getProfile/:id', checkSignIn,function (req, res) { 
         var id = req.params.id;  
          if(id){
-            var query = "select * from User where uid=?";
+            var query = "select name, mobile, email,isVerified,isSuperAdmin,your_api_key,your_redirect_uri,user,broker_password,password2f,api_secret,isFullyAutomated from User where uid=?";
             var param = [id];
             getFirst(query,param).then(user => {
                 //console.log("result > " + JSON.stringify(user));

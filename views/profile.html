@@ -218,35 +218,38 @@ $(document).ready( function () {
         } 
 
         var userProfile = {};
-        $.ajax({
-          type: "get",
-          url: server + '/api/getProfile/'+localStorage.getItem('uid'),success: function(data){
-                userProfile = data;
+        getProfile();
+        function getProfile(){
+          
+          $.ajax({
+            type: "get",
+            url: server + '/api/getProfile/'+localStorage.getItem('uid'),success: function(data){
+                  userProfile = data;
 
-                $('#nameField').val(userProfile.name);
-                $('#mobileField').val(userProfile.mobile);
-                $('#emailField').val(userProfile.email);
-                $('#userField').val(userProfile.user);
-                $('#yourApiKeyField').val(userProfile.your_api_key);
-                $('#yourRedirectUriField').val(userProfile.your_redirect_uri);
-                $('#passwordField').val(userProfile.broker_password);
-                $('#password2fField').val(userProfile.password2f);
-                $('#apiSecretField').val(userProfile.api_secret);
-                //$("#isAutomatedBox").val(userProfile.isFullyAutomated);
-                $("#isAutomatedBox").prop('checked', userProfile.isFullyAutomated);
+                  $('#nameField').val(userProfile.name);
+                  $('#mobileField').val(userProfile.mobile);
+                  $('#emailField').val(userProfile.email);
+                  $('#userField').val(userProfile.user);
+                  $('#yourApiKeyField').val(userProfile.your_api_key);
+                  $('#yourRedirectUriField').val(userProfile.your_redirect_uri);
+                  $('#passwordField').val(userProfile.broker_password);
+                  $('#password2fField').val(userProfile.password2f);
+                  $('#apiSecretField').val(userProfile.api_secret);
+                  //$("#isAutomatedBox").val(userProfile.isFullyAutomated);
+                  $("#isAutomatedBox").prop('checked', userProfile.isFullyAutomated > 0 ? true : false);
 
-                if($("#isAutomatedBox").prop('checked')){
-                  $('.collapse').collapse('show');
-                  $('#upstoxLoginButton').hide();
-                }
-                else {
-                  $('.collapse').collapse('hide');
-                  $('#upstoxLoginButton').show();
-                }
-                  
-            }
-          }); 
-
+                  if($("#isAutomatedBox").prop('checked')){
+                    $('.collapse').collapse('show');
+                    $('#upstoxLoginButton').hide();
+                  }
+                  else {
+                    $('.collapse').collapse('hide');
+                    $('#upstoxLoginButton').show();
+                  }
+                    
+              }
+            }); 
+          }
           
         $('#isAutomatedBox').on('change', function(event) {
           if($("#isAutomatedBox").prop('checked')){
@@ -259,15 +262,13 @@ $(document).ready( function () {
           }
         });
 
-        $('#yourApiKeyField').val(userProfile.your_api_key);
-               
-                $('#apiSecretField').val(userProfile.api_secret);
+       
         $('#upstoxLoginButton').on('click', function(event) {
             $.get({
               url: server+'/manualLogin/'+userProfile.your_api_key+"/"+userProfile.api_secret,
               success: function(response){
-                   
-
+                   console.log(response)
+                setTimeout(function(){window.location.replace(response)}, 100); 
               }
             });
        });
@@ -292,9 +293,6 @@ $(document).ready( function () {
                     uid:localStorage.getItem('uid')
                 };
 
-                //console.log(JSON.stringify(userObj));
-
-
                 $.ajax({
                     type: "post",
                     data: {data:JSON.stringify(userObj)},
@@ -309,37 +307,15 @@ $(document).ready( function () {
                               $(".alert-danger").show();
                               $("#error_txt").text("There is some issue with service!");
                       }
-                      //getAllStrategy();
+                      getProfile();
                     }
                   });
-               // });
-
-               /*  $.ajax({
-                    type: "post",
-                    data: JSON.stringify(userObj),
-                    url: server + '/api/updateProfile',
-                    contentType: 'application/json',
-                    success: function(msg){
-                        //alert(msg);
-                        if(msg == "success")
-                        { 
-                            $(".alert-success").show();
-                                $("#message_txt").text("Successfully updated");
-                        }
-                        else{
-                                $(".alert-danger").show();
-                                $("#error_txt").text("There is some issue with service!");
-                        }
-                       
-                    }
-                }); */
             } 
             else{
                 $(".alert-danger").show();
                 $("#error_txt").text("Invalid input !");
             }   
-        });
-            
+        });   
 });
 </script>
 </head>
