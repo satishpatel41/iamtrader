@@ -29,7 +29,7 @@ timezone: "Asia/Kolkata"
 });
 
 cron.schedule('*/3 * * * *', () => {
-    console.log(chalk.blue('running a task every 3 minutes ' + new Date()));
+    //console.log(chalk.blue('running a task every 3 minutes ' + new Date()));
     load3minData();
 }, {
 scheduled: true,
@@ -44,7 +44,7 @@ timezone: "Asia/Kolkata"
 });
 
 cron.schedule('*/5 * * * *', () => {
-    console.log(chalk.blue('running a task every 5 minutes ' + new Date()));
+    //console.log(chalk.blue('running a task every 5 minutes ' + new Date()));
     load5minData();
 }, {
 scheduled: true,
@@ -52,7 +52,7 @@ timezone: "Asia/Kolkata"
 });
 
 cron.schedule('*/10 * * * *', () => {
-    console.log(chalk.blue('running a task every 10 minutes ' + new Date()));
+    //console.log(chalk.blue('running a task every 10 minutes ' + new Date()));
     load10minData();
 }, {
 scheduled: true,
@@ -60,7 +60,7 @@ timezone: "Asia/Kolkata"
 });
 
 cron.schedule('*/15 * * * *', () => {
-    console.log(chalk.blue('running a task every 15 minutes ' + new Date()));
+    //console.log(chalk.blue('running a task every 15 minutes ' + new Date()));
     load15minData();   
 }, {
 scheduled: true,
@@ -68,7 +68,7 @@ timezone: "Asia/Kolkata"
 });
 
 cron.schedule('*/30 * * * *', () => {
-    console.log(chalk.blue('running a task every 30 minutes ' + new Date()));
+    //console.log(chalk.blue('running a task every 30 minutes ' + new Date()));
     load30minData();
 }, {
 scheduled: true,
@@ -77,7 +77,7 @@ timezone: "Asia/Kolkata"
 
 cron.schedule('0 */1 * * *', () => {
     
-    console.log(chalk.blue('running a task every 1 hour' + new Date()));
+    //console.log(chalk.blue('running a task every 1 hour' + new Date()));
     load60minData();
     
 }, {
@@ -133,7 +133,7 @@ timezone: "Asia/Kolkata"
 
 cron.schedule('0 18 * * *', () => {
     load1dayData();
-    console.log(chalk.blue('running a task every 1 day'));
+    //console.log(chalk.blue('running a task every 1 day'));
 }, {
 scheduled: true,
 timezone: "Asia/Kolkata"
@@ -141,7 +141,7 @@ timezone: "Asia/Kolkata"
 
 cron.schedule('0 19 * * *', () => {
     load1WeekData();
-    console.log(chalk.blue('running a task every 1 day'));
+    //console.log(chalk.blue('running a task every 1 day'));
 }, {
 scheduled: true,
 timezone: "Asia/Kolkata"

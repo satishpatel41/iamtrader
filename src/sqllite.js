@@ -71,10 +71,10 @@ async function getAllLiveStrategy()
     var query = "SELECT * from applyStrategy";
     var param = [];
     getAll(query,param).then(list => {
-        console.log("getAllLiveStrategy > " + list.length);
+        //console.log("getAllLiveStrategy > " + list.length);
         if(list == undefined)
         {
-            console.log("\n Error to getLiveSymbol");
+            console.log("\n Error to getAllLiveStrategy");
         }
         else{
             list.map(async(obj)=>{

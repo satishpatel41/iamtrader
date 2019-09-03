@@ -42,7 +42,7 @@ class UpstoxBroker {
                 //webSocket.send(JSON.stringify({data}));
                
                 //Validate my orders with db
-                console.log('\nEvent -> onPlaceOrder ' + data.strategy.name +":"+data.symbol+":"+data.strategy.transaction_type+":"+data.strategy.exchange+":"+data.strategy.odrerType+":"+data.strategy.isIntraday);
+                console.log('\n Upstox -> PlaceOrder >' + data.strategy.name +":"+data.symbol+":"+data.strategy.transaction_type+":"+data.strategy.exchange+":"+data.strategy.odrerType+":"+data.strategy.isIntraday);
                 //that.upstox.setToken(that.accessToken);
                 var orderObject = {
                     transaction_type:getTransactionType(data.strategy.transaction_type),
