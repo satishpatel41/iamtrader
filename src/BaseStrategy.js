@@ -362,7 +362,11 @@ strategyQueue.drain = function() {
 
 async function executeLiveStrategy(list)
 {  
-    isTradingHours = true;
+    if(process.env.NODE_ENV != "production")
+    {
+        isTradingHours = true;
+    }
+    
     console.log('list - ' +list.length +" :: "+ isTradingHours);
     
     if(isTradingHours){
@@ -384,7 +388,7 @@ async function executeLiveStrategy(list)
                         
                             if(process.env.NODE_ENV=="production")
                             {
-                                sendingMail("satish.patel41@gmail.com",strategy.name,matchSymbols).catch(console.error);
+                                sendingMail("satish.patel41@gmail.com",strategy.name,strategy.symbol).catch(console.error);
                             }
                         }
                         finalResult= strategy =base = null;     

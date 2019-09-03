@@ -11,7 +11,7 @@ let cnt=0;
             if (params){
                 url = generateUrl(url, params);
             }
-            return retry(getData,5,1000, url);// return getData (url);
+            return retry(getData,1000,5, url,0);// return getData (url);
         } catch (e) {
             console.error(e)
             return e;
@@ -33,19 +33,19 @@ let cnt=0;
 //} 
 
 
-const retry = (fn, ms=1000,maxRetries=5,url) =>
+const retry = (fn, ms=1000,maxRetries=5,url,retries) =>
      new Promise((resolve,reject) => { 
-        var retries=0;
+        //var retries=0;
         fn(url)
         .then(resolve)
         .catch(() => {
             setTimeout(() => {
-                console.log('retrying ...' + url);
+                console.log('retrying..' + retries+" : "+ maxRetries+" : " + url);
                 ++retries;
                 if(retries==maxRetries) {
                     return reject('maximum retries exceeded');
                 }
-                retry(fn, ms,maxRetries,url).then(resolve);
+                retry(fn, ms,maxRetries,url,retries).then(resolve);
             }, ms);
         })
 });

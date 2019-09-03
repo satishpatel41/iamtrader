@@ -385,7 +385,7 @@ if (cluster.isMaster) {
                 else{
                     //console.log("result > " + JSON.stringify(strategy));
                     getAllLiveStrategy();
-                    res.send(strategy);
+                    //getLiveSymbol();
                 }
         });    
     });
@@ -418,6 +418,7 @@ if (cluster.isMaster) {
             if(responses == 'success')
             {
                 getAllLiveStrategy();
+                //getLiveSymbol();
                 res.send('success');
             }
             else{

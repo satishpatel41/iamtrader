@@ -105,8 +105,10 @@ async function getAllLiveStrategy()
                         } 
                     }
                     tempList.push(obj);
-                    if(tempList.length > 0 && tempList.length == list.length)
+                    if(tempList.length > 0 && tempList.length == list.length){
                         strategyList = tempList;
+                        getLiveSymbol();
+                    }
                    // console.log("Final result > " + strategyList.length);   
                 });
             });
