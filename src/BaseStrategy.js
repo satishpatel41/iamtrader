@@ -301,9 +301,9 @@ async function applyStrategy(list,interval){
     //Promise.all(
     list.map(strategyObj =>  {
         //console.log(strategyObj.id +" : "+ strategyObj.symbol);
-        strategyQueue.push({strategy: strategyObj}, function (err) {
+       /*  strategyQueue.push({strategy: strategyObj}, function (err) {
             //console.log('strategyQueue  - ');// + strategyQueue.id +" : "+ strategyObj.symbol);
-        });
+        }); */
     })//) 
 }
 
@@ -362,8 +362,9 @@ strategyQueue.drain = function() {
 
 async function executeLiveStrategy(list)
 {  
+    isTradingHours = true;
     console.log('list - ' +list.length +" :: "+ isTradingHours);
-    //isTradingHours = true;
+    
     if(isTradingHours){
         list.map(async(strategy)=>{
             await fetchLiveCandle(strategy.symbol,strategy.exchange,interval,start_date,end_date).then(response=>{

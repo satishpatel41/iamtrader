@@ -23,7 +23,7 @@ class UpstoxBroker {
             this.loginUrl = this.upstox.getLoginUri(redirect_uri);
             //console.log("loginUri ***" + this.loginUrl);
         }
-        eventEmitter.on('placeOrder', onPlaceOrder);
+        eventEmitter.addListener('placeOrder', onPlaceOrder);
 
         function getLoginURL(){
             return this.loginUrl;

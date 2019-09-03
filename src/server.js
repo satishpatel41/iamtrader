@@ -22,6 +22,7 @@ var time = date +":"+date.getHours() +":"+date.getMinutes();
 var fs = require('fs');
 var events = require('events');
 var eventEmitter = new events.EventEmitter();
+eventEmitter.setMaxListeners(100000)
 var is15MinDataSync = false;
 var nseSymbolList = [];
 var isTradingHours = getTradingHours();

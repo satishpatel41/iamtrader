@@ -126,14 +126,6 @@ cron.schedule('31 9 * * *', () => {
     console.log('Good morning : 9:30 call');
     interval = '15MINUTE';
 
-    /* Promise.all(open_low_high_List.map(async(strategy) =>{
-        applyStrategy(watchList,interval,strategy); 
-    })).then(function(result) {
-        bollinger_open_List.map(async(strategy) =>{
-            applyStrategy(watchList,interval,strategy); 
-        });
-        console.log('9:30 call result : ' + result);        
-    }) */
 }, {
 scheduled: true,
 timezone: "Asia/Kolkata"
@@ -173,7 +165,7 @@ function load1dayData()
     }).then(res=>{
         const list = strategyList.filter(strategy => strategy.interval == interval);
         console.log("1DAY strategy "  +list.length);
-        applyStrategy(list,interval); 
+        //applyStrategy(list,interval); 
         now = interval = india = start_date = null;
     }); 
 }

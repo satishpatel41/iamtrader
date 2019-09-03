@@ -8,7 +8,7 @@ wss.on('connection', ws => {
   })
   //ws.send('Hello! Message From Server!!')
 
-  eventEmitter.on('placeOrder', onSendNotification);
+  eventEmitter.addListener('placeOrder', onSendNotification);
 
   function onSendNotification(data){
       console.log('Received message => ' + data.strategy.symbol);

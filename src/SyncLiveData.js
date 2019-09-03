@@ -445,11 +445,6 @@ function getAllData(){
         getPercent_list(watchList);
         getGapUpDown(watchList);
         
-       /*  strategyStrongList.map(async(strategy)=>{
-            applyStrategy(watchList,'15MINUTE',strategy); 
-        }); */
-        /* rsiList.map(async(strategy)=>{
-            applyStrategy(bankNifty_indices,'15MINUTE',strategy); 
-        }); */
+       
     });
 }

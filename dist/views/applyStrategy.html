@@ -284,11 +284,11 @@ $(document).ready( function () {
               $('#quantityTxt').val(symbolListArr[0]['QUOTATIONLOT']);
 
 
-          var search = $("#symbolTxt").val();
+          var search =  $("#symbolTxt").val();
           if(exchange && search.length >= 2){
           $.ajax({
             type: "get",
-            url: server + '/getInstrumentsOnSearch/'+exchange+'/'+instrumentType+'/'+search,success: function(data){
+            url: server + '/getInstrumentsOnSearch/'+exchange+'/'+instrumentType+'/'+search.trim(),success: function(data){
               //console.log("data " + data);
                   symbolListArr = [];
                   symbolListArr = data;
