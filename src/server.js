@@ -383,9 +383,8 @@ if (cluster.isMaster) {
                     res.send("error")
                 }
                 else{
-                    //console.log("result > " + JSON.stringify(strategy));
                     getAllLiveStrategy();
-                    //getLiveSymbol();
+                    res.send("success")
                 }
         });    
     });

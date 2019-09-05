@@ -124,6 +124,7 @@ class BaseStrategy {
            
             var result = [];
             var output = {};
+            //console.log("\n");
             //console.log("Strategy 1: " + strategyObj.symbol+" : "+strategyObj.id +" : "+strategyObj.name+" : "+strategyObj.interval);
             if(strategyObj && strategyObj.indicators && strategyObj.indicators.length > 0){
                 //console.log("Strategy : " + strategyObj.symbol+" : "+strategyObj.id +" : "+strategyObj.name+" : "+strategyObj.interval);
@@ -135,25 +136,21 @@ class BaseStrategy {
                             && indicatorObj.indicator2 && indicatorObj.indicator2 != "")
                             {
                                 output.op = indicatorObj.op;
-                                //console.log("\n indicator2 - " +indicatorObj.indicator2 +" > " + String(indicatorObj.indicator2).split(".").length);
                                 if(indicatorObj.indicator1 == 'number'){
                                     output.op1 = [indicatorObj.indicator_config1,indicatorObj.indicator_config1,indicatorObj.indicator_config1];
                                 }
                                 else if(indicatorObj.indicator1  == 'open' || indicatorObj.indicator1   == 'low' || indicatorObj.indicator1 == 'close' || indicatorObj.indicator1 == 'high'  || indicatorObj.indicator1 == 'volume' ){
-                                    output.op1 = eval('candle.'+indicatorObj.indicator1).reverse().slice(0, 3);//reverse().
+                                    output.op1 = eval('candle.'+indicatorObj.indicator1).reverse().slice(0, 3);
                                 }
                                 else if(String(indicatorObj.indicator1).split(".").length > 1){
                                     var str1 = indicatorObj.indicator1.split(".")[0]+".calculate("+JSON.stringify(that.getInputObject(candle,indicatorObj.indicator1,indicatorObj.indicator_config1))+")";
                                     var res1 = eval(str1); 
-                                    //var op1 = res1[indicatorObj.indicator1.split(".")[1]].reverse().slice(0, 3);  //**********  dont't change **********  
-                                   
-                                    var result = res1.slice(0, 3); //reverse(). //**********  dont't change **********  
+                                    var result = res1.slice(0, 3); //**********  dont't change **********  
                                     var op1 = [];
                                     result.map(obj=>{
                                         op1.push(obj[indicatorObj.indicator2.split(".")[1]])
                                     });
                                     output.op1 = op1;
-                                    //console.log("\n op1 - " +indicatorObj.indicator1 +" > " + op1);
                                 }
                                 else{
                                     var str1 = indicatorObj.indicator1+".calculate("+JSON.stringify(that.getInputObject(candle,indicatorObj.indicator1,indicatorObj.indicator_config1))+")";
@@ -171,10 +168,7 @@ class BaseStrategy {
                                 }   
                                 else if(String(indicatorObj.indicator2).split(".").length > 1){
                                     var str2 = indicatorObj.indicator2.split(".")[0]+".calculate("+JSON.stringify(that.getInputObject(candle,indicatorObj.indicator2,indicatorObj.indicator_config2))+")";
-                                     //console.log("\n op2 - " +indicatorObj.indicator2 +" > " + str2);
                                     var res2 = eval(str2); 
-                                    //console.log("\n str2 - " +indicatorObj.indicator2 +" > " + res2 +" - "+ indicatorObj.indicator2.split(".")[1]);
-                                    //var op2 = res2[indicatorObj.indicator2.split(".")[1]].reverse().slice(0, 3);  //**********  dont't change ********** 
                                     var result = res2.slice(0, 3);  ////**********  dont't change **********  
                                     var op2 = [];
                                     result.map(obj=>{
@@ -182,20 +176,50 @@ class BaseStrategy {
                                     });
 
                                     output.op2 = op2;
-                                    //console.log("\n op3 - " +indicatorObj.indicator2 +" > " + op2);
                                 }
                                 else{
                                     var str2 = indicatorObj.indicator2+".calculate("+JSON.stringify(that.getInputObject(candle,indicatorObj.indicator2,indicatorObj.indicator_config2))+")";
-                                    //console.log("\n indicators str:  " +str2);  
                                     var res2 = eval(str2);    
                                     var op2 = res2.reverse().slice(0, 3);  ////**********  dont't change **********  
                                     output.op2 = op2;
                                 }
+
+                                var finalResult = [];
+                                var first = 0;
+                                var second = 1;
+                                var third = 2;
+
+                                if(output.op == "Crossed Above"){
+                                    var strategyStr1 = output.op1[first]+">="+output.op2[first]; 
+                                    var strategy1 = eval(strategyStr1);
+                                    finalResult.push(strategy1);  
+                                    var strategyStr2 = output.op1[second]+"<"+output.op2[second]; 
+                                    var strategy2 = eval(strategyStr2);
+                                    finalResult.push(strategy2);   
+
+                                    //console.log("Crossed Above :   " + strategyStr1 +" : "+ strategyStr2 +" : "+JSON.stringify(output));
+
+                                }
+                                else if(output.op == "Crossed Below"){
+                                    var strategyStr1 = output.op1[first]+"<="+output.op2[first]; 
+                                    var strategy1 = eval(strategyStr1);
+                                    finalResult.push(strategy1); 
+                                    var strategyStr2 = output.op1[second]+">"+output.op2[second]; 
+                                    var strategy2 = eval(strategyStr2);
+                                    finalResult.push(strategy2);  
+                                  
+                                    //console.log("Crossed Below :   " + strategyStr1 +" : "+ strategyStr2 +" : "+JSON.stringify(output));
+                                }
+                                else{
+                                    var strategyStr = output.op1[first]+output.op+output.op2[first]; 
+                                    var strategy = eval(strategyStr);
+                                    finalResult.push(strategy);   
+                                }
                                                                 
-                                //console.log("\n indicators :  " +strategyObj.name +": "+symbol +" > " +JSON.stringify(output));
-                                res1 = indicatorObj = null;
-                                //result.push(output);
-                                resolve(output);   
+                                //console.log("Strategy res :   " + symbol +" : " + finalResult);
+                                var flag = finalResult.every(x => x == true);  
+                                res1 = indicatorObj = finalResult = first= second= third= null;
+                                resolve(flag);   
                             }     
                             else{
                                 console.error("First - " + e);
@@ -207,55 +231,10 @@ class BaseStrategy {
                             reject(e);
                         }
                     });        
-                })).then(obj => { 
-                    //candle.close = candle.close.reverse(); //**********  dont't change **********  
-                    //candle.high = candle.high.reverse(); //**********  dont't change **********  
-                    //candle.low = candle.low.reverse(); //**********  dont't change **********  
-                    //candle.open = candle.open.reverse(); //**********  dont't change **********  
-                
-                    //console.log("Result 1:" + symbol +" : " + JSON.stringify(obj));
-
-                    if(obj[0].op == "Crossed Above"){
-                        //if(obj[0].op1[0].length > 0 && obj[0].op2[0].length > 0){
-                            var strategyStr1 = obj[0].op1[0]+">="+obj[0].op2[0]; 
-                            //console.log("Result :" + strategyStr1);
-                            var strategy1 = eval(strategyStr1);
-                            result.push(strategy1);  
-
-                            var strategyStr2 = obj[0].op1[1]+"<"+obj[0].op2[1]; 
-                            var strategy2 = eval(strategyStr2);
-
-                            //console.log("Result :"  + strategyStr2);
-                            result.push(strategy2);   
-                       
-                    }
-                    else if(obj[0].op == "Crossed Below"){
-                        //if(obj[0].op1[0].length > 0 && obj[0].op2[0].length > 0){
-                            var strategyStr1 = obj[0].op1[0]+"<="+obj[0].op2[0]; 
-                            var strategy1 = eval(strategyStr1);
-                            result.push(strategy1); 
-                            
-                            var strategyStr2 = obj[0].op1[1]+">"+obj[0].op2[1]; 
-                            var strategy2 = eval(strategyStr2);
-                            result.push(strategy2);  
-                      
-                    }
-                    else{
-                        //console.log("obj " + symbol +" > "+JSON.stringify(obj));
-                        //if(obj[0].op1.length > 0 && obj[0].op2.length > 0){
-                            var strategyStr = obj[0].op1[0]+obj[0].op+obj[0].op2[0]; 
-                            var strategy = eval(strategyStr);
-                            result.push(strategy);   
-                       
-                    }
-                   // candle.close = candle.close.reverse(); //**********  dont't change **********  
-                   // candle.high = candle.high.reverse(); //**********  dont't change **********  
-                   // candle.low = candle.low.reverse(); //**********  dont't change **********  
-                   // candle.open = candle.open.reverse(); //**********  dont't change **********  
-                    var d =new Date(Number(candle.timeStamp[0])); 
-                   // console.log("result " + symbol +" : " + result);
-                    var strategyRes = result.every(x => x == true);  
-                    candle = output = result = d = null;
+                })).then(obj => {  
+                    //console.log("Result :   " + symbol +" : " + JSON.stringify(obj));
+                    var strategyRes = obj.every(x => x == true);  
+                    candle = output = result = null;
                     strategyObj.result = strategyRes;
                     return resolved(strategyObj);       
                 })
@@ -367,7 +346,7 @@ async function executeLiveStrategy(list)
         isTradingHours = true;
     }
     
-    console.log('list - ' +list.length +" :: "+ isTradingHours);
+    console.log('list - ' +list.length +" :: "+ interval +" :: "+isTradingHours);
     
     if(isTradingHours){
         list.map(async(strategy)=>{
@@ -384,11 +363,10 @@ async function executeLiveStrategy(list)
                             price = data[0]['CLOSE'];
                             console.log("Place Order  --> " +strategy.name +" : "+ strategy.interval +" : "+ strategy.symbol +" : "+ price);
                             eventEmitter.emit('placeOrder',{'strategy':strategy,"symbol":strategy.symbol,'interval':interval,'price':price});
-                            //eventEmitter.emit('sendNotification',{'strategy':strategy,"symbol":strategy.symbol,'interval':interval,'price':price});
                         
                             if(process.env.NODE_ENV=="production")
                             {
-                                sendingMail("satish.patel41@gmail.com",strategy.name,strategy.symbol).catch(console.error);
+                                //sendingMail("satish.patel41@gmail.com",strategy.name,strategy.symbol).catch(console.error);
                             }
                         }
                         finalResult= strategy =base = null;     

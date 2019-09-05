@@ -285,18 +285,22 @@ $(document).ready( function () {
 
 
           var search =  $("#symbolTxt").val();
-          if(exchange && search.length >= 2){
-          $.ajax({
-            type: "get",
-            url: server + '/getInstrumentsOnSearch/'+exchange+'/'+instrumentType+'/'+search.trim(),success: function(data){
-              //console.log("data " + data);
-                  symbolListArr = [];
-                  symbolListArr = data;
 
-                  helpers.buildDropdown(data,$('#intrumentDropdown'),'Select an option','IDENTIFIER');
-              }
-          });
-          }
+          
+
+          if(exchange && search.length >= 2){
+            $.ajax({
+              type: "get",
+              url: server + '/getInstrumentsOnSearch/'+exchange+'/'+instrumentType+'/'+search.trim(),success: function(data){
+                //console.log("data " + data);
+                    symbolListArr = [];
+                    symbolListArr = data;
+
+                    helpers.buildDropdown(data,$('#intrumentDropdown'),'Select an option','IDENTIFIER');
+                }
+            });
+            }
+            $("#symbolTxt").val(search.trim());
         });
 
         $( "#symbolDropdown" ).change(function() {
