@@ -364,8 +364,28 @@ async function executeLiveStrategy(list)
                             console.log("Place Order  --> " +strategy.name +" : "+ strategy.interval +" : "+ strategy.symbol +" : "+ price);
                             eventEmitter.emit('placeOrder',{'strategy':strategy,"symbol":strategy.symbol,'interval':interval,'price':price});
                         
+                            var now = new Date();
+                            var india = moment.tz(now, "Asia/Kolkata");
+                            india.format(); 
+                            var entryTime =india.date()+"-"+(india.month())+"-"+india.year() +"  "+india.hour()+":"+india.minute();
+                            var appliedId = strategy.id;
+                            var exitTime ="-"; 
+                            var profit =0; 
+                            var uid = strategy.uid;
+                            var q = "INSERT INTO StrategyTriggered (appliedId,entryTime, exitTime,profit, uid)VALUES(?,?,?,?,?)";
+                            var p = [appliedId,entryTime,exitTime, profit,uid];
+
+                            //console.log("strategy  : " +JSON.stringify(strategy));
+
+
+                            insertDB(q,p).then(responses => {
+                                //console.log("StrategyTriggered > " + JSON.stringify(responses));
+                            }); 
+                            
+                            
                             if(process.env.NODE_ENV=="production")
                             {
+                                
                                 //sendingMail("satish.patel41@gmail.com",strategy.name,strategy.symbol).catch(console.error);
                             }
                         }

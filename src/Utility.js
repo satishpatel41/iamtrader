@@ -80,16 +80,22 @@ function getTradingHours()
   india.format();  
   var hour= india.hour();
   var min = india.minute();
-  //console.log(hour+" : "+min);
-  if(hour >= 9 && hour <= 16)
-  {
-      flag = true;
-      if(hour == 9 && min < 15){
-        flag = false;
-      }
-      else if(hour == 15 && min > 15){
-        flag = false;
-      }
+  var day = moment().weekday();
+  //console.log(day +": "+hour+" : "+min);
+  if(day >0  && day < 6){
+    if(hour >= 9 && hour <= 16)
+    {
+        flag = true;
+        if(hour == 9 && min < 15){
+          flag = false;
+        }
+        else if(hour == 15 && min > 15){
+          flag = false;
+        }
+    }
+    else{
+      flag = false;
+    }
   }
   else{
     flag = false;

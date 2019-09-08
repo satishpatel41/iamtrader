@@ -125,28 +125,28 @@ if (cluster.isMaster) {
     }
 
     app.post('/login', function (req, res) {
-    var email = req.body.username;
-    var psw = req.body.password;
+        var email = req.body.username;
+        var psw = req.body.password;
 
-    if(email){
-        
-        var query = "select uid,name,isSuperAdmin,isVerified from User where email=? and password=?";
-        var param = [email,psw];
-        getFirst(query,param).then(user => {
-                //console.log("result > " + JSON.stringify(user));
-                if(user == undefined)
-                {
-                    res.send("error")
-                }
-                else{
-                        req.session.user = user;
-                        res.send(user);
-                   
-                }
-            });     
-    }
-    else
-        res.sendFile("login.html", {"root": __dirname});
+        if(email){
+            
+            var query = "select uid,name,isSuperAdmin,isVerified from User where email=? and password=?";
+            var param = [email,psw];
+            getFirst(query,param).then(user => {
+                    //console.log("result > " + JSON.stringify(user));
+                    if(user == undefined)
+                    {
+                        res.send("error")
+                    }
+                    else{
+                            req.session.user = user;
+                            res.send(user);
+                    
+                    }
+                });     
+        }
+        else
+            res.sendFile("login.html", {"root": __dirname});
     });
 
     app.post('/api/updateProfile',checkSignIn, function (req, res) {
@@ -220,7 +220,11 @@ if (cluster.isMaster) {
     app.get('/gapupdown', function (req, res) {
         res.sendFile("gapUpDown.html", {"root": __dirname});
     });
+    
 
+    app.get('/Triggers', function (req, res) {
+        res.sendFile("triggeredStrategy.html", {"root": __dirname});
+    });
 
     app.get('/index', function (req, res) {
         res.sendFile("index.html", {"root": __dirname});
@@ -555,6 +559,24 @@ if (cluster.isMaster) {
                 else{
                     //console.log("result > " + JSON.stringify(strategy));
                     res.send(strategy);
+                }
+        });    
+    });
+
+    app.get('/getTriggeredList/:uid',checkSignIn, function (req, res) {
+        var uid = req.params.uid;  
+        var query = "SELECT applyStrategy.symbol,applyStrategy.quantity,applyStrategy.transaction_type,applyStrategy.exchange,applyStrategy.interval,StrategyTriggered.entryTime, StrategyTriggered.profit FROM applyStrategy left join StrategyTriggered where applyStrategy.id like (select StrategyTriggered.appliedId from StrategyTriggered where StrategyTriggered.uid=?);";
+  
+        var param = [uid];
+        getAll(query,param).then(result => {
+                //console.log("result > " + JSON.stringify(strategy));
+                if(result == undefined)
+                {
+                    res.send("error")
+                }
+                else{
+                    //console.log("result > " + JSON.stringify(strategy));
+                    res.send(result);
                 }
         });    
     });
