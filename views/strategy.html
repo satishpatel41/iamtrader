@@ -10,6 +10,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
 <link href="https://unpkg.com/tabulator-tables@4.1.3/dist/css/tabulator.min.css" rel="stylesheet">
 <link href="https://unpkg.com/tabulator-tables@4.1.3/dist/css/semantic-ui/tabulator_semantic-ui.min.css" rel="stylesheet">
+
+
+<script src="https://moment.github.io/luxon/global/luxon.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+<script src="https://moment.github.io/luxon/global/luxon.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.25/moment-timezone-with-data.js"></script>
+
+
 <style>
     .loader {
       border: 10px solid #f3f3f3;
@@ -48,10 +56,93 @@
         border-radius: 3px
     }
 
+    hr {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      border: 0;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
     #target{
       padding-bottom:15px;
     }
+
+   
+    text {
+        fill: #000;
+    }
+
+    path.candle {
+        stroke: #000000;
+    }
+
+    path.candle.body {
+        stroke-width: 0;
+    }
+
+    path.candle.up {
+        fill: #00AA00;
+        stroke: #00AA00;
+    }
+
+    path.candle.down {
+        fill: #FF0000;
+        stroke: #FF0000;
+    }
+
+    path.tradearrow {
+        stroke: none;
+    }
+
+    path.tradearrow.buy {
+        fill: #0000FF;
+    }
+
+    path.tradearrow.buy-pending {
+        fill-opacity: 0.2;
+        stroke: #0000FF;
+        stroke-width: 1.5;
+    }
+
+    path.tradearrow.sell {
+        fill: #9900FF;
+    }
+
+    .tradearrow path.highlight {
+        fill: none;
+        stroke-width: 2;
+    }
+
+    .tradearrow path.highlight.buy,.tradearrow path.highlight.buy-pending {
+        stroke: #0000FF;
+    }
+
+    .tradearrow path.highlight.buy-pending {
+        fill: #0000FF;
+        fill-opacity: 0.3;
+    }
+
+    .tradearrow path.highlight.sell {
+        stroke: #9900FF;
+    }
     
+
+    .bollinger path {
+        fill: none;
+        stroke-width: 1;
+    }
+
+    .bollinger path.upper {
+        stroke: #0000AA;
+    }
+
+    .bollinger path.lower {
+        stroke: #FF9999;
+    }
+
+    .bollinger path.middle {
+        stroke: #BBBBBB;
+    }
 
 
 </style>
@@ -59,16 +150,26 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/web-socket-js/1.0.0/web_socket.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="http://techanjs.org/techan.min.js"></script>
 
 <script type="text/javascript">
 
 $(document).ready( function () {
-      var index= 0;
-      var selectedSid= -1;
-      var items ={};
-      var template = $("#items_tmp").html();
-      var strategyListArr =[];
-      var allIndicators= [
+        var interval = "15MINUTE";
+        var strategyListArr = [];
+        var symbolListArr = [];
+        var symbol = '';
+        var selectedSid = -1;
+        var count = 0;
+        var exchange= '';
+        var instrumentType= '';
+        var selctedStrategyIndex = -1;
+        var index= 0;
+        var selectedSid= -1;
+        var items ={};
+        var template = $("#items_tmp").html();
+        var allIndicators= [
         {
             "name":"number",
             "input":'0',
@@ -149,6 +250,7 @@ $(document).ready( function () {
       var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
       $('#userTxt').text(localStorage.getItem('user'));
      
+      $('.nav-tabs a[href="#strategyListPanel"]').tab('show');
       getAllStrategy();
 
       function getAllStrategy()
@@ -164,6 +266,9 @@ $(document).ready( function () {
                 strategyListArr = list.filter(function (el) {
                   return (el != null && el.name != null && el.name != undefined && el.name != "");
                 });
+
+                helpers.buildDropdown(strategyListArr,$('#strategyDropdown'),'Select an option','name');
+
                 createTable()
               }
           });
@@ -218,9 +323,10 @@ $(document).ready( function () {
                           url: server+'/indicatorList/'+sid,
                           success: function(list){
                               $(".loader").hide();  
-                              console.log(list);
+                              //console.log(list);
                               // Select first tab
-                              $('.nav-tabs a:first').tab('show');
+                              //$('.nav-tabs a:first').tab('show');
+                              $('.nav-tabs a[href="#addStrategyPanel"]').tab('show');
                               selectedSid = sid;
                               createIndicators(list);
                             }
@@ -274,7 +380,9 @@ $(document).ready( function () {
                 $("#is_private")[0].checked =false;
                 $('#strategyModal').modal('hide');
                 $("#target").empty();
-                $('.nav-tabs a:last').tab('show');
+                //$('.nav-tabs a:last').tab('show');
+                $('.nav-tabs a[href="#strategyListPanel"]').tab('show');
+                
                 selectedSid = -1;
                 index = 0;
                 getAllStrategy();
@@ -453,6 +561,77 @@ $(document).ready( function () {
         });
       }
 
+      $( "#instrumentDropdown" ).change(function() {
+          instrumentType = $("#instrumentDropdown").val();
+      });
+
+      $( "#exchangesDropdown" ).change(function() {
+          exchange = $("#exchangesDropdown").val();
+          $.ajax({
+          type: "get",
+          url: server + '/getInstrumentTypes/'+exchange,success: function(data){
+              helpers.buildDropdown(
+                  data,
+                  $('#instrumentDropdown'),
+                  'Select an option'
+              );
+              $(".loader").hide();
+          }
+          });
+          
+          $.ajax({
+          type: "get",
+          url: server + '/getOptionType/'+exchange,success: function(data){
+              helpers.buildDropdown(
+                  data,
+                  $('#typeDropdown'),
+                  'Select an option'
+              );
+              $(".loader").hide();
+          }
+          });
+        });
+
+      $( "#intervalDropDown" ).change(function() {
+        interval = $("#intervalDropDown").val();
+      });
+
+      $("#symbolTxt").on('input', function () {
+        var search =  $("#symbolTxt").val();
+
+        if(exchange && search.length >= 2){
+          $.ajax({
+            type: "get",
+            url: server + '/getInstrumentsOnSearch/'+exchange+'/'+instrumentType+'/'+search.trim(),success: function(data){
+              //console.log("data " + data);
+                  symbolListArr = [];
+                  symbolListArr = data;
+
+                  helpers.buildDropdown(data,$('#intrumentDropdown'),'Select an option','IDENTIFIER');
+              }
+          });
+        }
+        $("#symbolTxt").val(search.trim());
+      });
+
+      $( "#symbolDropdown" ).change(function() {
+        symbol = $("#symbolDropdown").val();
+        console.log(symbol);
+
+      });
+
+      $.ajax({
+        type: "get",
+        url: server + '/getIndices',success: function(data){
+              helpers.buildDropdown(
+                  data,
+                  $('#exchangesDropdown'),
+                  'Select an option'
+              );
+              $(".loader").hide();
+             
+          }
+        });
 
       var helpers = {
           buildDropdown: function(result, dropdown, emptyMessage,field){
@@ -508,160 +687,363 @@ $(document).ready( function () {
         console.log("closed");
       };
 
+    
+      $( "#strategyDropdown" ).change(function() {
+        selctedStrategyIndex =document.getElementById("strategyDropdown").selectedIndex - 1;
+      });
+
+      
+      $('#backTestBtn').on('click', function(event) {
+          var uid=localStorage.getItem('uid');
+          var sid=selctedStrategyIndex >= 0 ? strategyListArr[selctedStrategyIndex]['sid']:-1;
+          var symbol= $("#symbolTxt").val();
+          //console.log('click' + uid + sid + exchange+interval+symbol);
+          $.get({
+            url: server+'/api/backtestStrategy/'+uid+'/'+sid+'/'+exchange+'/'+interval+'/'+symbol,
+            success: function(response){
+                $(".loader").hide();       
+               // $("#symbolTxt").val('');
+               var accessor = bollinger.accessor();
+              //var accessor = candlestick.accessor();
+              var trades = [];
+              var data = response.slice(0, 200).map(function(d) {
+                  var india = moment.tz(new Date(Number(d.LASTTRADETIME)), "Asia/Kolkata");
+                  india.format(); 
+                  var d1 = new Date();
+                  d1.setDate(india.date());
+                  d1.setMonth(india.month());
+                  d1.setFullYear(india.year());
+                  d1.setHours(india.hour());
+                  d1.setMinutes(india.minute());
+                  d1.setSeconds(india.second());
+                  
+                  if(d.signal == true){
+                    var trade = {};
+                    trade.date= d1;
+                    trade.type= "buy";
+                    trade.price= d.CLOSE;
+                    trade.quantity= 1000;
+                    trades.push(trade);
+                  } 
+
+                  return {
+                      date: d1,
+                      open: +d.OPEN,
+                      high: +d.HIGH,
+                      low: +d.LOW,
+                      close: +d.CLOSE,
+                      volume: +d.TRADEDQTY
+                  };
+              }).sort(function(a, b) { return d3.ascending(accessor.d(a), accessor.d(b)); });
+
+              svg.append("g")
+                      .attr("class", "candlestick");
+              
+              svg.append("g")
+                .attr("class", "bollinger");
+
+              svg.append("g")
+                      .attr("class", "tradearrow");
+
+              svg.append("g")
+                      .attr("class", "x axis")
+                      .attr("transform", "translate(0," + height + ")");
+
+              svg.append("g")
+                      .attr("class", "y axis")
+                      .append("text")
+                      .attr("transform", "rotate(-90)")
+                      .attr("y", 6)
+                      .attr("dy", ".71em")
+                      .style("text-anchor", "end")
+                      .text("Price ($)");
+
+              draw(data, trades);
+              }
+          });
+
+      });
+
+
+      var margin = {top: 20, right: 10, bottom: 30, left: 60},
+            width = window.innerWidth - 180,
+            height = 500 - margin.top - margin.bottom;
+
+      var dateFormat = d3.timeFormat("%d-%b-%y"),
+        parseDate = d3.timeParse("%d-%b-%y"),
+        valueFormat = d3.format(',.2f');
+
+      var x = techan.scale.financetime()
+            .range([0, width]);
+
+      var y = d3.scaleLinear()
+            .range([height, 0]);
+
+      var candlestick = techan.plot.candlestick()
+            .xScale(x)
+            .yScale(y);
+
+      var bollinger = techan.plot.bollinger()
+            .xScale(x)
+            .yScale(y);
+
+      var tradearrow = techan.plot.tradearrow()
+            .xScale(x)
+            .yScale(y)
+            .orient(function(d) { return d.type.startsWith("buy") ? "up" : "down"; })
+            .on("mouseenter", enter)
+            .on("mouseout", out);
+
+      var xAxis = d3.axisBottom(x);
+      var yAxis = d3.axisLeft(y);
+      var svg =  d3.select("#myChart").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      var valueText = svg.append('text')
+            .style("text-anchor", "end")
+            .attr("class", "coords")
+            .attr("x", width - 5)
+            .attr("y", 15);
+
+
+      function draw(data, trades) {
+       /*  svg.selectAll("g.candlestick").remove();
+        svg.selectAll("g.tradearrow").remove();
+        svg.selectAll("g.bollinger").remove();
+        svg.selectAll("g.x.axis").remove();
+        svg.selectAll("g.y.axis").remove(); */
+        var bollingerData = techan.indicator.bollinger()(data);
+        x.domain(bollingerData.map(bollinger.accessor().d));
+        y.domain(techan.scale.plot.bollinger(bollingerData).domain());
+
+        svg.selectAll("g.candlestick").datum(data.slice(20, data.length)).call(candlestick);
+        svg.selectAll("g.tradearrow").datum(trades).call(tradearrow);
+        svg.selectAll("g.bollinger").datum(bollingerData).call(bollinger);
+        svg.selectAll("g.x.axis").call(xAxis);
+        svg.selectAll("g.y.axis").call(yAxis);
+      }
+
+      function enter(d) {
+        valueText.style("display", "inline");
+        refreshText(d);
+      }
+
+      function out() {
+        valueText.style("display", "none");
+      }
+
+      function refreshText(d) {
+        valueText.text("Trade: " + dateFormat(d.date) + ", " + d.type + ", " + valueFormat(d.price));
+      }
 });
 </script>
 </head>
 <body>
-
-<nav class="navbar navbar-inverse navbar-fixed-top">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>                        
-        </button>
-      <a class="navbar-brand" href="#">Scanner</a>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>                        
+          </button>
+        <a class="navbar-brand" href="#">Scanner</a>
+      </div>
+      <div class="collapse navbar-collapse" id="myNavbar">
+        <ul class="nav navbar-nav">
+          <!--  <li ><a href="/gainerloser">Top Gainer / Looser</a></li>
+          <li><a href="/gapupdown">Gap up/Down</a></li>
+          <li><a href="/allCharts">Stocks Charts</a></li> -->
+          <li ><a href="/scanner">Scanner</a></li>
+          <li class="active"><a href="/strategy">Strategy</a></li>
+          <li><a href="/applyStrategy">Apply Strategy</a></li> 
+          <li><a href="/Triggers">Triggers</a></li> 
+        </ul>
+        <ul class="nav navbar-nav pull-right">
+            <li class="dropdown pull-right"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome, <span id="userTxt"></span> <span class="glyphicon glyphicon-user"></span><b class="caret"></b></a>
+              <ul class="dropdown-menu pull-right">
+                  <li><a href="/profile"><i class="icon-cog"></i> Profile</a></li>
+                  <li><a href="/authenticate"><i class="icon-cog"></i> Upstox Login</a></li>
+                  <li><a href="/preferences"><i class="icon-envelope"></i> Preferences</a></li>
+                  <li class="divider"></li>
+                  <li><a href="/logout"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
+              </ul>
+          </li>
+        </ul>
+      </div> 
     </div>
-    <div class="collapse navbar-collapse" id="myNavbar">
-      <ul class="nav navbar-nav">
-       <!--  <li ><a href="/gainerloser">Top Gainer / Looser</a></li>
-        <li><a href="/gapupdown">Gap up/Down</a></li>
-        <li><a href="/allCharts">Stocks Charts</a></li> -->
-        <li ><a href="/scanner">Scanner</a></li>
-        <li class="active"><a href="/strategy">Strategy</a></li>
-        <li><a href="/applyStrategy">Apply Strategy</a></li> 
-        <li><a href="/Triggers">Triggers</a></li> 
-      </ul>
-      <ul class="nav navbar-nav pull-right">
-          <li class="dropdown pull-right"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome, <span id="userTxt"></span> <span class="glyphicon glyphicon-user"></span><b class="caret"></b></a>
-            <ul class="dropdown-menu pull-right">
-                <li><a href="/profile"><i class="icon-cog"></i> Profile</a></li>
-                <li><a href="/authenticate"><i class="icon-cog"></i> Upstox Login</a></li>
-                <li><a href="/preferences"><i class="icon-envelope"></i> Preferences</a></li>
-                <li class="divider"></li>
-                <li><a href="/logout"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
-            </ul>
-        </li>
-      </ul>
-    </div> 
-  </div>
-</nav>
-  
-<div class="container">
-      <div class="row"></div>
-      <br/><br/><br/>
-      <ul class="nav nav-tabs">
-        <li ><a data-toggle="tab" href="#addStrategyPanel">Create strategy</a></li>
-        <li class="active"><a data-toggle="tab" href="#strategyListPanel">All strategy</a></li>
-      </ul>
+    </nav>
 
-      <div class="tab-content">
-        <div id="addStrategyPanel" class="tab-pane fade">
-          
-          <br/>
-          <div class="alert alert-warning" role="alert" id="notePanel">
-              You can create your own custom strategy by adding Indicators, you can click below button to add Indicators !
-          </div>
+    <div class="container">
+        <div class="row"></div>
+        <br/><br/><br/>
+        <ul class="nav nav-tabs">
+          <li class="active"><a data-toggle="tab" href="#strategyListPanel">All strategy</a></li>
+          <li ><a data-toggle="tab" href="#addStrategyPanel">Create strategy</a></li>
+          <li><a data-toggle="tab" href="#backtestPanel">Backtest strategy</a></li>
+        </ul>
 
-          <script id="items_tmp" type="text/template">
-          {{#items}}
-            <div class="indicatorsRow row row-{{id}}" id="indicatorsRow{{id}}">
-              <div class="col-sm-1">
-                <span class="btn-label delBtn"><i class="glyphicon glyphicon-trash"></i></span>
-              </div> 
-              <div class="col-sm-2">
-                <select class="form-control indicatorTxt1" placeholder="Select Indicator">
-                </select>
-              </div> 
-              <div class="col-sm-2">
-                <input type="text"  class="form-control valueTxt inputTxt1" placeholder="Enter Value">
-              </div> 
-
-              <div class="col-sm-2">
-                <select class="form-control opDropDown" >
-                    <option value=">">&gt;</option>
-                    <option value="<">&lt;</option>
-                    <option value="==">==</option>
-                    <option value=">=">>=</option>
-                    <option value="<="><=</option>
-                    <option value="Crossed Above">Crossed Above</option>
-                    <option value="Crossed Below">Crossed Below</option>
-                  </select>
-              </div> 
-              <div class="col-sm-2">
-                <select class="form-control indicatorTxt2" placeholder="Select Indicator">
-                </select>
-              </div> 
-
-              <div class="col-sm-2">
-                <input type="text"  class="form-control valueTxt inputTxt2"  placeholder="Enter Value">
-              </div>  
-            </div> 
-          {{/items}}
-          </script>
-         
-          <div id="target"></div>
-
-          <div class="row">
-            <div class="col-sm-2">
-              <button type="button" id="addButton" class="btn btn-primary">Add Indicators</button>
-            </div>
-            <div class="col-sm-2">
-              <button type="button" id="saveButton" class="btn btn-success" >Save Strategy</button>
-            </div>
-          </div>
-
-          <!-- Modal -->
-          <div class="modal fade" id="strategyModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h4 class="modal-title">Save Strategy</h>
-              </div>
-                <div class="modal-body">
-                  <form>
-                    <div class="form-group">
-                      <label for="nameTxt">Name</label>
-                      <input type="text" class="form-control" id="nameTxt" placeholder="Enter your strategy name">
-                    </div>
-                    <div class="form-group">
-                      <label for="descriptionTxt">Description</label>
-                      <textarea class="form-control" id="descriptionTxt" rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
-                      <label for="category">Select category</label>
-                      <select class="form-control" id="category">
-                        <option>Intraday Bullish scan</option>
-                        <option>Intraday Bearish scan</option>
-                      </select>
-                    </div>
-                    <label>
-                      <input type="checkbox" id="is_private"> Is Private?
-                  </label>
-                </form>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Discard</button>
-                  <button type="button" id="saveBtn" class="btn btn-primary">Save</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-        </div>
-        <div id="strategyListPanel" class="tab-pane fade in active">
+        <div class="tab-content">
+          <div id="addStrategyPanel" class="tab-pane fade">
+            
             <br/>
-            <div class="alert alert-info">  
-                <p>All custom strategy are listed below!</p>
+            <div class="alert alert-warning" role="alert" id="notePanel">
+                You can create your own custom strategy by adding Indicators, you can click below button to add Indicators !
             </div>
-            <div id="strategyTable">
+
+            <script id="items_tmp" type="text/template">
+            {{#items}}
+              <div class="indicatorsRow row row-{{id}}" id="indicatorsRow{{id}}">
+                <div class="col-sm-1">
+                  <span class="btn-label delBtn"><i class="glyphicon glyphicon-trash"></i></span>
+                </div> 
+                <div class="col-sm-2">
+                  <select class="form-control indicatorTxt1" placeholder="Select Indicator">
+                  </select>
+                </div> 
+                <div class="col-sm-2">
+                  <input type="text"  class="form-control valueTxt inputTxt1" placeholder="Enter Value">
+                </div> 
+
+                <div class="col-sm-2">
+                  <select class="form-control opDropDown" >
+                      <option value=">">&gt;</option>
+                      <option value="<">&lt;</option>
+                      <option value="==">==</option>
+                      <option value=">=">>=</option>
+                      <option value="<="><=</option>
+                      <option value="Crossed Above">Crossed Above</option>
+                      <option value="Crossed Below">Crossed Below</option>
+                    </select>
+                </div> 
+                <div class="col-sm-2">
+                  <select class="form-control indicatorTxt2" placeholder="Select Indicator">
+                  </select>
+                </div> 
+
+                <div class="col-sm-2">
+                  <input type="text"  class="form-control valueTxt inputTxt2"  placeholder="Enter Value">
+                </div>  
+              </div> 
+            {{/items}}
+            </script>
+            
+            <div id="target"></div>
+
+            <div class="row">
+              <div class="col-sm-2">
+                <button type="button" id="addButton" class="btn btn-primary">Add Indicators</button>
+              </div>
+              <div class="col-sm-2">
+                <button type="button" id="saveButton" class="btn btn-success" >Save Strategy</button>
+              </div>
             </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="strategyModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h4 class="modal-title">Save Strategy</h>
+                </div>
+                  <div class="modal-body">
+                    <form>
+                      <div class="form-group">
+                        <label for="nameTxt">Name</label>
+                        <input type="text" class="form-control" id="nameTxt" placeholder="Enter your strategy name">
+                      </div>
+                      <div class="form-group">
+                        <label for="descriptionTxt">Description</label>
+                        <textarea class="form-control" id="descriptionTxt" rows="3"></textarea>
+                      </div>
+                      <div class="form-group">
+                        <label for="category">Select category</label>
+                        <select class="form-control" id="category">
+                          <option>Intraday Bullish scan</option>
+                          <option>Intraday Bearish scan</option>
+                        </select>
+                      </div>
+                      <label>
+                        <input type="checkbox" id="is_private"> Is Private?
+                    </label>
+                  </form>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Discard</button>
+                    <button type="button" id="saveBtn" class="btn btn-primary">Save</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+          <div id="strategyListPanel" class="tab-pane fade in active">
+              <br/>
+              <div class="alert alert-info">  
+                  <p>All custom strategy are listed below!</p>
+              </div>
+              <div id="strategyTable"></div>
+          </div>
+          <div id="backtestPanel" class="tab-pane">
+              <br/>
+              <div class="alert alert-info">  
+                  <p>Backtest your strategy</p>
+              </div>
+              <div id="strategyTable1">
+                 
+                  <div class="row">
+                        <div class="col-sm-2">
+                            <label>Exchanges</label>
+                            <select id="exchangesDropdown" class="form-control"></select>
+                        </div>
+                        <div class="col-sm-2">
+                          <label>InstrumentTypes</label>
+                          <select id="instrumentDropdown" class="form-control"></select>
+                        </div>
+                        <div class="col-sm-2">
+                            <label>Symbol</label>
+                            <input type="text" id="symbolTxt" list="intrumentDropdown" class="form-control" placeholder="Search symbol" required autofocus>
+                            <datalist id="intrumentDropdown"></datalist>
+                        </div>
+                        <div class="col-sm-2">
+                            <label>Interval</label>
+                            <select id="intervalDropDown" class="form-control" >
+                                <option value="3MINUTE">3MINUTE</option>
+                                <option value="5MINUTE">5MINUTE</option>
+                                <option value="10MINUTE">10MINUTE</option>
+                                <option value="15MINUTE" selected="selected">15MINUTE</option>
+                                <option value="30MINUTE">30MINUTE</option>
+                                <option value="60MINUTE">60MINUTE</option>
+                                <option value="1DAY" >1DAY</option>
+                                <option value="1WEEK">1WEEK</option>
+                                <option value="1MONTH">1MONTH</option>
+                              </select>
+                          </div>
+                        <div class="col-sm-2">
+                          <label>Strategy</label>
+                          <select id="strategyDropdown" class="form-control"></select>
+                        </div>
+                        <div class="col-sm-2">
+                            <br/>
+                            <button id="backTestBtn" type="button"class="btn btn-primary">BackTest</button>
+                        </div> 
+                  </div>
+
+                  <hr/>
+                  <div class="row">
+                    <div class="col-md-6" id="myChart" style="position: absolute; height:80vh; width:100vw;max-width: 800px;"> 
+                      
+                    </div>  
+                  </div>
+
+              </div>
+          </div>
         </div>
       </div>
     </div>
-</div>
-
-<div class="loader"></div>
+    <div class="loader"></div>
 </body>
 </html>

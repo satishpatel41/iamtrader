@@ -166,10 +166,10 @@ var queue = async.queue(function(task, callback) {
 },20);
 
 function fetchLiveCandle(symbol,ex,interval,start_date,end_date){
-    
+    //console.log("fetchLiveCandle - " +symbol +":"+ ex +":"+ interval +":"+ start_date +":"+ end_date);
     return new Promise(function(resolve, reject) {
         var allIntervalsArr = ['15MINUTE','5MINUTE','60MINUTE','30MINUTE'];
-         //console.log("task " +task.symbol);
+       // console.log("symbol " +symbol +" : "+ interval);
 
         if(symbol){
             var symbolfile;
@@ -202,7 +202,7 @@ function fetchLiveCandle(symbol,ex,interval,start_date,end_date){
 
                 loadSymbol(symbol,ex,interval,start_date,end_date).then(function (response) {
                     try {
-                        //console.log('\n loadSymbol   ' +interval+"> "+ symbol +" :: "+ JSON.stringify(response));
+                        //console.log('\n loadSymbol   ' +interval+"> "+ symbol +" > "+ interval +" :: "+ JSON.stringify(response));
                         if(response != '' && response != undefined && response != null){
                             stockData = response;//JSON.parse(response);
                             

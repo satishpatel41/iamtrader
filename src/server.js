@@ -563,6 +563,67 @@ if (cluster.isMaster) {
         });    
     });
 
+
+    app.get('/api/backtestStrategy/:uid/:sid/:exchange/:interval/:symbol',checkSignIn, function (req, res) {
+        var uid = req.params.uid;  
+        var sid = req.params.sid;  
+      
+        var exchange = req.params.exchange;  
+        var interval = req.params.interval;  
+        var symbol = req.params.symbol;  
+        var strategy = {};
+        var query = "SELECT * from Indicators where sid=?;";
+        var param = [sid];
+       
+        getAll(query,param).then(indicators => {
+            if(indicators == undefined)
+            {
+                console.log("\n Error to getAllLiveStrategy");
+            }
+            else{
+                strategy['indicators'] = indicators;    
+            }
+        });
+
+        var query = "SELECT name,description,category,isPrivate FROM Strategy where sid=?";
+        var param = [sid];
+        getAll(query,param).then(response => {
+            if(response == undefined)
+            {
+                console.log("\n Error to Strategy");
+            }
+            else{
+                for (let [key, value] of Object.entries(response[0])) {
+                    strategy[key] = value;     
+                } 
+                //console.log("strategy > " + JSON.stringify(strategy));
+
+                var now = new Date();
+                now.setDate(now.getDate() - 30);
+                var india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
+                india.format();
+                var end_date = formatDate(india.date())+"-"+formatDate(india.month() + 1)+"-"+india.year();
+                 
+                now = new Date();
+                india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
+                india.format();
+                var start_date = formatDate(india.date())+"-"+formatDate(india.month() + 1) +"-"+india.year();
+                //console.log("start_date > " + start_date +" > "+ end_date);
+                executeBacktestingStrategy(symbol,exchange,interval,strategy,start_date,end_date).then(response => {
+                   var data = response.OHLC; 
+                    //console.log('fetchLiveCandle - ' +data.length +" : "+ JSON.stringify(strategy)); 
+                    var base = new BaseStrategy();
+                    return base.executeStrategy(symbol,data,strategy,true) .then(finalResult => { 
+                        //console.log("finalResult  : " +JSON.stringify(finalResult));
+                        res.send(finalResult);
+                        finalResult= strategy =base = null;     
+                    })
+                   });
+            }
+        });
+     
+    });
+
     app.get('/getTriggeredList/:uid',checkSignIn, function (req, res) {
         var uid = req.params.uid;  
         var query = "SELECT applyStrategy.symbol,applyStrategy.quantity,applyStrategy.transaction_type,applyStrategy.exchange,applyStrategy.interval,StrategyTriggered.entryTime, StrategyTriggered.profit FROM applyStrategy left join StrategyTriggered where applyStrategy.id like (select StrategyTriggered.appliedId from StrategyTriggered where StrategyTriggered.uid=?);";

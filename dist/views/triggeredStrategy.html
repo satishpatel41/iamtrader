@@ -30,9 +30,6 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
 <link href="https://unpkg.com/tabulator-tables@4.1.3/dist/css/semantic-ui/tabulator_semantic-ui.min.css" rel="stylesheet">
 <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.1.3/dist/js/tabulator.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/web-socket-js/1.0.0/web_socket.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
-
 
 <style>
     .loader {
@@ -65,16 +62,12 @@
       background-color: white;
     }
 
-
     hr {
       margin-top: 1rem;
       margin-bottom: 1rem;
       border: 0;
       border-top: 1px solid rgba(0, 0, 0, 0.1);
     }
-
-
-
 </style>
 
 <script type="text/javascript">
@@ -101,8 +94,7 @@ $(document).ready( function () {
                 }
             });
         }
-
-       
+  
         function createTable()
         {
             //console.log("appliedStrategyListArr" + appliedStrategyListArr);
@@ -128,12 +120,11 @@ $(document).ready( function () {
                       {title:"Qty", field:"quantity",widthShrink:1,width:100},
                       {title:"Profit", field:"profit",widthShrink:1,width:100},
                       {title:"Entry Time", field:"entryTime",widthShrink:1,width:130},
-                      {title:"Transaction", field:"transaction_type",widthShrink:1,width:120}
+                      {title:"Transaction", field:"transaction_type",widthShrink:1,width:180}
                     ]
               });
         }
-      
-
+    
 });
 </script>
 </head>
