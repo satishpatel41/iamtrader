@@ -318,7 +318,7 @@ var strategyQueue = async.queue(function(task, callback) {
     var strategyObj = task.strategy;
     var matchSymbols = [];  
     var symbol = strategyObj.symbol ? strategyObj.symbol:strategyObj;    
-    var interval = strategyObj.interval;    
+    var interval = strategyObj.intervals;    
     //console.log("\n");
     getStockDataFromDb(symbol,interval).then(stockData => {
         //console.log("Symbol > " +symbol +":"+stockData.data.length);
@@ -387,7 +387,7 @@ async function executeLiveStrategy(list)
                         //var result = finalResult.result.every(x => x == true);  
                         if(finalResult.result){
                             price = data[0]['CLOSE'];
-                            console.log("Place Order  --> " +strategy.name +" : "+ strategy.interval +" : "+ strategy.symbol +" : "+ price);
+                            console.log("Place Order  --> " +strategy.name +" : "+ strategy.intervals +" : "+ strategy.symbol +" : "+ price);
                             eventEmitter.emit('placeOrder',{'strategy':strategy,"symbol":strategy.symbol,'interval':interval,'price':price});
                         
                             var now = new Date();

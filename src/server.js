@@ -130,7 +130,7 @@ if (cluster.isMaster) {
 
         if(email){
             
-            var query = "select uid,name,isSuperAdmin,isVerified from User where email=? and password=?";
+            var query = "select uid,name,isSuperAdmin,isVerified from Users where email=? and password=?";
             var param = [email,psw];
             getFirst(query,param).then(user => {
                     //console.log("result > " + JSON.stringify(user));
@@ -166,7 +166,7 @@ if (cluster.isMaster) {
         var uid = profileObj.uid;
         
        
-        var query = "UPDATE User SET name = ?,mobile = ?,email = ?,your_api_key = ?,your_redirect_uri =?,user = ?,broker_password = ?,password2f = ?,api_secret = ?,isFullyAutomated = ? WHERE uid = ?";
+        var query = "UPDATE Users SET name = ?,mobile = ?,email = ?,your_api_key = ?,your_redirect_uri =?,user = ?,broker_password = ?,password2f = ?,api_secret = ?,isFullyAutomated = ? WHERE uid = ?";
         var param = [name,mobile,email,your_api_key,your_redirect_uri,user,broker_password,password2f,api_secret,isFullyAutomated,uid];
         
         updateDB(query,param).then(response => {
@@ -185,7 +185,7 @@ if (cluster.isMaster) {
     app.get('/api/getProfile/:id', checkSignIn,function (req, res) { 
         var id = req.params.id;  
          if(id){
-            var query = "select name, mobile, email,isVerified,isSuperAdmin,your_api_key,your_redirect_uri,user,broker_password,password2f,api_secret,isFullyAutomated from User where uid=?";
+            var query = "select name, mobile, email,isVerified,isSuperAdmin,your_api_key,your_redirect_uri,user,broker_password,password2f,api_secret,isFullyAutomated from Users where uid=?";
             var param = [id];
             getFirst(query,param).then(user => {
                 //console.log("result > " + JSON.stringify(user));
@@ -303,7 +303,7 @@ if (cluster.isMaster) {
 
         if(email)
         {
-            var query = "select * from User where email=?";
+            var query = "select * from Users where email=?";
             var param = [email];
             var isMatchEmail = false;
             getFirst(query,param).then(user => {
@@ -318,7 +318,7 @@ if (cluster.isMaster) {
                     }
                 });
 
-                var query = "INSERT INTO User (name,mobile,email,password)VALUES(?,?,?,?)";
+                var query = "INSERT INTO Users (name,mobile,email,password)VALUES(?,?,?,?)";
                 var param = [name,mobile,email,psw];
                 console.log(query +"> "+ param);
                 
@@ -414,7 +414,7 @@ if (cluster.isMaster) {
         var profitPoints = strategyObj.profitPoints;
         var isLive = strategyObj.isLive;
         
-        var query = "INSERT INTO applyStrategy (uid,sid,symbol,exchange,interval,isIntraday,odrerType,quantity,transaction_type,slSid,profitSid,slPercent,slPoints,profitPercent,profitPoints,isLive)VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        var query = "INSERT INTO applyStrategy (uid,sid,symbol,exchange,intervals,isIntraday,odrerType,quantity,transaction_type,slSid,profitSid,slPercent,slPoints,profitPercent,profitPoints,isLive)VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         var param = [uid,sid,symbol,exchange,interval,isIntraday,odrerType,quantity,transaction_type,slSid,profitSid,slPercent,slPoints,profitPercent,profitPoints,isLive];
         
         insertDB(query,param).then(responses => {
@@ -445,15 +445,19 @@ if (cluster.isMaster) {
         insertDB(query,param).then(responses => {
             if(responses == 'success')
             {
-                var query1 = 'select last_insert_rowid();';//"select sid from Strategy where uid=?";
+                var query1 = 'SELECT LAST_INSERT_ID()';
                 var param1 =[];
 
                 getFirst(query1,param1).then(obj1 => {
+                    console.log(obj1); 
+
                     if(obj1 == undefined){
                         res.send("error")
                     }
                     else{
-                        var sid = obj1['last_insert_rowid()'];
+                        var sid = obj1['LAST_INSERT_ID']['LAST_INSERT_ID()'];
+                        console.log("> sid" + sid); 
+
                         strategyObj.indicators.map(async (obj) => {
                             var indicator1= obj.indicator1;
                             var indicator2= obj.indicator2;
@@ -546,7 +550,7 @@ if (cluster.isMaster) {
    
     app.get('/getAppliedList/:uid',checkSignIn, function (req, res) {
         var uid = req.params.uid;  
-        var query = "SELECT applyStrategy.id,applyStrategy.uid,applyStrategy.sid,applyStrategy.symbol,applyStrategy.exchange,applyStrategy.interval,applyStrategy.isIntraday,applyStrategy.odrerType,applyStrategy.quantity,applyStrategy.transaction_type,Strategy.name,Strategy.description,Strategy.category,Strategy.isPrivate FROM applyStrategy LEFT JOIN Strategy ON Strategy.sid = applyStrategy.sid WHERE applyStrategy.uid=?;";
+        var query = "SELECT applyStrategy.id,applyStrategy.uid,applyStrategy.sid,applyStrategy.symbol,applyStrategy.exchange,applyStrategy.intervals,applyStrategy.isIntraday,applyStrategy.odrerType,applyStrategy.quantity,applyStrategy.transaction_type,Strategy.name,Strategy.description,Strategy.category,Strategy.isPrivate FROM applyStrategy LEFT JOIN Strategy ON Strategy.sid = applyStrategy.sid WHERE applyStrategy.uid=?;";
 
         //var query = "SELECT * FROM applyStrategy where uid=?";
         var param = [uid];
@@ -626,7 +630,7 @@ if (cluster.isMaster) {
 
     app.get('/getTriggeredList/:uid',checkSignIn, function (req, res) {
         var uid = req.params.uid;  
-        var query = "SELECT applyStrategy.symbol,applyStrategy.quantity,applyStrategy.transaction_type,applyStrategy.exchange,applyStrategy.interval,StrategyTriggered.entryTime, StrategyTriggered.profit FROM applyStrategy left join StrategyTriggered where applyStrategy.id like (select StrategyTriggered.appliedId from StrategyTriggered where StrategyTriggered.uid=?);";
+        var query = "SELECT applyStrategy.symbol,applyStrategy.quantity,applyStrategy.transaction_type,applyStrategy.exchange,applyStrategy.intervals,StrategyTriggered.entryTime, StrategyTriggered.profit FROM applyStrategy left join StrategyTriggered ON applyStrategy.id = StrategyTriggered.appliedId where StrategyTriggered.uid=?";
   
         var param = [uid];
         getAll(query,param).then(result => {

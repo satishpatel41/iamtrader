@@ -172,6 +172,7 @@
 $(document).ready( function () {
         var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
         $(".alert-danger").hide(); $(".alert-success").hide();
+        $('#userTxt').text(localStorage.getItem('user'));
 
         function validate(){
             var isValidEmail = ValidateEmail($("#emailField").val());
@@ -220,12 +221,12 @@ $(document).ready( function () {
         var userProfile = {};
         getProfile();
         function getProfile(){
-          
+          console.log(localStorage.getItem('uid'));
           $.ajax({
             type: "get",
             url: server + '/api/getProfile/'+localStorage.getItem('uid'),success: function(data){
-                  userProfile = data;
-
+                  userProfile = data[0];
+                  console.log(userProfile);
                   $('#nameField').val(userProfile.name);
                   $('#mobileField').val(userProfile.mobile);
                   $('#emailField').val(userProfile.email);
@@ -341,6 +342,7 @@ $(document).ready( function () {
         <li><a href="/scanner">Scanner</a></li>
         <li><a href="/strategy">Strategy</a></li>
         <li><a href="/applyStrategy">Apply Strategy</a></li> 
+        <li><a href="/Triggers">Triggers</a></li>
         <!-- <li><a href="/contactus">Contact Us</a></li>   -->
 
       </ul>

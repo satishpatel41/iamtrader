@@ -1,19 +1,34 @@
-const sqlite3 = require('sqlite3').verbose();
+/* const sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('db/upstox.db', (err) => {
 if (err) {
     return console.error(err.message);
-}
-console.log(chalk.green('Connected SQlite database'));
-getAllUsers();
+} */
+
+var db = require('mysql');
+
+var con = db.createConnection({
+    host: '13.235.38.97',
+    user: 'root',
+    password: 'p@ss123!',
+    database: 'Satish'
 });
+
+con.connect(function(err) {
+  if (err) throw err;
+  console.log("Connected!");
+  getAllUsers();
+});
+
 
 async function closeDb(){
     db.close();
 }
 
 async function insertDB(query,param){
+    //console.log(query +" : "+param);
     return new Promise(function(resolve, reject) {
-        db.run(query, param,function(err){
+        
+        con.query(query, param,function(err){
             if(err)
                 console.log(chalk.red("Insert error > " + err +" \n "+ query));
             else{
@@ -26,8 +41,8 @@ async function insertDB(query,param){
 
 async function updateDB(query,param){
     return new Promise(function(resolve, reject) {
-       // console.log(chalk.red("Update  > " + query +" \n "+ param));
-        db.run(query, param,function(err){
+        //console.log(chalk.red("Update  > " + query +" \n "+ param));
+       con.query(query, param,function(err){
             if(err)
                 console.log(chalk.red("Update error > " + err +" \n "+ query));
             else{
@@ -40,9 +55,11 @@ async function updateDB(query,param){
 
 async function getFirst(query,params){
     return new Promise(function(resolve, reject) {
-        db.get(query, params, function(err, row){  
+        //query +" : "+params);
+        con.query(query, params, function(err, row){  
             if(err) reject("Read error: " + err.message);
             else {
+                //console.log(JSON.stringify(row));
                 resolve(row);
             }
         })    
@@ -52,11 +69,11 @@ async function getFirst(query,params){
 async function getAll(query,params){
     return new Promise(function(resolve, reject) {
         //console.log(query +" : "+params);
-        db.all(query, params, function(err, row){  
+        con.query(query, params, function(err, row){  
             if(err) reject("Read error: " + err.message);
             else {
                resolve(row);
-               //console.log("\n" + query +" : "+row);
+              // console.log(JSON.stringify(row));
                return row;
             }
         })    
@@ -70,6 +87,7 @@ async function getAllLiveStrategy()
     var tempList = [];
     var query = "SELECT * from applyStrategy";
     var param = [];
+    //console.log(query +" : "+params);
     getAll(query,param).then(list => {
         //console.log("getAllLiveStrategy > " + list.length);
         if(list == undefined)
@@ -109,7 +127,7 @@ async function getAllLiveStrategy()
                         strategyList = tempList;
                         //getLiveSymbol();
                     }
-                   // console.log("Final result > " + strategyList.length);   
+                    //console.log("Final result > " + JSON.stringify(strategyList));   
                 });
             });
            
@@ -123,6 +141,7 @@ async function getLiveSymbol()
 {
     var query = "SELECT * from applyStrategy";
     var param = [];
+    //console.log(query +" : "+params);
     await getAll(query,param).then(list => {
         //console.log("result > " + JSON.stringify(list));
         if(list == undefined)

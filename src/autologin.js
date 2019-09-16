@@ -16,7 +16,7 @@ var userObjList =[];
 
 async function getAllUsers()
 {
-    var query = "select * from User";
+    var query = "select * from Users";
     var param = [];
     getAll(query,param).then(userList => {
     

@@ -157,13 +157,13 @@ function load1dayData()
 {
     interval = '1DAY';
     let promise = new Promise(function(resolve, reject) {
-        const list = strategyList.filter(strategy => strategy.interval == '1DAY');
+        const list = strategyList.filter(strategy => strategy.intervals == '1DAY');
         syncLiveAllStockData(list,interval,start_date,end_date); 
         setTimeout(function() {
             resolve(1);
         },1000); 
     }).then(res=>{
-        const list = strategyList.filter(strategy => strategy.interval == interval);
+        const list = strategyList.filter(strategy => strategy.intervals == interval);
         console.log("1DAY strategy "  +list.length);
         //applyStrategy(list,interval); 
         now = interval = india = start_date = null;
@@ -176,7 +176,7 @@ function load60minData()
     now.setDate(now.getDate() - 6);
     india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
     india.format(); 
-    const list = strategyList.filter(strategy => strategy.interval == '60MINUTE');
+    const list = strategyList.filter(strategy => strategy.intervals == '60MINUTE');
     if(list.length > 0)
         executeLiveStrategy(list);
 }
@@ -189,7 +189,7 @@ function load30minData()
     india.format(); 
     start_date = formatDate(india.date())+"-"+formatDate(india.month() + 1) +"-"+india.year();
     interval = '30MINUTE';
-    const list = strategyList.filter(strategy => strategy.interval == '30MINUTE');
+    const list = strategyList.filter(strategy => strategy.intervals == '30MINUTE');
     if(list.length > 0)
         executeLiveStrategy(list);  
 }
@@ -202,7 +202,7 @@ function load10minData()
     india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
     india.format();    
     start_date = formatDate(india.date())+"-"+formatDate(india.month() + 1) +"-"+india.year(); 
-    const list = strategyList.filter(strategy => strategy.interval == '10MINUTE');
+    const list = strategyList.filter(strategy => strategy.intervals == '10MINUTE');
     if(list.length > 0)
         executeLiveStrategy(list);
 }
@@ -215,7 +215,7 @@ function load5minData()
     india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
     india.format(); 
     start_date = formatDate(india.date())+"-"+formatDate(india.month() + 1) +"-"+india.year();
-    const list = strategyList.filter(strategy => strategy.interval == '5MINUTE');
+    const list = strategyList.filter(strategy => strategy.intervals == '5MINUTE');
     if(list.length > 0)
         executeLiveStrategy(list);
 }
@@ -233,7 +233,7 @@ function load3minData()
     isTradingHours = getTradingHours();
     
     //console.log("load3minData StrategyList > " + strategyList.length);   
-    const list = strategyList.filter(strategy => strategy.interval == '3MINUTE');
+    const list = strategyList.filter(strategy => strategy.intervals == '3MINUTE');
     if(list.length > 0)
         executeLiveStrategy(list);
 }
@@ -267,7 +267,7 @@ async function load15minData()
     india = moment.tz(now, 'DD-MM-YYYY HH:mm',"Asia/Kolkata");
     india.format(); 
     start_date = formatDate(india.date())+"-"+formatDate(india.month() + 1) +"-"+india.year();
-    const list = strategyList.filter(strategy => strategy.interval == '15MINUTE');
+    const list = strategyList.filter(strategy => strategy.intervals == '15MINUTE');
     if(list.length > 0)
         executeLiveStrategy(list);
 }

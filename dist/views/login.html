@@ -202,10 +202,11 @@ $(document).ready( function () {
             contentType: 'application/json',
             url: server + '/login',
             success: function(user){
+             // console.log("login > " + JSON.stringify(user));   
               if(user != 'error'){
-                localStorage.setItem('user', user.name);  
-                localStorage.setItem('uid', user.uid);  
-                localStorage.setItem('isAdmin', user.isSuperAdmin);  
+                localStorage.setItem('user', user[0].name);  
+                localStorage.setItem('uid', user[0].uid);  
+                localStorage.setItem('isAdmin', user[0].isSuperAdmin);  
                
                 $(".alert-success").show();
                 $("#message_txt").text("Login Success !");
@@ -214,6 +215,7 @@ $(document).ready( function () {
                 if(user.isSuperAdmin == '1')
                   url = server+'/admin';
                   
+                  //console.log(localStorage.getItem('uid')); 
                 setTimeout(function(){window.location.replace(url)}, 100); 
               }
               else{
