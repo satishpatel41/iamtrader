@@ -75,7 +75,8 @@ $(document).ready( function () {
         var stockData = [];
         var server = window.location.port ? window.location.protocol +"//"+window.location.hostname +":"+window.location.port: window.location.protocol +"//"+window.location.hostname;
         var appliedStrategyListArr = [];
-    
+        $('#userTxt').text(localStorage.getItem('user'));
+
         getAllAppliedStrategyList();
 
         function getAllAppliedStrategyList()
@@ -88,7 +89,9 @@ $(document).ready( function () {
               url: server+'/getTriggeredList/'+uid,
               success: function(list){
                   $(".loader").hide();    
-                  //console.log("list" + JSON.stringify(list));   
+                  //console.log("list" + JSON.stringify(list));  
+                  //list.sort((a, b) => (a.entryTime > b.entryTime) ? 1 : -1) 
+                  list.reverse(); 
                   appliedStrategyListArr = list;
                   createTable();
                 }

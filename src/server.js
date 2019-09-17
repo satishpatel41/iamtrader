@@ -308,34 +308,35 @@ if (cluster.isMaster) {
             var isMatchEmail = false;
             getFirst(query,param).then(user => {
                     //console.log("result > " + JSON.stringify(user));
-                    if(user == undefined)
+                    if(user[0] == undefined)
                     {
                         //Do nothing
+
+                        var query = "INSERT INTO Users (name,mobile,email,password)VALUES(?,?,?,?)";
+                        var param = [name,mobile,email,psw];
+                        //console.log(query +"> "+ param);
+                        
+                        if(!isMatchEmail){  
+                            insertDB(query,param).then(responses => {
+                                //console.log("result > " + JSON.stringify(responses));
+        
+                                if(responses == 'success')
+                                {
+                                    res.send('success');
+                                }
+                                else{
+                                    res.send("error");
+                                }
+                            });
+                        }  
+
                     }
                     else{
-                        res.send("error");
                         isMatchEmail = true;
+                        res.send("error");
+                        return;
                     }
-                });
-
-                var query = "INSERT INTO Users (name,mobile,email,password)VALUES(?,?,?,?)";
-                var param = [name,mobile,email,psw];
-                console.log(query +"> "+ param);
-                
-                if(!isMatchEmail){  
-                    insertDB(query,param).then(responses => {
-                        //console.log("result > " + JSON.stringify(responses));
-
-                        if(responses == 'success')
-                        {
-                            res.send('success');
-                        }
-                        else{
-                            res.send("error");
-                        }
-                    });
-            }    
-            //res.send('<b>username </b>  : ' + email +" > "+ mobile+" > "+ name+" > "+ psw);
+            });
         }
         else
             res.sendFile("signup.html", {"root": __dirname});
@@ -449,14 +450,14 @@ if (cluster.isMaster) {
                 var param1 =[];
 
                 getFirst(query1,param1).then(obj1 => {
-                    console.log(obj1); 
+                    //console.log(obj1); 
 
                     if(obj1 == undefined){
                         res.send("error")
                     }
                     else{
-                        var sid = obj1['LAST_INSERT_ID']['LAST_INSERT_ID()'];
-                        console.log("> sid" + sid); 
+                        var sid = obj1[0]['LAST_INSERT_ID()'];
+                        //console.log("> sid" + sid); 
 
                         strategyObj.indicators.map(async (obj) => {
                             var indicator1= obj.indicator1;
@@ -630,7 +631,7 @@ if (cluster.isMaster) {
 
     app.get('/getTriggeredList/:uid',checkSignIn, function (req, res) {
         var uid = req.params.uid;  
-        var query = "SELECT applyStrategy.symbol,applyStrategy.quantity,applyStrategy.transaction_type,applyStrategy.exchange,applyStrategy.intervals,StrategyTriggered.entryTime, StrategyTriggered.profit FROM applyStrategy left join StrategyTriggered ON applyStrategy.id = StrategyTriggered.appliedId where StrategyTriggered.uid=?";
+        var query = "SELECT applyStrategy.symbol,Strategy.name,applyStrategy.quantity,applyStrategy.transaction_type,applyStrategy.exchange,applyStrategy.intervals,StrategyTriggered.entryTime, StrategyTriggered.profit FROM applyStrategy left join StrategyTriggered ON applyStrategy.id = StrategyTriggered.appliedId INNER JOIN Strategy ON Strategy.sid = applyStrategy.sid where StrategyTriggered.uid=?";
   
         var param = [uid];
         getAll(query,param).then(result => {

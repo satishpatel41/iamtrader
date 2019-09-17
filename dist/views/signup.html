@@ -159,6 +159,9 @@ $(document).ready( function () {
                         { 
                             $(".alert-success").show();
                                 $("#message_txt").text("Success ! Please verify your email !");
+
+                                var url = server+'/login';
+                                setTimeout(function(){window.location.replace(url)}, 2000); 
                         }
                         else{
                                 $(".alert-danger").show();
