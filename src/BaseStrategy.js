@@ -9,6 +9,8 @@ var MACD = require('technicalindicators').MACD;
 var bullish = require('technicalindicators').bullish;
 var Lowest  = require('technicalindicators').Lowest;
 var Highest = require('technicalindicators').Highest;
+var bearish = require('technicalindicators').bearish;
+
 
 var async = require("async");
 var allIndicators= [
@@ -85,6 +87,16 @@ var allIndicators= [
         "input":'close,14',
         "config":'values,period'
     }
+    ,{
+        "name":"bullish",
+        "input":'candle',
+        "config":'values'
+    } 
+    ,{
+        "name":"bearish",
+        "input":'candle',
+        "config":'values'
+    } 
 ];
 
 class BaseStrategy {
@@ -111,8 +123,12 @@ class BaseStrategy {
                 high.push(Number(obj.HIGH));       
                 low.push(Number(obj.LOW));        
                 timeStamp.push(Number(obj.LASTTRADETIME));       
-                volume.push(Number(obj.TRADEDQTY));       
+                volume.push(Number(obj.TRADEDQTY));  
             }); 
+
+            for(var i=0;i < stockData.length;i++){
+                stockData[i]['signal'] = [];
+            }; 
 
             candle.close = close.reverse();
             candle.open = open.reverse();
@@ -144,8 +160,8 @@ class BaseStrategy {
                                 }
                                 
                                 else if(indicatorObj.indicator1  == 'open' || indicatorObj.indicator1   == 'low' || indicatorObj.indicator1 == 'close' || indicatorObj.indicator1 == 'high'  || indicatorObj.indicator1 == 'volume' ){
-                                    var candle1 = eval('candle.'+indicatorObj.indicator1).reverse();
-                                    output.op1 = isBacktesting ? candle1 : candle1.slice(0, 3);
+                                    var candle1 = eval('candle.'+indicatorObj.indicator1);
+                                    output.op1 = isBacktesting ? candle1.reverse() : candle1.reverse().slice(0, 3);
                                     candle1 = null;
                                 }
                                 else if(String(indicatorObj.indicator1).split(".").length > 1){
@@ -171,11 +187,13 @@ class BaseStrategy {
                                     for(var i = 0; i < length; i++){
                                         output.op2.push(indicatorObj.indicator_config2);
                                     }
-                                    //output.op2 = [indicatorObj.indicator_config2,indicatorObj.indicator_config2,indicatorObj.indicator_config2];
+                                    
                                 }
                                 else if(indicatorObj.indicator2 == 'open' || indicatorObj.indicator2 == 'low' || indicatorObj.indicator2 == 'close' || indicatorObj.indicator2 == 'high' || indicatorObj.indicator2 == 'volume')
                                 {
-                                    output.op2 = eval('candle.'+indicatorObj.indicator2).reverse().slice(0, 3);//
+                                    var candle1 = eval('candle.'+indicatorObj.indicator2);
+                                    output.op2 = isBacktesting ? candle1.reverse() : candle1.reverse().slice(0, 3);
+                                    candle1 = null;
                                 }   
                                 else if(String(indicatorObj.indicator2).split(".").length > 1){
                                     var str2 = indicatorObj.indicator2.split(".")[0]+".calculate("+JSON.stringify(that.getInputObject(candle,indicatorObj.indicator2,indicatorObj.indicator_config2))+")";
@@ -194,21 +212,30 @@ class BaseStrategy {
                                     var op2 = isBacktesting ? res2.reverse() :res2.reverse().slice(0, 3);  ////**********  dont't change **********  
                                     output.op2 = op2;
                                 }
-
+                                
                                 var finalResult = [];
-                                var length = isBacktesting ? stockData.length - 2 : 1;
-                                for(var i=0;i < length;i++)
+                                var length = isBacktesting ? stockData.length : 1;
+                                var arr = [output.op2.length,output.op1.length,stockData.length]
+                                var start = isBacktesting ? Math.min(...arr) : stockData.length;
+
+                                if(isBacktesting){
+                                    for(var i=start;i < length;i++)
+                                    {
+                                        stockData[i]['signal'].push(false);
+                                    }
+                                }
+
+                                for(var i=0;i < start;i++)
                                 {
                                     var first = i;
-                                    var second = i+1;
-                                    var third = i+2;
+                                    var second = i+1; 
 
                                     var strategyResFlag = false;
                                     if(output.op == "Crossed Above"){
                                         var strategyStr1 = output.op1[first]+">="+output.op2[first]; 
                                         var strategy1 = eval(strategyStr1);
                                         //finalResult.push(strategy1);  
-                                        var strategyStr2 = output.op1[second]+"<"+output.op2[second]; 
+                                        var strategyStr2 = output.op1[second]+"<="+output.op2[second]; 
                                         var strategy2 = eval(strategyStr2);
                                         
                                         if(strategy1 && strategy2)
@@ -222,7 +249,7 @@ class BaseStrategy {
                                         var strategyStr1 = output.op1[first]+"<="+output.op2[first]; 
                                         var strategy1 = eval(strategyStr1);
                                         //finalResult.push(strategy1); 
-                                        var strategyStr2 = output.op1[second]+">"+output.op2[second]; 
+                                        var strategyStr2 = output.op1[second]+">="+output.op2[second]; 
                                         var strategy2 = eval(strategyStr2);
                                         if(strategy1 && strategy2)
                                             strategyResFlag = true;
@@ -236,13 +263,16 @@ class BaseStrategy {
                                         strategyResFlag = eval(strategyStr);
                                         finalResult.push(strategyResFlag);   
                                     }
+
                                     if(isBacktesting)
-                                        stockData[i]['signal'] = strategyResFlag;
+                                        stockData[i]['signal'].push(strategyResFlag);
+
+                                        //stockData[i]['signal'] = (stockData[i]['signal'] != null && stockData[i]['signal'] != undefined) ? stockData[i]['signal'] && strategyResFlag : strategyResFlag;
                                 }
-                                   
-                                //console.log("Strategy result  :   " + symbol +" : " + isBacktesting +" : " + finalResult);//+" > "+ JSON.stringify(stockData)
+                                //console.log("Strategy result  :   " + indicatorObj.indicator1 +" : "+ indicatorObj.indicator2 +" : "+stockData.length +":"+ output.op2.length +" :"+ output.op1.length +" : "+ start);
+                                //console.log("Strategy result  :   " + JSON.stringify(output) );//+" > "+ JSON.stringify(stockData)
                                 var flag = finalResult.every(x => x == true);  
-                                res1 = indicatorObj = finalResult = first= second= third= null;
+                                res1 = indicatorObj = finalResult = first= second= null;
                                 resolve(flag);   
                             }     
                             else{
@@ -256,12 +286,18 @@ class BaseStrategy {
                         }
                     });        
                 })).then(obj => {  
-                    //console.log("\n Result :   " + symbol +" : " + JSON.stringify(stockData));
+                    //console.log("\n Result :   " + symbol +" : " + JSON.stringify(obj));
                     var strategyRes = obj.every(x => x == true);  
                     candle = output = result = null;
                     strategyObj.result = strategyRes;
-                    if(isBacktesting)
+                    if(isBacktesting){
+                        for(var i=0;i < stockData.length;i++)
+                        {
+                            var signal = stockData[i]['signal'];
+                            stockData[i]['signal'] = signal.every(x => x == true);  
+                        }
                         return resolved(stockData);  
+                    }
                     else
                         return resolved(strategyObj);       
                 })
@@ -324,11 +360,11 @@ var strategyQueue = async.queue(function(task, callback) {
         //console.log("Symbol > " +symbol +":"+stockData.data.length);
         try{
             var data = JSON.parse(stockData.data); 
-            //console.log("data > " +data.length +"::"+JSON.stringify(strategyObj));
+            console.log("data > " +data.length +"::"+JSON.stringify(strategyObj));
             var base = new BaseStrategy();
            
             base.executeStrategy(strategyObj.symbol,data,strategyObj).then(finalResult => { 
-                //console.log("finalResult > " + JSON.stringify(finalResult));
+                console.log("finalResult > " + JSON.stringify(finalResult));
                 var result = finalResult.result.every(x => x == true);  
                 if(result){
                     matchSymbols.push(strategyObj.symbol);
@@ -393,7 +429,7 @@ async function executeLiveStrategy(list)
                             var now = new Date();
                             var india = moment.tz(now, "Asia/Kolkata");
                             india.format(); 
-                            var entryTime =india.date()+"-"+(india.month())+"-"+india.year() +"  "+india.hour()+":"+india.minute();
+                            var entryTime =india.date()+"-"+(india.month())+"-"+india.year() +"  "+india.hour()+":"+india.minute() < 10 ? "0"+india.minute() : india.minute();
                             var appliedId = strategy.id;
                             var exitTime ="-"; 
                             var profit =0; 

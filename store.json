@@ -1,4 +1,11 @@
 {
-  "percentage": [],
-  "gap": []
+  "exchange": [
+    "NFO"
+  ],
+  "NFO": [
+    "FUTIDX",
+    "FUTSTK",
+    "OPTIDX",
+    "OPTSTK"
+  ]
 }

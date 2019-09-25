@@ -976,13 +976,21 @@ if (cluster.isMaster) {
     app.get('/getInstrumentTypes/:exchange', checkSignIn,function (req, res) {   
         res.setHeader('Content-Type', 'application/json');
         var exchange = req.params.exchange;  
-        var data = {};
-        data.exchange = exchange;//"NFO";
-        GetInstrumentTypes(data).then(list=>{
-            //console.log("GetInstrumentTypes  \n\n  "+list);
-            res.send(list);
+         
+        if(store.get(exchange)){
+            res.send(store.get(exchange));
             res.end();
-        });
+        }
+        else{
+            var data = {};
+            data.exchange = exchange;//"NFO";
+
+            GetInstrumentTypes(data).then(list=>{
+                store.set(exchange,list);
+                res.send(list);
+                res.end();
+            });
+        }   
     });
 
     app.get('/getExpiryDates/:exchange/:instrumentType/:product', checkSignIn,function (req, res) {   
@@ -1005,10 +1013,17 @@ if (cluster.isMaster) {
     app.get('/getIndices', checkSignIn,function (req, res) {   
         res.setHeader('Content-Type', 'application/json');
         
-        GetExchanges().then(list=>{
-            res.send(list);
+        if(store.get("exchange")){
+            res.send(store.get("exchange"));
             res.end();
-        });
+        }
+        else{
+            GetExchanges().then(list=>{
+                store.set("exchange",list);
+                res.send(list);
+                res.end();
+            });
+        }    
     });
 
     app.get('/getBalance', function (req, res) {   

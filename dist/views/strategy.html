@@ -242,7 +242,16 @@ $(document).ready( function () {
             "name":"Highest",
             "input":'close,14',
             "config":'values,period'
+        } ,{
+            "name":"bullish",
+            "input":'candle',
+            "config":'values'
+        } ,{
+            "name":"bearish",
+            "input":'candle',
+            "config":'values'
         } 
+        
     ];
   
       
@@ -662,7 +671,7 @@ $(document).ready( function () {
         var strategy = JSON.parse(e.data);
         if(localStorage.getItem('uid') == strategy.data.strategy.uid){
             Command: toastr["info"](strategy.data.strategy.symbol)
-            Command: toastr["info"](e.data)
+            //Command: toastr["info"](e.data)
 
             toastr.options = {
             "closeButton": false,
@@ -717,7 +726,22 @@ $(document).ready( function () {
                   d1.setMinutes(india.minute());
                   d1.setSeconds(india.second());
                   
-                  if(d.signal == true){
+                  if(d.signal == "buy"){
+                    var trade = {};
+                    trade.date= d1;
+                    trade.type= "buy";
+                    trade.price= d.CLOSE;
+                    trade.quantity= 1000;
+                    trades.push(trade);
+                  }if(d.signal == "sell"){
+                    var trade = {};
+                    trade.date= d1;
+                    trade.type= "sell";
+                    trade.price= d.CLOSE;
+                    trade.quantity= 1000;
+                    trades.push(trade);
+                  }
+                  else if(d.signal == true){
                     var trade = {};
                     trade.date= d1;
                     trade.type= "buy";
@@ -866,8 +890,8 @@ $(document).ready( function () {
             <li class="dropdown pull-right"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome, <span id="userTxt"></span> <span class="glyphicon glyphicon-user"></span><b class="caret"></b></a>
               <ul class="dropdown-menu pull-right">
                   <li><a href="/profile"><i class="icon-cog"></i> Profile</a></li>
-                  <li><a href="/authenticate"><i class="icon-cog"></i> Upstox Login</a></li>
-                  <li><a href="/preferences"><i class="icon-envelope"></i> Preferences</a></li>
+                  <!-- <li><a href="/authenticate"><i class="icon-cog"></i> Upstox Login</a></li>
+                  <li><a href="/preferences"><i class="icon-envelope"></i> Preferences</a></li> -->
                   <li class="divider"></li>
                   <li><a href="/logout"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
               </ul>

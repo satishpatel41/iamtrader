@@ -25,19 +25,12 @@ function getStockDataFromDb(symbol,interval)
         }); 
         
         function onLoaded() {
-            //var database1 =  lokiJson.getCollection('1MINUTE');
             var database = lokiJson.getCollection(interval);
             var stockData = [];
             try{
                  
                 if(database && database.get(1) && database.get(1).OHLC != null){
-                    
                     var stockDataList = database.get(1).OHLC;
-                   /*  stockData = stockDataList.map(price=>{
-                        var candle = new CandleData(price.OPEN,price.LOW,price.HIGH,price.CLOSE,price.LASTTRADETIME,price.TRADEDQTY,true)
-                        return candle;
-                    }); */
-
                     resolve({"symbol":symbol,data:JSON.stringify(stockDataList)});
                     lokiJson.close();  
                     stockDataList = database = null;
@@ -51,21 +44,6 @@ function getStockDataFromDb(symbol,interval)
                     return;
                }
 
-                
-                /* if(result && result != "" && database != null && interval !='1MINUTE'){
-                    //lokiJson.saveDatabase();       
-                    backFill(lokiJson,stockData,interval)
-                    .then(data =>{
-                        console.log("Third  " + data.length);
-                        resolve({"symbol":symbol,data:JSON.stringify(data)});
-                    });
-                }
-                if(result && result != "" && database != null ){
-                        resolve({"symbol":symbol,data:JSON.stringify(data)});
-                }
-                else
-                    resolve({"symbol":symbol,data:[]}); 
- */
                 lokiJson.close();  
                 database = null;
             }

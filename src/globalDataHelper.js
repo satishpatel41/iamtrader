@@ -118,7 +118,8 @@ async function GetHistory1Day(data) {
         exchange: data.exchange,
         instrumentIdentifier: data.instrumentIdentifier,
         period:1,
-        periodicity: 'DAY'
+        periodicity: 'DAY',
+        max: 500
     };
     let fifteen_min_candle = await GET(url, urlParameters);
     return fifteen_min_candle;
