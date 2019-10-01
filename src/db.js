@@ -197,15 +197,8 @@ function fetchLiveCandle(symbol,ex,interval,start_date,end_date){
                             }
                             else if(database != null && response) // && response.code == 200
                             {
-                                //console.log(JSON.stringify(stockData))
                                 database.clear();
-                                /*var OHLC = [];
-                                OHLC = Array(stockData.OHLC);
-                                OHLC= OHLC.reverse(); 
-                                stockData.OHLC = OHLC; */
                                 database.insert(stockData);
-                                //OHLC = null;  
-                            
                             }
                             else{
                                 lokiJson.close();    
