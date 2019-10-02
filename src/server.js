@@ -793,11 +793,11 @@ if (cluster.isMaster) {
         var exchange = req.params.exchange;  
 
         var list = [];
-      /*   if(exchange == "nifty")
+        if(exchange == "nifty")
             list =  nifty;
         else if(exchange == "fno")
             list = fno;
-        else */
+        else
             list = watchList; 
 
 

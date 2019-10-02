@@ -286,8 +286,8 @@ class BaseStrategy {
                                 resolve(flag);   
                             }     
                             else{
-                                console.error("First - " + e);
-                                reject(e);
+                                //console.error("First - " + e);
+                                reject('');
                             }                
                         }
                         catch(e){
