@@ -338,11 +338,18 @@ $(document).ready( function () {
             "name":"BB.lower",
             "input":'20,close,2',
             "config":'period,values,stdDev'
-        },{
-            "name":"MACD",
-            "input":'close,fastPeriod,slowPeriod,false,false',
-            "config":'values,fastPeriod,slowPeriod,SimpleMAOscillator,SimpleMASignal'
-        },{
+        },
+        {
+          "name":"MACD.MACD",
+          "input":'close,12,26,9,false,false',
+          "config":'values,fastPeriod,slowPeriod,signalPeriod,SimpleMAOscillator,SimpleMASignal'
+        },
+        {
+            "name":"MACD.signal",
+            "input":'close,12,26,9,false,false',
+            "config":'values,fastPeriod,slowPeriod,signalPeriod,SimpleMAOscillator,SimpleMASignal'
+        },
+        {
             "name":"RSI",
             "input":'close,14',
             "config":'values,period'
@@ -372,6 +379,10 @@ $(document).ready( function () {
             "config":'values'
         } ,{
             "name":"bearish",
+            "input":'candle',
+            "config":'values'
+        },{
+            "name":"maths",
             "input":'candle',
             "config":'values'
         } 
@@ -1178,7 +1189,7 @@ $(document).ready( function () {
                     .attr("y", -12)
                     .attr("dy", ".71em")
                     .style("text-anchor", "end")
-                    .text("Price");
+                    .text("");//Price
 
             ohlcSelection.append("g")
                     .attr("class", "close annotation up");
@@ -1373,6 +1384,7 @@ $(document).ready( function () {
                       <option value="<="><=</option>
                       <option value="Crossed Above">Crossed Above</option>
                       <option value="Crossed Below">Crossed Below</option>
+                      <option value="is">is</option>
                     </select>
                 </div> 
                 <div class="col-sm-2">
